@@ -45,4 +45,4 @@ Your Visualforce page will need to include jQuery and the toolkit, then create a
 	    <p>The first account I see is <span id="accountlist"></span>.</p>
 	</apex:page>
 	
-A much more fully featured sample is provided in example.page.
+A much more fully featured sample is provided in `example.page`.

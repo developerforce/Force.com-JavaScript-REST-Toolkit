@@ -39,10 +39,10 @@ Your Visualforce page will need to include jQuery and the toolkit, then create a
 	        var client = new forcetk.Client('{!$Api.Session_ID}');
         
 	        client.query("SELECT Name FROM Account LIMIT 1",function(response){
-	            $j('#accountlist').html(response.records[0].Name);
+	            $j('#accountname').html(response.records[0].Name);
 	        });
 	    </script>
-	    <p>The first account I see is <span id="accountlist"></span>.</p>
+	    <p>The first account I see is <span id="accountname"></span>.</p>
 	</apex:page>
 	
 A much more fully featured sample is provided in `example.page`.

@@ -1,0 +1,335 @@
+<!--
+Copyright (c) 2011, salesforce.com, inc.
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification, are permitted provided
+that the following conditions are met:
+
+Redistributions of source code must retain the above copyright notice, this list of conditions and the
+ following disclaimer.
+
+Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
+the following disclaimer in the documentation and/or other materials provided with the distribution.
+
+Neither the name of salesforce.com, inc. nor the names of its contributors may be used to endorse or
+promote products derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.
+-->
+<!--
+Sample Visualforce page for Force.com JavaScript REST Toolkit
+-->
+<apex:page standardStylesheets="false" showHeader="false" sidebar="false">
+    <head>
+        <title>
+            Force.com JavaScript REST Toolkit
+        </title>
+        <style type="text/css">
+            body {
+                font-family:"Arial";
+            }
+            table.main {
+                border: 1px solid #666;
+            }
+            .highlighted {
+                background-color:#D6EDFC;
+            }
+            .odd {
+                background-color:#fea;
+            }
+            form {
+                margin-bottom: 1em;
+            }
+        </style>
+		<!--
+		Download jQuery, jQuery UI and Trimpath Template, and put them in a
+		static resource bundles!
+		-->
+        <apex:includeScript 
+         value="{!URLFOR($Resource.static, 'query.js')}"  />
+        <apex:includeScript 
+         value="{!URLFOR($Resource.static, 'jquery-ui.js')}"  />
+        <apex:includeScript 
+         value="{!URLFOR($Resource.static, 'template.js')}"  />
+        <apex:includeScript 
+         value="{!URLFOR($Resource.static, 'forcetk.js')}"  />
+        <apex:stylesheet 
+         value="{!URLFOR($Resource.static, 'jquery-ui.css')}"  />
+        
+        <script type="text/javascript">
+// Get a reference to jQuery that we can work with
+$j = jQuery.noConflict();
+
+// Make our own startsWith utility fn
+String.prototype.startsWith = function(str){
+    return (this.substr(0, str.length) === str);
+}
+
+// Get an instance of the REST API client
+var client = new forcetk.Client('{!$Api.Session_ID}');
+
+// We'll use this a lot :-)
+var ajaxgif = "<img src='{!URLFOR($Resource.static, 'static/ajax.gif')}'/>";
+
+var $dialog = null;
+
+// Kick things off by doing a describe on Account...
+$j(document).ready(function() {
+    $dialog = $j('<div></div>')
+        .dialog({
+            autoOpen: false,
+            width: 450
+        });
+        
+    $j('#prompt').html(ajaxgif+" loading metadata...");
+    client.describe('Account', metadataCallback);
+});
+
+var timeout = null;
+
+function autoFilter() {
+    if (timeout != null) {
+        clearTimeout(timeout);
+    }
+    
+    var field = $j("#field").val();
+    var value = $j("#value").val();
+    
+    filterAccounts(field,value);
+}
+
+function metadataCallback(response){
+    // Using TrimPath Template for now - may switch to jQuery Template at some
+    // point
+    $j('#prompt').html(TrimPath.processDOMTemplate("prompt_jst"
+        , response));
+        
+    $j("#value").keyup(function(){
+        if (timeout != null) {
+            clearTimeout(timeout);
+        }
+        timeout = setTimeout("autoFilter()",1000);
+    });
+    
+    $j('#go').click(function(e) {
+        var field = $j("#field").val();
+        var value = $j("#value").val();
+        
+        e.preventDefault();
+        filterAccounts(field,value);
+    });
+    
+    $j('#new').click(function(e) {
+        e.preventDefault();
+        
+        // Just make Trimpath happy
+        var dummy = {};
+        var i;
+        for (i = 0; i < response.fields.length; i++) {
+            dummy[response.fields[i].name] = '';
+        }
+        $dialog.html(TrimPath.processDOMTemplate("edit_jst", dummy));
+        $dialog.find('#action').html('Create').click(function(e) {
+            e.preventDefault();
+            $dialog.dialog('close');
+
+            var fields = {};
+            $dialog.find('input').each(function() {
+                var child = $j(this);
+                if ( child.val().length > 0 ) {
+                    fields[child.attr("name")] = child.val();  
+                }               
+            });
+            
+            $j('#list').html(ajaxgif+" creating account...");
+            
+            client.create('Account', fields, createCallback);
+        });
+        $dialog.dialog('option', 'title', 'New Account');
+        $dialog.dialog('open');
+    });
+    
+    filterAccounts();
+}
+
+function queryCallback(response) {
+    $j('#list').html(TrimPath.processDOMTemplate("accounts_jst"
+        , response));
+        
+    $j('#version').html($j.fn.jquery);
+    $j('#uiversion').html($j.ui.version);
+        
+    $j("#list tr:nth-child(odd)").addClass("odd");
+    
+    $j('#accounts').find('.id')
+        .hover(function() {
+             $j(this).addClass("highlighted");
+           },function(){
+             $j(this).removeClass("highlighted");
+        })
+        .click(showAccountDetail);
+}
+
+function detailCallback(response) {
+    if (response.Website != null
+      && !response.Website.startsWith('http://')) {
+        response.Website = 'http://'+response.Website;
+    }
+    $dialog.html(TrimPath.processDOMTemplate("detail_jst"
+        ,response));
+    $dialog.find('#industry').click(function(e) {
+        e.preventDefault();
+        $dialog.dialog('close');
+        filterIndustry($j(this).html());
+    });
+    $dialog.find('#delete').click(function(e) {
+        e.preventDefault();
+        $dialog.dialog('close');
+        $j('#list').html(ajaxgif+" deleting account...");
+        client.del('Account', $dialog.find('#id').val(), deleteCallback);
+    });
+    $dialog.find('#edit').click(function(e) {
+        e.preventDefault();
+        $dialog.html(TrimPath.processDOMTemplate("edit_jst"
+            ,response));
+        $dialog.find('#action').html('Update').click(function(e) {
+            e.preventDefault();
+            $dialog.dialog('close');
+
+            var fields = {};
+            $dialog.find('input').each(function() {
+                var child = $j(this);
+                if ( child.val().length > 0 && child.attr("name") != 'id') {
+                    fields[child.attr("name")] = child.val();  
+                }               
+            });
+
+            $j('#list').html(ajaxgif+" updating account...");
+            
+            client.update('Account', $dialog.find('#id').val(), fields, updateCallback);
+        });
+    });
+}
+
+function createCallback(response) {
+    $j('#list').html('Created '+response.id);
+    
+    setTimeout("filterAccounts()",1000);
+}
+
+function updateCallback(response) {
+    $j('#list').html('Updated');
+    
+    setTimeout("filterAccounts()",1000);
+}
+
+function deleteCallback(response) {
+    $j('#list').html('Deleted');
+    
+    setTimeout("filterAccounts()",1000);
+}
+
+function showAccountDetail() {
+    // Show the dialog
+    $dialog.dialog('option', 'title', 'Account Detail');
+    $dialog.dialog('open');
+    $dialog.html(ajaxgif+" retrieving...");
+
+    // Get account details and populate the dialog
+    client.retrieve('Account', this.id, 'Name,Industry,TickerSymbol,Website'
+        , detailCallback);
+}
+
+function filterAccounts(field, value) {
+    $j('#list').html(ajaxgif+" loading data...");
+
+    var query = ( typeof value !== 'undefined' && value.length > 0 ) 
+        ? "SELECT Id, Name FROM Account WHERE "+field+" LIKE '"+value
+          +"%' ORDER BY Name LIMIT 20"
+        : "SELECT Id, Name FROM Account ORDER BY Name LIMIT 20";
+        
+    client.query(query, queryCallback);
+}
+        </script>
+    </head>
+    <body>
+        <div id="main">
+            <div id="prompt">
+            </div>
+            <div id="list">
+            </div>
+        </div>
+            <textarea id="prompt_jst" style="display:none;">
+            <form>
+                <h3 style="display:inline;">Filter on</h3>
+                <select id="field">
+                    {for f in fields}
+                        {if f.type == 'string'}
+                            <option value="${f.name}">${f.label}</option>
+                        {/if}
+                    {/for}
+                </select>
+                <input type="text" id="value" />
+                <input type="submit" id="go" name="search" value="Search" />
+            </form>
+            <form>
+                <input type="submit" id="new" name="new" value="New" />
+            </form>
+        </textarea>
+    
+        <textarea id="accounts_jst" style="display:none;">
+            <table class="main" id="accounts">
+                {for r in records}
+                    <tr><td class="id" id="${r.Id}">${r.Name}</td></tr>
+                {/for}
+            </table>
+            <br/>
+            <a href="https://login.salesforce.com/secur/logout.jsp" id="logout">Logout</a>
+            <p>
+                <i>Running jQuery <span id="version">0.0.0</span>, jQuery UI <span id="uiversion">0.0.0</span></i>
+            </p>
+        </textarea>
+    
+        <textarea id="detail_jst" style="display:none;">
+            <table>
+                {if Website != null}
+                    <tr><td>Name:</td><td><a href="${Website}">${Name}</a></td></tr>
+                {else}
+                    <tr><td>Name:</td><td>${Name}</td></tr>
+                {/if}
+                {if Industry != null}
+                    <tr><td>Industry:</td><td><a href="#" id="industry">${Industry}</a></td></tr>
+                {/if}
+                {if TickerSymbol != null}
+                    <tr><td>Ticker Symbol:</td><td><a href="http://www.google.com/finance?q=${TickerSymbol}">${TickerSymbol}</a></td></tr>
+                {/if}
+            </table>
+            <br/>
+            <form>
+                <input type="hidden" name="id" id="id" value="${Id}" />
+                <button id="delete">Delete</button>
+                <button id="edit">Edit</button>
+            </form>
+        </textarea> 
+    
+        <textarea id="edit_jst" style="display:none;">
+            <form id="editform">
+                <input type="hidden" name="id" id="id" value="${Id}" />
+                <table>
+                    <tr><td>Name:</td><td><input name="Name" id="Name" value="${Name}"/></td></tr>
+                    <tr><td>Industry:</td><td><input name="Industry" id="Industry" value="${Industry}"/></td></tr>
+                    <tr><td>Ticker Symbol:</td><td><input name="TickerSymbol" id="TickerSymbol" value="${TickerSymbol}"/></td></tr>
+                </table>
+                <br/>
+                <button id="action" />
+            </form>
+        </textarea>
+    </body>
+</apex:page>

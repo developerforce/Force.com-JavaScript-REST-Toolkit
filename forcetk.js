@@ -53,11 +53,12 @@ if (forcetk.Client === undefined) {
         this.sessionId = sessionId;
         this.proxy_url = location.protocol + "//" + location.hostname
         + "/services/proxy";
-        // location.hostname is of the form 'abc.na1.visual.force.com', so we 
-        // can simply split it on '.' and take the second element of the 
-        // resulting array
-        this.instance_url = "https://" + location.hostname.split(".")[1] 
-        + ".salesforce.com";
+        // location.hostname can be of the form 'abc.na1.visual.force.com' or
+        // 'na1.salesforce.com'. Split on '.', and take the [1] or [0] element
+        // as appropriate
+        var elements = location.hostname.split(".");
+        var instance = (elements.length == 3) ? elements[0] : elements[1];
+        this.instance_url = "https://"+instance+".salesforce.com";
         this.apiVersion = (typeof apiVersion === 'undefined' || apiVersion == null)
             ?  'v21.0' : apiVersion;
     }

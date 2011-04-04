@@ -41,7 +41,6 @@ an HTML5 mobile app using jQuery Mobile
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <!--
     For development, you may want to load jQuery/jQuery Mobile from their CDN. 
-    Sample code to load them from a static resource is below.
 -->
 <link rel="stylesheet" href="http://code.jquery.com/mobile/1.0a4/jquery.mobile-1.0a4.min.css" />
 <script src="http://code.jquery.com/jquery-1.5.2.min.js"></script>

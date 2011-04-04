@@ -47,21 +47,19 @@ Sample Visualforce page for Force.com JavaScript REST Toolkit
             form {
                 margin-bottom: 1em;
             }
+            .ui-autocomplete-loading { 
+                background: white url('{!URLFOR($Resource.static, 'static/ajax.gif')}') right center no-repeat; 
+            }
         </style>
-		<!--
-		Download jQuery, jQuery UI and Trimpath Template, and put them in a
-		static resource bundles!
-		-->
-        <apex:includeScript 
-         value="{!URLFOR($Resource.static, 'query.js')}"  />
-        <apex:includeScript 
-         value="{!URLFOR($Resource.static, 'jquery-ui.js')}"  />
-        <apex:includeScript 
-         value="{!URLFOR($Resource.static, 'template.js')}"  />
-        <apex:includeScript 
-         value="{!URLFOR($Resource.static, 'forcetk.js')}"  />
-        <apex:stylesheet 
-         value="{!URLFOR($Resource.static, 'jquery-ui.css')}"  />
+        <!--
+        Download jQuery, jQuery UI and Trimpath Template, and put them in a
+        static resource bundles!
+        -->
+        <apex:stylesheet value="{!URLFOR($Resource.static, '/static/jquery-ui.css')}"  />
+        <apex:includeScript value="{!URLFOR($Resource.static, '/static/jquery.js')}"  />
+        <apex:includeScript value="{!URLFOR($Resource.static, '/static/jquery-ui.js')}"  />
+        <apex:includeScript value="{!URLFOR($Resource.static, '/static/template.js')}"  />
+        <apex:includeScript value="{!URLFOR($Resource.forcetk, '/forcetk.js')}"  />
         
         <script type="text/javascript">
 // Get a reference to jQuery that we can work with
@@ -80,30 +78,18 @@ var ajaxgif = "<img src='{!URLFOR($Resource.static, 'static/ajax.gif')}'/>";
 
 var $dialog = null;
 
-// Kick things off by doing a describe on Account...
 $j(document).ready(function() {
+    // Set up the dialog
     $dialog = $j('<div></div>')
         .dialog({
             autoOpen: false,
             width: 450
         });
-        
+
+    // Kick things off by doing a describe on Account...        
     $j('#prompt').html(ajaxgif+" loading metadata...");
     client.describe('Account', metadataCallback);
 });
-
-var timeout = null;
-
-function autoFilter() {
-    if (timeout != null) {
-        clearTimeout(timeout);
-    }
-    
-    var field = $j("#field").val();
-    var value = $j("#value").val();
-    
-    filterAccounts(field,value);
-}
 
 function metadataCallback(response){
     // Using TrimPath Template for now - may switch to jQuery Template at some
@@ -111,11 +97,33 @@ function metadataCallback(response){
     $j('#prompt').html(TrimPath.processDOMTemplate("prompt_jst"
         , response));
         
-    $j("#value").keyup(function(){
-        if (timeout != null) {
-            clearTimeout(timeout);
-        }
-        timeout = setTimeout("autoFilter()",1000);
+    // Set up autocomplete
+    $j( "#value" ).autocomplete({
+        source: function( request, response ) {
+            var query = "SELECT Id, Name FROM Account "+
+                "WHERE "+$j("#field").val()+" LIKE '%"+request.term+"%' "+
+                "ORDER BY Name LIMIT 20";
+
+            client.query(query, function( data ) {
+                response( $j.map( data.records, function( record ) {
+                    return {
+                        label: record.Name,
+                        value: record.Id
+                    }
+                }));
+            });
+        },
+        minLength: 2,
+        delay: 1000,
+        select: function( event, ui ) {
+            if ( ui.item != null ) {
+                showAccountDetail(ui.item.value);
+            } else {
+                filterAccounts($j("#field").val(),this.value);
+            }
+            
+            return false;
+        },
     });
     
     $j('#go').click(function(e) {
@@ -174,7 +182,9 @@ function queryCallback(response) {
            },function(){
              $j(this).removeClass("highlighted");
         })
-        .click(showAccountDetail);
+        .click(function() {
+            showAccountDetail(this.id);
+        });
 }
 
 function detailCallback(response) {
@@ -236,14 +246,14 @@ function deleteCallback(response) {
     setTimeout("filterAccounts()",1000);
 }
 
-function showAccountDetail() {
+function showAccountDetail(id) {
     // Show the dialog
     $dialog.dialog('option', 'title', 'Account Detail');
     $dialog.dialog('open');
     $dialog.html(ajaxgif+" retrieving...");
 
     // Get account details and populate the dialog
-    client.retrieve('Account', this.id, 'Name,Industry,TickerSymbol,Website'
+    client.retrieve('Account', id, 'Name,Industry,TickerSymbol,Website'
         , detailCallback);
 }
 
@@ -251,7 +261,7 @@ function filterAccounts(field, value) {
     $j('#list').html(ajaxgif+" loading data...");
 
     var query = ( typeof value !== 'undefined' && value.length > 0 ) 
-        ? "SELECT Id, Name FROM Account WHERE "+field+" LIKE '"+value
+        ? "SELECT Id, Name FROM Account WHERE "+field+" LIKE '%"+value
           +"%' ORDER BY Name LIMIT 20"
         : "SELECT Id, Name FROM Account ORDER BY Name LIMIT 20";
         
@@ -260,7 +270,7 @@ function filterAccounts(field, value) {
         </script>
     </head>
     <body>
-        <div id="main">
+        <div class="ui-widget" id="main">
             <div id="prompt">
             </div>
             <div id="list">

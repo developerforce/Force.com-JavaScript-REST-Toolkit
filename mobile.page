@@ -40,15 +40,19 @@ an HTML5 mobile app using jQuery Mobile
 <title>Accounts</title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <!--
-    You will need to download jQuery and jQuery Mobile, and put them in a
-    static resource bundle. Don't forget the images for the CSS!
+    For development, you may want to load jQuery/jQuery Mobile from their CDN. 
+    Sample code to load them from a static resource is below.
 -->
-<apex:stylesheet 
- value="{!URLFOR($Resource.static, '/static/jquery.mobile-1.0a3.css')}"  />
-<apex:includeScript 
- value="{!URLFOR($Resource.static, '/static/jquery-1.4.4.js')}"  />
-<apex:includeScript 
- value="{!URLFOR($Resource.static, '/static/jquery.mobile-1.0a3.js')}"  />
+<link rel="stylesheet" href="http://code.jquery.com/mobile/1.0a4/jquery.mobile-1.0a4.min.css" />
+<script src="http://code.jquery.com/jquery-1.5.2.min.js"></script>
+<script src="http://code.jquery.com/mobile/1.0a4/jquery.mobile-1.0a4.min.js"></script>
+<!--
+    Alternatively, you could download jQuery and jQuery Mobile, and put them in a
+    static resource bundle like this. Don't forget the images for the CSS!
+<apex:stylesheet value="{!URLFOR($Resource.static, '/mobile/jquery.mobile-1.0a4.min.css')}"  />
+<apex:includeScript value="{!URLFOR($Resource.static, '/jquery-1.5.2.min.js')}"  />
+<apex:includeScript value="{!URLFOR($Resource.static, '/mobile/jquery.mobile-1.0a4.min.js')}"  />
+-->
 <apex:includeScript 
  value="{!URLFOR($Resource.forcetk, 'forcetk.js')}"  />
 <script type="application/javascript">

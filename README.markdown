@@ -6,7 +6,7 @@ This minimal toolkit allows JavaScript in Visualforce pages to call the Force.co
 Background
 ----------
 
-Due to the [same origin policy](http://en.wikipedia.org/wiki/Same_origin_policy), JavaScript running in Visualforce pages may not use XmlHttpRequest to directly invoke the REST API, since Visualforce pages have hostnames of the form abc.na1.visual.force.com, and the REST API endpoints are of the form na1.salesforce.com.
+Due to the [same origin policy](http://en.wikipedia.org/wiki/Same_origin_policy), JavaScript running in Visualforce pages may not use [XmlHttpRequest](http://en.wikipedia.org/wiki/XMLHttpRequest) to directly invoke the REST API, since Visualforce pages have hostnames of the form abc.na1.visual.force.com, and the REST API endpoints are of the form na1.salesforce.com.
 
 We can work around this restriction by using the [AJAX Proxy](http://www.salesforce.com/us/developer/docs/ajax/Content/sforce_api_ajax_queryresultiterator.htm#ajax_proxy). Since the AJAX proxy is present on all
 Visualforce hosts with an endpoint of the form https://abc.na1.visual.force.com/services/proxy, our Visualforce-hosted JavaScript can invoke it, passing the desired resource URL in an HTTP header.
@@ -45,4 +45,4 @@ Your Visualforce page will need to include jQuery and the toolkit, then create a
 	    <p>The first account I see is <span id="accountname"></span>.</p>
 	</apex:page>
 	
-A much more fully featured sample is provided in `example.page`.
+More fully featured samples are provided in [example.page](https://github.com/metadaddy/Force.com-JavaScript-REST-Toolkit/blob/master/example.page) and [mobile.page](https://github.com/metadaddy/Force.com-JavaScript-REST-Toolkit/blob/master/mobile.page). [Watch a brief demo of the samples](http://www.youtube.com/watch?v=qNA8nxfPgBU).

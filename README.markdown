@@ -1,7 +1,7 @@
 Force.com JavaScript REST Toolkit
 =================================
 
-This minimal toolkit allows JavaScript in Visualforce pages to call the Force.com REST API via the Ajax Proxy.
+This minimal toolkit allows JavaScript in Visualforce pages to call the Force.com REST API via the Ajax Proxy, providing an easy-to-use JavaScript wrapper.
 
 Background
 ----------
@@ -38,7 +38,7 @@ Your Visualforce page will need to include jQuery and the toolkit, then create a
 	        // Get an instance of the REST API client
 	        var client = new forcetk.Client('{!$Api.Session_ID}');
         
-	        client.query("SELECT Name FROM Account LIMIT 1",function(response){
+	        client.query("SELECT Name FROM Account LIMIT 1", function(response){
 	            $j('#accountname').html(response.records[0].Name);
 	        });
 	    </script>

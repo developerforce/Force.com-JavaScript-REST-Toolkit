@@ -26,8 +26,8 @@
  
  /*
   * This is a simple jQuery-based app that uses the Force.com REST API.
-  * See vf.js for code required to run this in Visualforce
-  * See custom.js for code required to run this on your own server
+  * See example.page for code required to run this in Visualforce
+  * See example.html for code required to run this on your own server
   */
 
   function logout(e) {

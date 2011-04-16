@@ -40,6 +40,11 @@ if (forcetk === undefined) {
  
 if (forcetk.Client === undefined) {
     
+	// We use $j rather than $ for jQuery so it works in Visualforce
+	if (window.$j === undefined) {
+	    $j = $;
+	}
+	    
     /**
      * The Client provides a convenient wrapper for the Force.com REST API, 
      * allowing JavaScript in Visualforce pages to use the API via the Ajax
@@ -49,18 +54,26 @@ if (forcetk.Client === undefined) {
      * @param [apiVersion="21.0"] Force.com API version
      * @constructor
      */
-    forcetk.Client = function(sessionId, apiVersion) {
+    forcetk.Client = function(sessionId, apiVersion, instanceUrl, proxyUrl) {
         this.sessionId = sessionId;
-        this.proxy_url = location.protocol + "//" + location.hostname
-        + "/services/proxy";
-        // location.hostname can be of the form 'abc.na1.visual.force.com' or
-        // 'na1.salesforce.com'. Split on '.', and take the [1] or [0] element
-        // as appropriate
-        var elements = location.hostname.split(".");
-        var instance = (elements.length == 3) ? elements[0] : elements[1];
-        this.instance_url = "https://"+instance+".salesforce.com";
         this.apiVersion = (typeof apiVersion === 'undefined' || apiVersion == null)
             ?  'v21.0' : apiVersion;
+        if (typeof instanceUrl === 'undefined' || instanceUrl == null) {
+            // location.hostname can be of the form 'abc.na1.visual.force.com' or
+            // 'na1.salesforce.com'. Split on '.', and take the [1] or [0] element
+            // as appropriate
+            var elements = location.hostname.split(".");
+            var instance = (elements.length == 3) ? elements[0] : elements[1];
+            this.instance_url = "https://"+instance+".salesforce.com";            
+        } else {
+            this.instance_url = instanceUrl;
+        }
+        if (typeof proxyUrl === 'undefined' || proxyUrl == null) {
+            this.proxy_url = location.protocol + "//" + location.hostname
+            + "/services/proxy";
+        } else {
+            this.proxy_url = proxyUrl;
+        }
     }
 
     /*

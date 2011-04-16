@@ -43,8 +43,8 @@ an HTML5 mobile app using jQuery Mobile
     For development, you may want to load jQuery/jQuery Mobile from their CDN. 
 -->
 <link rel="stylesheet" href="http://code.jquery.com/mobile/1.0a4/jquery.mobile-1.0a4.min.css" />
-<script src="http://code.jquery.com/jquery-1.5.2.min.js"></script>
-<script src="http://code.jquery.com/mobile/1.0a4/jquery.mobile-1.0a4.min.js"></script>
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.5.2.min.js"></script>
+<script type="text/javascript" src="http://code.jquery.com/mobile/1.0a4/jquery.mobile-1.0a4.min.js"></script>
 <!--
     Alternatively, you could download jQuery and jQuery Mobile, and put them in a
     static resource bundle like this. Don't forget the images for the CSS!

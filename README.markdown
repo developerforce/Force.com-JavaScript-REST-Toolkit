@@ -11,6 +11,8 @@ Due to the [same origin policy](http://en.wikipedia.org/wiki/Same_origin_policy)
 We can work around this restriction by using the [AJAX Proxy](http://www.salesforce.com/us/developer/docs/ajax/Content/sforce_api_ajax_queryresultiterator.htm#ajax_proxy). Since the AJAX proxy is present on all
 Visualforce hosts with an endpoint of the form https://abc.na1.visual.force.com/services/proxy, our Visualforce-hosted JavaScript can invoke it, passing the desired resource URL in an HTTP header.
 
+Alternatively, to host JavaScript outside the Force.com platform, we can deploy a simple PHP proxy to perform the same function as the AJAX proxy.
+
 Dependencies
 ------------
 

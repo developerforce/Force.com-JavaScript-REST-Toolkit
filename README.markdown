@@ -45,7 +45,7 @@ Your Visualforce page will need to include jQuery and the toolkit, then create a
 	    <p>The first account I see is <span id="accountname"></span>.</p>
 	</apex:page>
 	
-More fully featured samples are provided in [example.page](https://github.com/metadaddy/Force.com-JavaScript-REST-Toolkit/blob/master/example.page) and [mobile.page](https://github.com/metadaddy/Force.com-JavaScript-REST-Toolkit/blob/master/mobile.page). [Watch a brief demo of the samples](http://www.youtube.com/watch?v=qNA8nxfPgBU).
+More fully featured samples are provided in [example.page](blob/master/example.page) and [mobile.page](blob/master/mobile.page). [Watch a brief demo of the samples](http://www.youtube.com/watch?v=qNA8nxfPgBU).
 
 Using the Toolkit in an HTML page outside the Force.com platform
 ----------------------------------------------------------------
@@ -105,4 +105,4 @@ Your HTML page will need to include jQuery and the toolkit, then create a client
 	    <p id="message">Click here.</p>
 	</html>
 	
-More fully featured samples are provided in [example.html](https://github.com/metadaddy/Force.com-JavaScript-REST-Toolkit/blob/master/example.html) and [mobile.html](https://github.com/metadaddy/Force.com-JavaScript-REST-Toolkit/blob/master/mobile.html).
+More fully featured samples are provided in [example.html](blob/master/example.html) and [mobile.html](blob/master/mobile.html).

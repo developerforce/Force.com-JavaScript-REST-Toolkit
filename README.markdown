@@ -108,3 +108,85 @@ Your HTML page will need to include jQuery and the toolkit, then create a client
 	</html>
 	
 More fully featured samples are provided in [example.html](Force.com-JavaScript-REST-Toolkit/blob/master/example.html) and [mobile.html](Force.com-JavaScript-REST-Toolkit/blob/master/mobile.html).
+
+Using the Toolkit in a PhoneGap app
+-----------------------------------
+
+Your HTML page will need to include jQuery, the toolkit, PhoneGap and the ChildBrowser plugin, then create a client object, passing a session ID to the constructor. You can use __https://login.salesforce.com/services/oauth2/success__ as the redirect URI and catch the page load in ChildBrowser.
+
+An absolutely minimal sample using OAuth to obtain a session ID is:
+
+	<html>
+	  <head>
+	    <script type="text/javascript" src="static/jquery.js"></script>
+		<script type="text/javascript" src="static/jquery.popup.js"></script>
+	    <script type="text/javascript" src="forcetk.js"></script>
+        <script type="text/javascript" src="phonegap.0.9.5.min.js"></script>
+        <script type="text/javascript" src="ChildBrowser.js"></script>	    		
+        <script type="text/javascript">
+			// OAuth Configuration
+			var loginUrl    = 'https://login.salesforce.com/';
+			var clientId    = 'YOUR_CLIENT_ID';
+			var redirectUri = 'https://login.salesforce.com/services/oauth2/success';
+
+			// We'll get an instance of the REST API client in a callback 
+			// after we do OAuth
+			var client = null;
+
+			$(document).ready(function() {
+                var cb = ChildBrowser.install();
+                $('#login').click(function(e) {
+                    e.preventDefault();
+                    cb.onLocationChange = function(loc){   
+                        if (loc.startsWith(redirectUri)) {
+                            cb.close();
+                            sessionCallback(unescape(loc));
+                        }
+                    };
+                    cb.showWebPage(getAuthorizeUrl(loginUrl, clientId, redirectUri));
+                });
+			});
+
+			function getAuthorizeUrl(loginUrl, clientId, redirectUri){
+			    return loginUrl+'services/oauth2/authorize?display=touch'
+			        +'&response_type=token&client_id='+escape(clientId)
+			        +'&redirect_uri='+escape(redirectUri);
+			}
+		
+            function sessionCallback(loc) {
+                var oauthResponse = {};
+                
+                var fragment = loc.split("#")[1];
+                
+                if (fragment) {
+                    var nvps = fragment.split('&');
+                    for (var nvp in nvps) {
+                        var parts = nvps[nvp].split('=');
+                        oauthResponse[parts[0]] = unescape(parts[1]);
+                    }
+                }
+                
+                if (typeof oauthResponse === 'undefined'
+                    || typeof oauthResponse['access_token'] === 'undefined') {
+                    errorCallback({
+                                  status: 0, 
+                                  statusText: 'Unauthorized', 
+                                  responseText: 'No OAuth response'
+                                  });
+                } else {
+                    client = new forcetk.Client(oauthResponse.access_token, null, oauthResponse.instance_url);
+                    
+					client.query("SELECT Name FROM Account LIMIT 1", 
+						function(response){
+						    $('#message').html('The first account I see is '
+							+response.records[0].Name);
+					    }
+					);
+                }
+            }
+	    </script>
+	    <p id="message">Click here.</p>
+	</html>
+	
+A fully featured sample is provided in [phonegap.html](Force.com-JavaScript-REST-Toolkit/blob/master/phonegap.html).
+

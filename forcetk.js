@@ -44,7 +44,7 @@ if (forcetk.Client === undefined) {
 	if (window.$j === undefined) {
 	    $j = $;
 	}
-	    
+
     /**
      * The Client provides a convenient wrapper for the Force.com REST API, 
      * allowing JavaScript in Visualforce pages to use the API via the Ajax
@@ -68,37 +68,48 @@ if (forcetk.Client === undefined) {
         } else {
             this.instance_url = instanceUrl;
         }
-        if (typeof proxyUrl === 'undefined' || proxyUrl == null) {
-            this.proxy_url = location.protocol + "//" + location.hostname
-            + "/services/proxy";
+        if (typeof proxyUrl === 'undefined' || proxyUrl === null) {
+            if (location.protocol === 'file:'){
+                // In PhoneGap
+                this.proxy_url = null;
+            } else {
+                // In Visualforce
+                this.proxy_url = location.protocol + "//" + location.hostname
+                + "/services/proxy";
+            }
         } else {
+            // On a server outside VF
             this.proxy_url = proxyUrl;
         }
     }
 
     /*
-     * Low level utility function to call the Salesforce proxy endpoint.
+     * Low level utility function to call the Salesforce endpoint.
      * @param path resource path relative to /services/data
      * @param callback function to which response will be passed
+     * @param [error=null] function to which jqXHR will be passed in case of error
      * @param [method="GET"] HTTP method for call
      * @param [payload=null] payload for POST/PATCH etc
      */
-    forcetk.Client.prototype.proxyAjax = function(path, callback, method, payload) {
+    forcetk.Client.prototype.ajax = function(path, callback, error, method, payload) {
         var url = this.instance_url + '/services/data' + path;
         var sessionId = this.sessionId;
 
         $j.ajax({
             type: (typeof method === 'undefined' || method == null) 
                 ? "GET" : method,
-            url: this.proxy_url,
+            url: (this.proxy_url !== null) ? this.proxy_url : url,
             contentType: 'application/json',
             processData: false,
             data: (typeof payload === 'undefined' || payload == null) 
                 ? null : payload,
             success: callback,
+            error: error,
             dataType: "json",
             beforeSend: function(xhr) {
-                xhr.setRequestHeader('SalesforceProxy-Endpoint', url);
+                if (this.proxy_url !== null) {
+                    xhr.setRequestHeader('SalesforceProxy-Endpoint', url);
+                }
                 xhr.setRequestHeader("Authorization", "OAuth " + sessionId);
             }
         });
@@ -109,37 +120,41 @@ if (forcetk.Client === undefined) {
      * available, including the version, label, and a link to each version's
      * root.
      * @param callback function to which response will be passed
+     * @param [error=null] function to which jqXHR will be passed in case of error
      */
-    forcetk.Client.prototype.versions = function(callback) {
-        this.proxyAjax('/', callback);
+    forcetk.Client.prototype.versions = function(callback, error) {
+        this.ajax('/', callback, error);
     }
 
     /*
      * Lists available resources for the client's API version, including 
      * resource name and URI.
      * @param callback function to which response will be passed
+     * @param [error=null] function to which jqXHR will be passed in case of error
      */
-    forcetk.Client.prototype.resources = function(callback) {
-        this.proxyAjax('/' + this.apiVersion + '/', callback);
+    forcetk.Client.prototype.resources = function(callback, error) {
+        this.ajax('/' + this.apiVersion + '/', callback, error);
     }
 
     /*
      * Lists the available objects and their metadata for your organization's 
      * data.
      * @param callback function to which response will be passed
+     * @param [error=null] function to which jqXHR will be passed in case of error
      */
-    forcetk.Client.prototype.describeGlobal = function(callback) {
-        this.proxyAjax('/' + this.apiVersion + '/sobjects/', callback);
+    forcetk.Client.prototype.describeGlobal = function(callback, error) {
+        this.ajax('/' + this.apiVersion + '/sobjects/', callback, error);
     }
 
     /*
      * Describes the individual metadata for the specified object.
      * @param objtype object type; e.g. "Account"
      * @param callback function to which response will be passed
+     * @param [error=null] function to which jqXHR will be passed in case of error
      */
-    forcetk.Client.prototype.metadata = function(objtype, callback) {
-        this.proxyAjax('/' + this.apiVersion + '/sobjects/' + objtype + '/'
-        , callback);
+    forcetk.Client.prototype.metadata = function(objtype, callback, error) {
+        this.ajax('/' + this.apiVersion + '/sobjects/' + objtype + '/'
+        , callback, error);
     }
 
     /*
@@ -147,10 +162,11 @@ if (forcetk.Client === undefined) {
      * specified object.
      * @param objtype object type; e.g. "Account"
      * @param callback function to which response will be passed
+     * @param [error=null] function to which jqXHR will be passed in case of error
      */
-    forcetk.Client.prototype.describe = function(objtype, callback) {
-        this.proxyAjax('/' + this.apiVersion + '/sobjects/' + objtype 
-        + '/describe/', callback);
+    forcetk.Client.prototype.describe = function(objtype, callback, error) {
+        this.ajax('/' + this.apiVersion + '/sobjects/' + objtype 
+        + '/describe/', callback, error);
     }
 
     /*
@@ -160,10 +176,11 @@ if (forcetk.Client === undefined) {
      *               the record, e.g. {:Name "salesforce.com", :TickerSymbol 
      *               "CRM"}
      * @param callback function to which response will be passed
+     * @param [error=null] function to which jqXHR will be passed in case of error
      */
-    forcetk.Client.prototype.create = function(objtype, fields, callback) {
-        this.proxyAjax('/' + this.apiVersion + '/sobjects/' + objtype + '/'
-        , callback, "POST", JSON.stringify(fields));
+    forcetk.Client.prototype.create = function(objtype, fields, callback, error) {
+        this.ajax('/' + this.apiVersion + '/sobjects/' + objtype + '/'
+        , callback, error, "POST", JSON.stringify(fields));
     }
 
     /*
@@ -173,10 +190,11 @@ if (forcetk.Client === undefined) {
      * @param fields comma-separated list of fields for which to return
      *               values; e.g. Name,Industry,TickerSymbol
      * @param callback function to which response will be passed
+     * @param [error=null] function to which jqXHR will be passed in case of error
      */
-    forcetk.Client.prototype.retrieve = function(objtype, id, fieldlist, callback) {
-        this.proxyAjax('/' + this.apiVersion + '/sobjects/' + objtype + '/' + id 
-        + '?fields=' + fieldlist, callback);
+    forcetk.Client.prototype.retrieve = function(objtype, id, fieldlist, callback, error) {
+        this.ajax('/' + this.apiVersion + '/sobjects/' + objtype + '/' + id 
+        + '?fields=' + fieldlist, callback, error);
     }
 
     /*
@@ -187,10 +205,11 @@ if (forcetk.Client === undefined) {
      *               the record, e.g. {:Name "salesforce.com", :TickerSymbol 
      *               "CRM"}
      * @param callback function to which response will be passed
+     * @param [error=null] function to which jqXHR will be passed in case of error
      */
-    forcetk.Client.prototype.update = function(objtype, id, fields, callback) {
-        this.proxyAjax('/' + this.apiVersion + '/sobjects/' + objtype + '/' + id
-        , callback, "PATCH", JSON.stringify(fields));
+    forcetk.Client.prototype.update = function(objtype, id, fields, callback, error) {
+        this.ajax('/' + this.apiVersion + '/sobjects/' + objtype + '/' + id
+        , callback, error, "PATCH", JSON.stringify(fields));
     }
 
     /*
@@ -199,10 +218,11 @@ if (forcetk.Client === undefined) {
      * @param objtype object type; e.g. "Account"
      * @param id the record's object ID
      * @param callback function to which response will be passed
+     * @param [error=null] function to which jqXHR will be passed in case of error
      */
-    forcetk.Client.prototype.del = function(objtype, id, callback) {
-        this.proxyAjax('/' + this.apiVersion + '/sobjects/' + objtype + '/' + id
-        , callback, "DELETE");
+    forcetk.Client.prototype.del = function(objtype, id, callback, error) {
+        this.ajax('/' + this.apiVersion + '/sobjects/' + objtype + '/' + id
+        , callback, error, "DELETE");
     }
 
     /*
@@ -210,10 +230,11 @@ if (forcetk.Client === undefined) {
      * @param soql a string containing the query to execute - e.g. "SELECT Id, 
      *             Name from Account ORDER BY Name LIMIT 20"
      * @param callback function to which response will be passed
+     * @param [error=null] function to which jqXHR will be passed in case of error
      */
-    forcetk.Client.prototype.query = function(soql, callback) {
-        this.proxyAjax('/' + this.apiVersion + '/query?q=' + escape(soql)
-        , callback);
+    forcetk.Client.prototype.query = function(soql, callback, error) {
+        this.ajax('/' + this.apiVersion + '/query?q=' + escape(soql)
+        , callback, error);
     }
 
     /*
@@ -221,9 +242,10 @@ if (forcetk.Client === undefined) {
      * @param sosl a string containing the search to execute - e.g. "FIND 
      *             {needle}"
      * @param callback function to which response will be passed
+     * @param [error=null] function to which jqXHR will be passed in case of error
      */
-    forcetk.Client.prototype.search = function(sosl, callback) {
-        this.proxyAjax('/' + this.apiVersion + '/search?s=' + escape(sosl)
-        , callback);
+    forcetk.Client.prototype.search = function(sosl, callback, error) {
+        this.ajax('/' + this.apiVersion + '/search?s=' + escape(sosl)
+        , callback, error);
     }
 }

@@ -1,7 +1,7 @@
 Force.com JavaScript REST Toolkit
 =================================
 
-This minimal toolkit allows JavaScript in Visualforce pages to call the Force.com REST API via the Ajax Proxy, providing an easy-to-use JavaScript wrapper.
+This minimal toolkit allows JavaScript in Visualforce pages to call the Force.com REST API either via the Ajax Proxy (in the case of web apps) or directly (from a PhoneGap app), providing an easy-to-use JavaScript wrapper.
 
 Background
 ----------
@@ -13,10 +13,12 @@ Visualforce hosts with an endpoint of the form https://abc.na1.visual.force.com/
 
 Alternatively, to host JavaScript outside the Force.com platform, we can deploy a simple PHP proxy to perform the same function as the AJAX proxy.
 
+[PhoneGap](http://www.phonegap.com/) provides a way for HTML5/JavaScript apps to run as native applications; in this configuration a proxy is not required - the toolkit simply provides a convenient abstraction of the REST API.
+
 Dependencies
 ------------
 
-The toolkit uses [jQuery](http://jquery.com/). It has been tested on jQuery 1.4.4, but other versions may also work.
+The toolkit uses [jQuery](http://jquery.com/). It has been tested on jQuery 1.4.4 and 1.5.2, but other versions may also work.
 
 Configuration
 -------------

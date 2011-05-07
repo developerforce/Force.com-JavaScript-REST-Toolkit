@@ -174,7 +174,7 @@ $valid_url_regex = '/https:\/\/.*salesforce.com/';
 $url_query_param = null; // 'url'
 $url_header = 'HTTP_SALESFORCEPROXY_ENDPOINT';
 
-$authz_header = 'AUTHORIZATION';
+$authz_header = 'HTTP_X_AUTHORIZATION';
 
 $return_all_headers = true;
 
@@ -186,22 +186,10 @@ $cors_allow_headers = 'Authorization, Content-Type';
 
 $status = array();
 
-// Get the full collection of HTTP headers - start with $_SERVER...
-$request_headers = $_SERVER;
-
-// ...and add anything in apache_request_headers() that's not already there
-foreach(apache_request_headers() as $key=>$value) {
-	$key = str_replace(" ","_",strtoupper(str_replace("-"," ",$key)));
-	if ((! array_key_exists($key, $request_headers)) 
-	  && (! array_key_exists('HTTP_'.$key, $request_headers))) {
-		$request_headers[$key]=urldecode($value);
-	}
-}
-
 if ( $url_query_param != null ) {
 	$url = $_GET[$url_query_param];
 } else if ( $url_header != null ) {
-	$url = $request_headers[$url_header];
+	$url = $_SERVER[$url_header];
 } else {
 	$url = null;
 }
@@ -260,13 +248,13 @@ if ( !$url ) {
   }
 
   $headers = array();
-  if ( isset($authz_header) && isset($request_headers[$authz_header]) ) {
+  if ( isset($authz_header) && isset($_SERVER[$authz_header]) ) {
     // Set the Authorization header
-    array_push($headers, "Authorization: ".$request_headers[$authz_header] );
+    array_push($headers, "Authorization: ".$_SERVER[$authz_header] );
   }
-  if ( isset($request_headers['CONTENT_TYPE']) ) {
+  if ( isset($_SERVER['CONTENT_TYPE']) ) {
 	// Pass through the Content-Type header
-	array_push($headers, "Content-Type: ".$request_headers['CONTENT_TYPE'] );
+	array_push($headers, "Content-Type: ".$_SERVER['CONTENT_TYPE'] );
   }	
   if ( count($headers) > 0 ) {
 	curl_setopt( $ch, CURLOPT_HTTPHEADER, $headers );

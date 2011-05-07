@@ -72,14 +72,17 @@ if (forcetk.Client === undefined) {
             if (location.protocol === 'file:'){
                 // In PhoneGap
                 this.proxy_url = null;
+                this.authzHeader = null;
             } else {
                 // In Visualforce
                 this.proxy_url = location.protocol + "//" + location.hostname
                 + "/services/proxy";
+                this.authzHeader = "Authorization";
             }
         } else {
             // On a server outside VF
             this.proxy_url = proxyUrl;
+            this.authzHeader = "X-Authorization";
         }
     }
 
@@ -92,8 +95,8 @@ if (forcetk.Client === undefined) {
      * @param [payload=null] payload for POST/PATCH etc
      */
     forcetk.Client.prototype.ajax = function(path, callback, error, method, payload) {
+        var that = this;
         var url = this.instance_url + '/services/data' + path;
-        var sessionId = this.sessionId;
 
         $j.ajax({
             type: (typeof method === 'undefined' || method == null) 
@@ -107,10 +110,10 @@ if (forcetk.Client === undefined) {
             error: error,
             dataType: "json",
             beforeSend: function(xhr) {
-                if (this.proxy_url !== null) {
+                if (that.proxy_url !== null) {
                     xhr.setRequestHeader('SalesforceProxy-Endpoint', url);
                 }
-                xhr.setRequestHeader("Authorization", "OAuth " + sessionId);
+                xhr.setRequestHeader(that.authzHeader, "OAuth " + that.sessionId);
             }
         });
     }

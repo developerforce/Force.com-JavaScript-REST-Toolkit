@@ -271,6 +271,11 @@ if ( !$url ) {
   
   $status = curl_getinfo( $ch );
   
+  if ( curl_errno( $ch ) ) {
+    $status['http_code'] = 500;
+    $contents = "cURL error ".curl_errno( $ch ).": ".curl_error( $ch )."\n";
+  }
+  
   curl_close( $ch );
 }
 

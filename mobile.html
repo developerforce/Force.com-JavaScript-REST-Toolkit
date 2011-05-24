@@ -50,7 +50,7 @@ var proxyUrl    = 'https://localhost/jsapp/proxy.php?mode=native';
 
 // We'll get an instance of the REST API client in a callback after we do 
 // OAuth
-var client = null;
+var client = new forcetk.Client(clientId, loginUrl, proxyUrl);;
 
 // We use $j rather than $ for jQuery
 if (window.$j === undefined) {
@@ -83,8 +83,8 @@ function sessionCallback(oauthResponse) {
             responseText: 'No OAuth response'
         });
     } else {
-        client = new forcetk.Client(oauthResponse.access_token, null,
-            oauthResponse.instance_url, proxyUrl);
+        client.setSessionToken(oauthResponse.access_token, null,
+            oauthResponse.instance_url);
 
 		addClickListeners();
 

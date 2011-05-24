@@ -51,8 +51,9 @@ Sample Visualforce page for Force.com JavaScript REST Toolkit
 		// Get a reference to jQuery that we can work with
 		$j = jQuery.noConflict();
 
-		// Get an instance of the REST API client
-		var client = new forcetk.Client('{!$Api.Session_ID}');
+		// Get an instance of the REST API client and set the session ID
+		var client = new forcetk.Client();
+		client.setSessionToken('{!$Api.Session_ID}');
 
 		var ajaxgif = "<img src='{!URLFOR($Resource.sample, '/ajax.gif')}' />";
 

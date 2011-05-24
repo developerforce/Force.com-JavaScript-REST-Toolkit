@@ -31,58 +31,107 @@
  * https://na1.salesforce.com/ or similar) as a remote site - in the admin
  * console, go to Your Name | Setup | Security Controls | Remote Site Settings
  */
- 
+
 var forcetk = window.forcetk;
 
 if (forcetk === undefined) {
     forcetk = {};
 }
- 
+
 if (forcetk.Client === undefined) {
-    
-	// We use $j rather than $ for jQuery so it works in Visualforce
-	if (window.$j === undefined) {
-	    $j = $;
-	}
+
+    // We use $j rather than $ for jQuery so it works in Visualforce
+    if (window.$j === undefined) {
+        $j = $;
+    }
 
     /**
      * The Client provides a convenient wrapper for the Force.com REST API, 
      * allowing JavaScript in Visualforce pages to use the API via the Ajax
      * Proxy.
+     * @param [clientId=null] 'Consumer Key' in the Remote Access app settings
+     * @param [loginUrl='https://login.salesforce.com/'] Login endpoint
+     * @param [proxyUrl=null] Proxy URL. Omit if running on Visualforce or 
+     *                  PhoneGap etc
+     * @constructor
+     */
+    forcetk.Client = function(clientId, loginUrl, proxyUrl) {
+        this.clientId = clientId;
+        this.loginUrl = loginUrl || 'https://login.salesforce.com/';
+        if (typeof proxyUrl === 'undefined' || proxyUrl === null) {
+            if (location.protocol === 'file:') {
+                // In PhoneGap
+                this.proxyUrl = null;
+            } else {
+                // In Visualforce
+                this.proxyUrl = location.protocol + "//" + location.hostname
+                    + "/services/proxy";
+            }
+            this.authzHeader = "Authorization";
+        } else {
+            // On a server outside VF
+            this.proxyUrl = proxyUrl;
+            this.authzHeader = "X-Authorization";
+        }
+        this.refreshToken = null;
+        this.sessionId = null;
+        this.apiVersion = null;
+        this.instanceUrl = null;
+    }
+
+    /**
+     * Set a refresh token in the client.
+     * @param refreshToken an OAuth refresh token
+     */
+    forcetk.Client.prototype.setRefreshToken = function(refreshToken) {
+        this.refreshToken = refreshToken;
+    }
+
+    /**
+     * Refresh the access token.
+     * @param callback function to call on success
+     * @param error function to call on failure
+     */
+    forcetk.Client.prototype.refreshAccessToken = function(callback, error) {
+        var that = this;
+        var url = this.loginUrl + '/services/oauth2/token';
+        $j.ajax({
+            type: 'POST',
+            url: (this.proxyUrl !== null) ? this.proxyUrl: url,
+            processData: false,
+            data: 'grant_type=refresh_token&client_id=' + this.clientId + '&refresh_token=' + this.refreshToken,
+            success: callback,
+            error: error,
+            dataType: "json",
+            beforeSend: function(xhr) {
+                if (that.proxyUrl !== null) {
+                    xhr.setRequestHeader('SalesforceProxy-Endpoint', url);
+                }
+            }
+        });
+    }
+
+    /**
+     * Set a session token and the associated metadata in the client.
      * @param sessionId a salesforce.com session ID. In a Visualforce page,
      *                   use '{!$Api.sessionId}' to obtain a session ID.
      * @param [apiVersion="21.0"] Force.com API version
-     * @constructor
+     * @param [instanceUrl] Omit this if running on Visualforce; otherwise 
+     *                   use the value from the OAuth token.
      */
-    forcetk.Client = function(sessionId, apiVersion, instanceUrl, proxyUrl) {
+    forcetk.Client.prototype.setSessionToken = function(sessionId, apiVersion, instanceUrl) {
         this.sessionId = sessionId;
         this.apiVersion = (typeof apiVersion === 'undefined' || apiVersion == null)
-            ?  'v21.0' : apiVersion;
+        ? 'v21.0': apiVersion;
         if (typeof instanceUrl === 'undefined' || instanceUrl == null) {
             // location.hostname can be of the form 'abc.na1.visual.force.com' or
             // 'na1.salesforce.com'. Split on '.', and take the [1] or [0] element
             // as appropriate
             var elements = location.hostname.split(".");
             var instance = (elements.length == 3) ? elements[0] : elements[1];
-            this.instance_url = "https://"+instance+".salesforce.com";            
+            this.instanceUrl = "https://" + instance + ".salesforce.com";
         } else {
-            this.instance_url = instanceUrl;
-        }
-        if (typeof proxyUrl === 'undefined' || proxyUrl === null) {
-            if (location.protocol === 'file:'){
-                // In PhoneGap
-                this.proxy_url = null;
-                this.authzHeader = null;
-            } else {
-                // In Visualforce
-                this.proxy_url = location.protocol + "//" + location.hostname
-                + "/services/proxy";
-                this.authzHeader = "Authorization";
-            }
-        } else {
-            // On a server outside VF
-            this.proxy_url = proxyUrl;
-            this.authzHeader = "X-Authorization";
+            this.instanceUrl = instanceUrl;
         }
     }
 
@@ -94,23 +143,28 @@ if (forcetk.Client === undefined) {
      * @param [method="GET"] HTTP method for call
      * @param [payload=null] payload for POST/PATCH etc
      */
-    forcetk.Client.prototype.ajax = function(path, callback, error, method, payload) {
+    forcetk.Client.prototype.ajax = function(path, callback, error, method, payload, retry) {
         var that = this;
-        var url = this.instance_url + '/services/data' + path;
+        var url = this.instanceUrl + '/services/data' + path;
 
         $j.ajax({
-            type: (typeof method === 'undefined' || method == null) 
-                ? "GET" : method,
-            url: (this.proxy_url !== null) ? this.proxy_url : url,
+            type: method || "GET",
+            url: (this.proxyUrl !== null) ? this.proxyUrl: url,
             contentType: 'application/json',
             processData: false,
-            data: (typeof payload === 'undefined' || payload == null) 
-                ? null : payload,
+            data: payload,
             success: callback,
-            error: error,
+            error: (!this.refreshToken || retry ) ? error : function() {
+                that.refreshAccessToken(function(oauthResponse) {
+                    that.setSessionToken(oauthResponse.access_token, null,
+                    oauthResponse.instance_url);
+                    that.ajax(path, callback, error, method, payload, true);
+                },
+                error);
+            },
             dataType: "json",
             beforeSend: function(xhr) {
-                if (that.proxy_url !== null) {
+                if (that.proxyUrl !== null) {
                     xhr.setRequestHeader('SalesforceProxy-Endpoint', url);
                 }
                 xhr.setRequestHeader(that.authzHeader, "OAuth " + that.sessionId);
@@ -168,7 +222,7 @@ if (forcetk.Client === undefined) {
      * @param [error=null] function to which jqXHR will be passed in case of error
      */
     forcetk.Client.prototype.describe = function(objtype, callback, error) {
-        this.ajax('/' + this.apiVersion + '/sobjects/' + objtype 
+        this.ajax('/' + this.apiVersion + '/sobjects/' + objtype
         + '/describe/', callback, error);
     }
 
@@ -196,7 +250,7 @@ if (forcetk.Client === undefined) {
      * @param [error=null] function to which jqXHR will be passed in case of error
      */
     forcetk.Client.prototype.retrieve = function(objtype, id, fieldlist, callback, error) {
-        this.ajax('/' + this.apiVersion + '/sobjects/' + objtype + '/' + id 
+        this.ajax('/' + this.apiVersion + '/sobjects/' + objtype + '/' + id
         + '?fields=' + fieldlist, callback, error);
     }
 

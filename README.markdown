@@ -39,8 +39,9 @@ Your Visualforce page will need to include jQuery and the toolkit, then create a
 	        // Get a reference to jQuery that we can work with
 	        $j = jQuery.noConflict();
         
-	        // Get an instance of the REST API client
-	        var client = new forcetk.Client('{!$Api.Session_ID}');
+			// Get an instance of the REST API client and set the session ID
+			var client = new forcetk.Client();
+			client.setSessionToken('{!$Api.Session_ID}');
         
 	        client.query("SELECT Name FROM Account LIMIT 1", function(response){
 	            $j('#accountname').html(response.records[0].Name);
@@ -70,9 +71,7 @@ Your HTML page will need to include jQuery and the toolkit, then create a client
 			var redirectUri = 'PATH_TO_YOUR_APP/oauthcallback.html';
 			var proxyUrl    = 'PATH_TO_YOUR_APP/proxy.php?mode=native';
 
-			// We'll get an instance of the REST API client in a callback 
-			// after we do OAuth
-			var client = null;
+			var client = new forcetk.Client(clientId, loginUrl, proxyUrl);
 
 			$(document).ready(function() {
 				$('#message').popupWindow({ 
@@ -95,8 +94,8 @@ Your HTML page will need to include jQuery and the toolkit, then create a client
 			        || typeof oauthResponse['access_token'] === 'undefined') {
 			        $('#message').html('Error - unauthorized!');
 			    } else {
-			        client = new forcetk.Client(oauthResponse.access_token, 
-				        null, oauthResponse.instance_url, proxyUrl);
+			        client.setSessionToken(oauthResponse.access_token, null,
+			            oauthResponse.instance_url);
 
 				        client.query("SELECT Name FROM Account LIMIT 1", 
 				          function(response){
@@ -131,9 +130,7 @@ An absolutely minimal sample using OAuth to obtain a session ID is:
 			var clientId    = 'YOUR_CLIENT_ID';
 			var redirectUri = 'https://login.salesforce.com/services/oauth2/success';
 
-			// We'll get an instance of the REST API client in a callback 
-			// after we do OAuth
-			var client = null;
+			var client = new forcetk.Client(clientId, loginUrl);
 
 			$(document).ready(function() {
                 var cb = ChildBrowser.install();
@@ -176,7 +173,8 @@ An absolutely minimal sample using OAuth to obtain a session ID is:
                                   responseText: 'No OAuth response'
                                   });
                 } else {
-                    client = new forcetk.Client(oauthResponse.access_token, null, oauthResponse.instance_url);
+                    client.setSessionToken(oauthResponse.access_token, null,
+				    	oauthResponse.instance_url);
                     
 					client.query("SELECT Name FROM Account LIMIT 1", 
 						function(response){
@@ -190,5 +188,5 @@ An absolutely minimal sample using OAuth to obtain a session ID is:
 	    <p id="message">Click here.</p>
 	</html>
 	
-A fully featured sample is provided in [phonegap.html](Force.com-JavaScript-REST-Toolkit/blob/master/phonegap.html).
+A fully featured sample (including persistence of the OAuth refresh token to the iOS Keychain) is provided in [phonegap.html](Force.com-JavaScript-REST-Toolkit/blob/master/phonegap.html).
 

@@ -45,79 +45,123 @@
         <script type="text/javascript" src="mobileapp.js"></script>
         <script type="text/javascript" src="phonegap.0.9.5.min.js"></script>
         <script type="text/javascript" src="ChildBrowser.js"></script>
+        <script type="text/javascript" src="SAiOSKeychainPlugin.js"></script>
         <script type="text/javascript">
-            // OAuth Configuration
-            var loginUrl    = 'https://login.salesforce.com/';
-            var clientId    = '3MVG9Km_cBLhsuPzTtcGHsZpj9HSp.uUwbHupEXhWi6k3JJphEv8swpsUYIFCZSLp8pi7YYMbRjeQUxptYdIt';
-            var redirectUri = 'https://login.salesforce.com/services/oauth2/success';
-            
-            // We'll get an instance of the REST API client in a callback after we do 
-            // OAuth
-            var client = null;
-            
-            // Make our own startsWith utility fn
-            String.prototype.startsWith = function(str){
-                return (this.substr(0, str.length) === str);
-            }
-            
-            function getAuthorizeUrl(loginUrl, clientId, redirectUri){
-                return loginUrl+'services/oauth2/authorize?display=touch'
-                +'&response_type=token&client_id='+escape(clientId)
-                +'&redirect_uri='+escape(redirectUri);
-            }
-            
-            function sessionCallback(loc) {
-                var oauthResponse = {};
-                
-                var fragment = loc.split("#")[1];
-                
-                if (fragment) {
-                    var nvps = fragment.split('&');
-                    for (var nvp in nvps) {
-                        var parts = nvps[nvp].split('=');
-                        oauthResponse[parts[0]] = unescape(parts[1]);
-                    }
-                }
-                
-                if (typeof oauthResponse === 'undefined'
-                    || typeof oauthResponse['access_token'] === 'undefined') {
-                    errorCallback({
-                                  status: 0, 
-                                  statusText: 'Unauthorized', 
-                                  responseText: 'No OAuth response'
-                                  });
-                } else {
-                    client = new forcetk.Client(oauthResponse.access_token, null,
-                                                oauthResponse.instance_url);
-                    
-                    addClickListeners();
-                    
-                    $j.mobile.changePage('#mainpage',"slide",false,true);
-                    $j.mobile.pageLoading();
-                    getAccounts(function(){
-                                $j.mobile.pageLoading(true);
-                                });
-                }
-            }
+			// OAuth Configuration
+			var loginUrl = 'https://login.salesforce.com/';
+			var clientId = '3MVG9Km_cBLhsuPzTtcGHsZpj9HSp.uUwbHupEXhWi6k3JJphEv8swpsUYIFCZSLp8pi7YYMbRjeQUxptYdIt';
+			var redirectUri = 'https://login.salesforce.com/services/oauth2/success';
 
-            // We use $j rather than $ for jQuery
-            if (window.$j === undefined) {
-                $j = $;
-            }
+			var client = new forcetk.Client(clientId, loginUrl);
 
-            $j(document).ready(function() {
-               var cb = ChildBrowser.install();
-               $j('#login').click(function(e) {
-                  e.preventDefault();
-                  cb.onLocationChange = function(loc){   
-                      if (loc.startsWith(redirectUri)) {
-                          cb.close();
-                          sessionCallback(unescape(loc));
-                      }
-                  };
-                  cb.showWebPage(getAuthorizeUrl(loginUrl, clientId, redirectUri));
-               });
-            });
+			// Make our own startsWith utility fn
+			String.prototype.startsWith = function(str) {
+			    return (this.substr(0, str.length) === str);
+			}
+
+			function getAuthorizeUrl(loginUrl, clientId, redirectUri) {
+			    return loginUrl + 'services/oauth2/authorize?display=touch'
+			    + '&response_type=token&client_id=' + escape(clientId)
+			    + '&redirect_uri=' + escape(redirectUri);
+			}
+
+			function sessionCallback(oauthResponse) {
+			    client.setSessionToken(oauthResponse.access_token, null,
+			    	oauthResponse.instance_url);
+
+			    addClickListeners();
+
+			    $j('#logoutbtn').click(function(e) {
+			        // Delete the saved refresh token
+			        window.plugins.keychain.removeForKey('refresh_token', 
+					    'forcetk',
+				        function() {
+				            var cb = ChildBrowser.install();
+
+				            client.setRefreshToken(null);
+				            $j.mobile.changePage('#loginpage', "slide", false, true);
+				            $j.mobile.pageLoading();
+				            cb.onLocationChange = function(loc) {
+				                if (loc.startsWith(redirectUri)) {
+				                    cb.close();
+				                    oauthCallback(unescape(loc));
+				                }
+				            };
+				            cb.showWebPage(getAuthorizeUrl(loginUrl, clientId, redirectUri));
+				        }
+				    );
+			    });
+
+			    $j.mobile.changePage('#mainpage', "slide", false, true);
+			    $j.mobile.pageLoading();
+			    getAccounts(function() {
+			        $j.mobile.pageLoading(true);
+			    });
+			}
+
+			function oauthCallback(loc) {
+			    var oauthResponse = {};
+
+			    var fragment = loc.split("#")[1];
+
+			    if (fragment) {
+			        var nvps = fragment.split('&');
+			        for (var nvp in nvps) {
+			            var parts = nvps[nvp].split('=');
+			            oauthResponse[parts[0]] = unescape(parts[1]);
+			        }
+			    }
+
+			    if (typeof oauthResponse === 'undefined'
+			    || typeof oauthResponse['access_token'] === 'undefined') {
+			        errorCallback({
+			            status: 0,
+			            statusText: 'Unauthorized',
+			            responseText: 'No OAuth response'
+			        });
+			    } else {
+			        window.plugins.keychain.setForKey('refresh_token',
+				        oauthResponse.refresh_token,
+				        'forcetk',
+				        null,
+				        function(key, error) {
+				            alert("Error storing OAuth refresh token!");
+				        }
+				    );
+
+			        sessionCallback(oauthResponse);
+			    }
+			}
+
+			// We use $j rather than $ for jQuery
+			if (window.$j === undefined) {
+			    $j = $;
+			}
+
+			$j(document).ready(function() {
+			    var cb = ChildBrowser.install();
+			    SAiOSKeychainPlugin.install();
+			    window.plugins.keychain.getForKey('refresh_token',
+			    'forcetk',
+			    function(key, value) {
+			        $j.mobile.pageLoading();
+			        client.setRefreshToken(value);
+			        client.refreshAccessToken(sessionCallback,
+			        function(jqXHR, textStatus, errorThrown) {
+			            alert('Error getting refresh token: ' + errorThrown);
+			        });
+			    },
+			    function(key, error) {
+			        // No refresh token - do OAuth
+			        cb.onLocationChange = function(loc) {
+			            if (loc.startsWith(redirectUri)) {
+			                cb.close();
+			                oauthCallback(unescape(loc));
+			            }
+			        };
+			        cb.showWebPage(getAuthorizeUrl(loginUrl, clientId, redirectUri));
+			    });
+			});
         </script>
     </head>
     <body>
@@ -125,10 +169,8 @@
             <div data-role="header">
                 <h1>Login</h1>
             </div>
-            <div data-role="content">
-                <form>
-                    <button data-role="button" id="login">Login</button>
-                </form>
+            <div data-role="content" style="margin-left: auto; margin-right: auto; text-align: center;">
+                Connecting to Force.com
             </div>
             <div data-role="footer">
                 <h4>Force.com</h4>
@@ -145,6 +187,9 @@
                 <ul id="accountlist" data-inset="true" data-role="listview" 
                     data-theme="c" data-dividertheme="b">
                 </ul>
+                <form>
+                    <button data-role="button" id="logoutbtn">Logout</button>
+                </form>
             </div>
             <div data-role="footer">
                 <h4>Force.com</h4>

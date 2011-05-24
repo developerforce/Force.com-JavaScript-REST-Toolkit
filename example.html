@@ -55,9 +55,7 @@ Sample HTML page for Force.com JavaScript REST Toolkit
 		var redirectUri = 'https://localhost/jsapp/oauthcallback.html';
 		var proxyUrl    = 'https://localhost/jsapp/proxy.php?mode=native';
 
-		// We'll get an instance of the REST API client in a callback after we do 
-		// OAuth
-		var client = null;
+		var client = new forcetk.Client(clientId, loginUrl, proxyUrl);
 
 		var ajaxgif = "<img src='static/ajax.gif' />";
 
@@ -104,8 +102,8 @@ Sample HTML page for Force.com JavaScript REST Toolkit
 		            responseText: 'No OAuth response'
 		        });
 		    } else {
-		        client = new forcetk.Client(oauthResponse.access_token, null,
-		            oauthResponse.instance_url, proxyUrl);
+		        client.setSessionToken(oauthResponse.access_token, null,
+		            oauthResponse.instance_url);
 
 		        // Kick things off by doing a describe on Account...  
 		        $j('#prompt').html(ajaxgif+" loading metadata...");

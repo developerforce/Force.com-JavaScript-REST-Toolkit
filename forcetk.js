@@ -154,13 +154,17 @@ if (forcetk.Client === undefined) {
             processData: false,
             data: payload,
             success: callback,
-            error: (!this.refreshToken || retry ) ? error : function() {
-                that.refreshAccessToken(function(oauthResponse) {
-                    that.setSessionToken(oauthResponse.access_token, null,
-                    oauthResponse.instance_url);
-                    that.ajax(path, callback, error, method, payload, true);
-                },
-                error);
+            error: (!this.refreshToken || retry ) ? error : function(jqXHR, textStatus, errorThrown) {
+                if (jqXHR.status === 401) {
+                    that.refreshAccessToken(function(oauthResponse) {
+                        that.setSessionToken(oauthResponse.access_token, null,
+                        oauthResponse.instance_url);
+                        that.ajax(path, callback, error, method, payload, true);
+                    },
+                    error);
+                } else {
+                    error(jqXHR, textStatus, errorThrown);
+                }
             },
             dataType: "json",
             beforeSend: function(xhr) {

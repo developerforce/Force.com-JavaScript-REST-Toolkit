@@ -61,7 +61,14 @@ Your HTML page will need to include jQuery and the toolkit, then create a client
 
 	<html>
 	  <head>
+	
+		<!-- 
+		jQuery - http://docs.jquery.com/Downloading_jQuery
+		-->
 	    <script type="text/javascript" src="static/jquery.js"></script>
+		<!--
+		From jQuery-swip - http://code.google.com/p/jquery-swip/source/browse/trunk/jquery.popupWindow.js 
+		-->
 		<script type="text/javascript" src="static/jquery.popup.js"></script>
 	    <script type="text/javascript" src="forcetk.js"></script>
 	    <script type="text/javascript">
@@ -120,7 +127,6 @@ An absolutely minimal sample using OAuth to obtain a session ID is:
 	<html>
 	  <head>
 	    <script type="text/javascript" src="static/jquery.js"></script>
-		<script type="text/javascript" src="static/jquery.popup.js"></script>
 	    <script type="text/javascript" src="forcetk.js"></script>
         <script type="text/javascript" src="phonegap.0.9.5.min.js"></script>
         <script type="text/javascript" src="ChildBrowser.js"></script>	    		

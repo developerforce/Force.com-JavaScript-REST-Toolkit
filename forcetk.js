@@ -121,7 +121,7 @@ if (forcetk.Client === undefined) {
      */
     forcetk.Client.prototype.setSessionToken = function(sessionId, apiVersion, instanceUrl) {
         this.sessionId = sessionId;
-        this.apiVersion = (typeof apiVersion === 'undefined' || apiVersion == null)
+        this.apiVersion = (typeof apiVersion === 'undefined' || apiVersion === null)
         ? 'v21.0': apiVersion;
         if (typeof instanceUrl === 'undefined' || instanceUrl == null) {
             // location.hostname can be of the form 'abc.na1.visual.force.com' or
@@ -172,6 +172,7 @@ if (forcetk.Client === undefined) {
                     xhr.setRequestHeader('SalesforceProxy-Endpoint', url);
                 }
                 xhr.setRequestHeader(that.authzHeader, "OAuth " + that.sessionId);
+                xhr.setRequestHeader('X-User-Agent', 'salesforce-toolkit-rest-javascript/' + that.apiVersion);
             }
         });
     }

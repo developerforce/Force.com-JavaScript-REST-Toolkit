@@ -256,6 +256,16 @@ if ( !$url ) {
 	// Pass through the Content-Type header
 	array_push($headers, "Content-Type: ".$_SERVER['CONTENT_TYPE'] );
   }	
+  if ( isset($_SERVER['HTTP_X_USER_AGENT']) ) {
+	// Pass through the X-User-Agent header
+	array_push($headers, "X-User-Agent: ".$_SERVER['HTTP_X_USER_AGENT'] );
+  }
+  if ( isset($_SERVER['HTTP_X_FORWARDED_FOR']) ) {
+	array_push($headers, $_SERVER['HTTP_X_FORWARDED_FOR'].", ".$_SERVER['HTTP_X_USER_AGENT'] );
+  } else {
+	array_push($headers, "X-Forwarded-For: ".$_SERVER['REMOTE_ADDR'] );
+  }
+
   if ( count($headers) > 0 ) {
 	curl_setopt( $ch, CURLOPT_HTTPHEADER, $headers );
   }

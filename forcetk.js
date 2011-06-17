@@ -270,8 +270,8 @@ if (forcetk.Client === undefined) {
      * @param [error=null] function to which jqXHR will be passed in case of error
      */
     forcetk.Client.prototype.update = function(objtype, id, fields, callback, error) {
-        this.ajax('/' + this.apiVersion + '/sobjects/' + objtype + '/' + id
-        , callback, error, "PATCH", JSON.stringify(fields));
+        this.ajax('/' + this.apiVersion + '/sobjects/' + objtype + '/' + id 
+        + '?_HttpMethod=PATCH', callback, error, "POST", JSON.stringify(fields));
     }
 
     /*

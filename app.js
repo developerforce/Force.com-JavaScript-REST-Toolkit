@@ -68,7 +68,7 @@
                          value: record.Id
                      }
                  }));
-             });
+             }, errorCallback);
          },
          minLength: 2,
          delay: 1000,
@@ -115,7 +115,7 @@
 
              $j('#list').html(ajaxgif+" creating account...");
 
-             client.create('Account', fields, createCallback);
+             client.create('Account', fields, createCallback, errorCallback);
          });
          $dialog.dialog('option', 'title', 'New Account');
          $dialog.dialog('open');
@@ -167,7 +167,7 @@
          e.preventDefault();
          $dialog.dialog('close');
          $j('#list').html(ajaxgif+" deleting account...");
-         client.del('Account', $dialog.find('#id').val(), deleteCallback);
+         client.del('Account', $dialog.find('#id').val(), deleteCallback, errorCallback);
      });
      $dialog.find('#edit').click(function(e) {
          e.preventDefault();
@@ -187,7 +187,7 @@
 
              $j('#list').html(ajaxgif+" updating account...");
 
-             client.update('Account', $dialog.find('#id').val(), fields, updateCallback);
+             client.update('Account', $dialog.find('#id').val(), fields, updateCallback, errorCallback);
          });
      });
  }
@@ -218,7 +218,7 @@
 
      // Get account details and populate the dialog
      client.retrieve('Account', id, 'Name,Industry,TickerSymbol,Website'
-         , detailCallback);
+         , detailCallback, errorCallback);
  }
 
  function filterIndustry(industry) {
@@ -227,7 +227,7 @@
      var query = "SELECT Id, Name FROM Account WHERE Industry = '"+industry
      +"' ORDER BY Name LIMIT 20";
 
-     client.query(query, queryCallback);
+     client.query(query, queryCallback, errorCallback);
  }
 
  function filterAccounts(field, value) {
@@ -238,6 +238,6 @@
          +"%' ORDER BY Name LIMIT 20"
          : "SELECT Id, Name FROM Account ORDER BY Name LIMIT 20";
 
-     client.query(query, queryCallback);
+     client.query(query, queryCallback, errorCallback);
  }
  

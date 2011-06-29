@@ -260,6 +260,23 @@ if (forcetk.Client === undefined) {
     }
 
     /*
+     * Upsert - creates or updates record of the given type, based on the 
+     * given external Id.
+     * @param objtype object type; e.g. "Account"
+     * @param externalIdField external ID field name; e.g. "accountMaster__c"
+     * @param externalId the record's external ID value
+     * @param fields an object containing field names and values for 
+     *               the record, e.g. {:Name "salesforce.com", :TickerSymbol 
+     *               "CRM"}
+     * @param callback function to which response will be passed
+     * @param [error=null] function to which jqXHR will be passed in case of error
+     */
+    forcetk.Client.prototype.upsert = function(objtype, externalIdField, externalId, fields, callback, error) {
+        this.ajax('/' + this.apiVersion + '/sobjects/' + objtype + '/' + externalIdField + '/' + externalId 
+        + '?_HttpMethod=PATCH', callback, error, "POST", JSON.stringify(fields));
+    }
+
+    /*
      * Updates field values on a record of the given type.
      * @param objtype object type; e.g. "Account"
      * @param id the record's object ID

@@ -249,14 +249,20 @@ if (forcetk.Client === undefined) {
      * Retrieves field values for a record of the given type.
      * @param objtype object type; e.g. "Account"
      * @param id the record's object ID
-     * @param fields comma-separated list of fields for which to return
-     *               values; e.g. Name,Industry,TickerSymbol
+     * @param [fields=null] optional comma-separated list of fields for which 
+     *               to return values; e.g. Name,Industry,TickerSymbol
      * @param callback function to which response will be passed
      * @param [error=null] function to which jqXHR will be passed in case of error
      */
     forcetk.Client.prototype.retrieve = function(objtype, id, fieldlist, callback, error) {
+        if (!arguments[4]) {
+            error = callback;
+            callback = fieldlist;
+            fieldlist = null;
+        }
+        var fields = fieldlist ? '?fields=' + fieldlist : '';
         this.ajax('/' + this.apiVersion + '/sobjects/' + objtype + '/' + id
-        + '?fields=' + fieldlist, callback, error);
+        + fields, callback, error);
     }
 
     /*

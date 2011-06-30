@@ -77,6 +77,7 @@ if (forcetk.Client === undefined) {
         this.sessionId = null;
         this.apiVersion = null;
         this.instanceUrl = null;
+        this.asyncAjax = true;
     }
 
     /**
@@ -150,6 +151,7 @@ if (forcetk.Client === undefined) {
 
         $j.ajax({
             type: method || "GET",
+            async: this.asyncAjax,
             url: (this.proxyUrl !== null) ? this.proxyUrl: url,
             contentType: 'application/json',
             cache: false,

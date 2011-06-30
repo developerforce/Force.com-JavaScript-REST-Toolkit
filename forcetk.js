@@ -98,6 +98,7 @@ if (forcetk.Client === undefined) {
         $j.ajax({
             type: 'POST',
             url: (this.proxyUrl !== null) ? this.proxyUrl: url,
+            cache: false,
             processData: false,
             data: 'grant_type=refresh_token&client_id=' + this.clientId + '&refresh_token=' + this.refreshToken,
             success: callback,
@@ -151,6 +152,7 @@ if (forcetk.Client === undefined) {
             type: method || "GET",
             url: (this.proxyUrl !== null) ? this.proxyUrl: url,
             contentType: 'application/json',
+            cache: false,
             processData: false,
             data: payload,
             success: callback,

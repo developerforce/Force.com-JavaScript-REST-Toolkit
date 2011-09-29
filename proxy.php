@@ -234,7 +234,7 @@ if ( !$url ) {
     curl_setopt( $ch, CURLOPT_POSTFIELDS, file_get_contents("php://input") );
   }
 
-  if ( $_GET['send_cookies'] ) {
+  if ( isset($_GET['send_cookies']) ) {
     $cookie = array();
     foreach ( $_COOKIE as $key => $value ) {
       $cookie[] = $key . '=' . $value;
@@ -275,7 +275,7 @@ if ( !$url ) {
   curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
   
   curl_setopt( $ch, CURLOPT_USERAGENT, 
-	$_GET['user_agent'] ? $_GET['user_agent'] : $_SERVER['HTTP_USER_AGENT'] );
+	isset($_GET['user_agent']) ? $_GET['user_agent'] : $_SERVER['HTTP_USER_AGENT'] );
   
   list( $header, $contents ) = preg_split( '/([\r\n][\r\n])\\1/', curl_exec( $ch ), 2 );
   
@@ -300,17 +300,23 @@ if ( $_GET['mode'] == 'native' ) {
   }
 
   if ( isset( $status['http_code'] ) ) {
-	  header("HTTP/1.1 ".$status['http_code']." ".$status['status_text']);
-	  print $contents;
-	  exit();
-  }
+      $header = "HTTP/1.1 ".$status['http_code'];
+      if (isset($status['status_text'])) {
+          $header .= " ".$status['status_text'];
+      }
+      header( $header );
 
+      $header_match = '/^(?:Content-Type|Content-Language|Set-Cookie)/i';
+  } else {
+      $header_match = '/^(?:HTTP|Content-Type|Content-Language|Set-Cookie)/i';
+  }
+  
   foreach ( $header_text as $header ) {
-    if ( preg_match( '/^(?:HTTP|Content-Type|Content-Language|Set-Cookie)/i', $header ) ) {
+    if ( preg_match( $header_match, $header ) ) {
       header( $header );
     }
   }
-  
+
   print $contents;
   
 } else {

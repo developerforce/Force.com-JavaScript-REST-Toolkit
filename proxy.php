@@ -187,9 +187,9 @@ $cors_allow_headers = 'Authorization, Content-Type';
 $status = array();
 
 if ( $url_query_param != null ) {
-	$url = $_GET[$url_query_param];
+	$url = isset($_GET[$url_query_param]) ? $_GET[$url_query_param] : null;
 } else if ( $url_header != null ) {
-	$url = $_SERVER[$url_header];
+	$url = isset($_SERVER[$url_header]) ? $_SERVER[$url_header] : null;
 } else {
 	$url = null;
 }
@@ -218,7 +218,8 @@ if ( !$url ) {
     if ( isset( $cors_allow_headers ) ) {
       header( 'Access-Control-Allow-Headers: '.strtolower($cors_allow_headers) );
     }
-    if ( $_SERVER['REQUEST_METHOD'] == 'OPTIONS' ) {
+    if ( isset($_SERVER['REQUEST_METHOD']) && 
+        ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') ) {
       // We're done - don't proxy CORS OPTIONS request
       exit();
 	}
@@ -227,7 +228,8 @@ if ( !$url ) {
   $ch = curl_init( $url );
 
   // Pass on request method, regardless of what it is
-  curl_setopt( $ch, CURLOPT_CUSTOMREQUEST, $_SERVER['REQUEST_METHOD'] );
+  curl_setopt( $ch, CURLOPT_CUSTOMREQUEST, 
+      isset($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : 'GET' );
 
   // Pass on content, regardless of request method
   if ( isset($_SERVER['CONTENT_LENGTH'] ) && $_SERVER['CONTENT_LENGTH'] > 0 ) {
@@ -239,7 +241,7 @@ if ( !$url ) {
     foreach ( $_COOKIE as $key => $value ) {
       $cookie[] = $key . '=' . $value;
     }
-    if ( $_GET['send_session'] ) {
+    if ( isset($_GET['send_session']) ) {
       $cookie[] = SID;
     }
     $cookie = implode( '; ', $cookie );
@@ -262,7 +264,7 @@ if ( !$url ) {
   }
   if ( isset($_SERVER['HTTP_X_FORWARDED_FOR']) ) {
 	array_push($headers, $_SERVER['HTTP_X_FORWARDED_FOR'].", ".$_SERVER['HTTP_X_USER_AGENT'] );
-  } else {
+  } else if (isset($_SERVER['REMOTE_ADDR'])) {
 	array_push($headers, "X-Forwarded-For: ".$_SERVER['REMOTE_ADDR'] );
   }
 
@@ -290,9 +292,9 @@ if ( !$url ) {
 }
 
 // Split header text into an array.
-$header_text = preg_split( '/[\r\n]+/', $header );
+$header_text = isset($header) ? preg_split( '/[\r\n]+/', $header ) : array();
 
-if ( $_GET['mode'] == 'native' ) {
+if ( isset($_GET['mode']) && $_GET['mode'] == 'native' ) {
   if ( !$enable_native ) {
     $contents = 'ERROR: invalid mode';
     $status['http_code'] = 400;
@@ -325,7 +327,7 @@ if ( $_GET['mode'] == 'native' ) {
   $data = array();
   
   // Propagate all HTTP headers into the JSON data object.
-  if ( $_GET['full_headers'] ) {
+  if ( isset($_GET['full_headers']) ) {
     $data['headers'] = array();
     
     foreach ( $header_text as $header ) {
@@ -337,7 +339,7 @@ if ( $_GET['mode'] == 'native' ) {
   }
   
   // Propagate all cURL request / response info to the JSON data object.
-  if ( $_GET['full_status'] ) {
+  if ( isset($_GET['full_status']) ) {
     $data['status'] = $status;
   } else {
     $data['status'] = array();
@@ -349,11 +351,12 @@ if ( $_GET['mode'] == 'native' ) {
   $data['contents'] = $decoded_json ? $decoded_json : $contents;
 
   // Generate appropriate content-type header.
-  $is_xhr = strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
+  $is_xhr = isset($_SERVER['HTTP_X_REQUESTED_WITH']) && 
+      (strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest');
   header( 'Content-type: application/' . ( $is_xhr ? 'json' : 'x-javascript' ) );
   
   // Get JSONP callback.
-  $jsonp_callback = $enable_jsonp && isset($_GET['callback']) ? $_GET['callback'] : null;
+  $jsonp_callback = ($enable_jsonp && isset($_GET['callback'])) ? $_GET['callback'] : null;
   
   // Generate JSON/JSONP string
   $json = json_encode( $data );

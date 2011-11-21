@@ -181,6 +181,66 @@ if (forcetk.Client === undefined) {
         });
     }
 
+    /**
+     * Utility function to query the Chatter API and download a file
+     * Note, raw XMLHttpRequest because JQuery mangles the arraybuffer
+     * This should work on any browser that supports XMLHttpRequest 2 because arraybuffer is required. 
+     * For mobile, that means iOS >= 5 and Android >= Honeycomb
+     * @author Tom Gersic
+     * @param path resource path relative to /services/data
+     * @param mimetype of the file
+     * @param callback function to which response will be passed
+     * @param [error=null] function to which request will be passed in case of error
+     * @param rety true if we've already tried refresh token flow once
+     **/
+    forcetk.Client.prototype.getChatterFile = function(path,mimeType,callback,error,retry) {
+        var that = this;
+    
+        var url = this.instanceUrl + path;
+
+        var request = new XMLHttpRequest();
+        
+                
+        request.open("GET", url, true);
+        request.responseType = "arraybuffer";
+        
+        request.setRequestHeader(that.authzHeader, "OAuth " + that.sessionId);
+        request.setRequestHeader('X-User-Agent', 'salesforce-toolkit-rest-javascript/' + that.apiVersion);
+        
+        request.onreadystatechange = function() {
+            // continue if the process is completed
+            if (request.readyState == 4) {
+                // continue only if HTTP status is "OK"
+                if (request.status == 200) {
+                    try {
+                        // retrieve the response
+                        callback(request.response);
+                    }
+                    catch(e) {
+                        // display error message
+                        alert("Error reading the response: " + e.toString());
+                    }
+                }
+                //refresh token in 401
+                else if(request.status == 401 && !retry) {
+                    that.refreshAccessToken(function(oauthResponse) {
+                        that.setSessionToken(oauthResponse.access_token, null,oauthResponse.instance_url);
+                        that.getChatterFile(path, mimeType, callback, error, true);
+                    },
+                    error);
+                } 
+                else {
+                    // display status message
+                    error(request,request.statusText,request.response);
+                }
+            }            
+            
+        }
+
+        request.send();
+        
+    }
+
     /*
      * Lists summary information about each Salesforce.com version currently 
      * available, including the version, label, and a link to each version's

@@ -182,6 +182,50 @@ if (forcetk.Client === undefined) {
     }
 
     /*
+     * Low level utility function to call the Salesforce endpoint specific for Apex REST API.
+     * @param path resource path relative to /services/apexrest
+     * @param callback function to which response will be passed
+     * @param [error=null] function to which jqXHR will be passed in case of error
+     * @param [method="GET"] HTTP method for call
+     * @param [payload=null] payload for POST/PATCH etc
+     */
+    forcetk.Client.prototype.apexrest = function(path, callback, error, method, payload, retry) {
+        var that = this;
+        var url = this.instanceUrl + '/services/apexrest' + path;
+
+        $j.ajax({
+            type: method || "GET",
+            async: this.asyncAjax,
+            url: (this.proxyUrl !== null) ? this.proxyUrl: url,
+            contentType: 'application/json',
+            cache: false,
+            processData: false,
+            data: payload,
+            success: callback,
+            error: (!this.refreshToken || retry ) ? error : function(jqXHR, textStatus, errorThrown) {
+                if (jqXHR.status === 401) {
+                    that.refreshAccessToken(function(oauthResponse) {
+                        that.setSessionToken(oauthResponse.access_token, null,
+                        oauthResponse.instance_url);
+                        that.ajax(path, callback, error, method, payload, true);
+                    },
+                    error);
+                } else {
+                    error(jqXHR, textStatus, errorThrown);
+                }
+            },
+            dataType: "json",
+            beforeSend: function(xhr) {
+                if (that.proxyUrl !== null) {
+                    xhr.setRequestHeader('SalesforceProxy-Endpoint', url);
+                }
+                xhr.setRequestHeader(that.authzHeader, "OAuth " + that.sessionId);
+                xhr.setRequestHeader('X-User-Agent', 'salesforce-toolkit-rest-javascript/' + that.apiVersion);
+            }
+        });
+    }
+
+    /*
      * Lists summary information about each Salesforce.com version currently 
      * available, including the version, label, and a link to each version's
      * root.

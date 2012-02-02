@@ -169,7 +169,9 @@
 // Change these configuration options if needed, see above descriptions for info.
 $enable_jsonp    = false;
 $enable_native   = true;
-$valid_url_regex = '/https:\/\/.*salesforce.com/';
+$valid_forcecom_url_regex = '/https:\/\/.*.salesforce.com/';
+$valid_databasecom_url_regex = '/https:\/\/.*database.com/';
+
 
 $url_query_param = null; // 'url'
 $url_header = 'HTTP_SALESFORCEPROXY_ENDPOINT';
@@ -201,7 +203,7 @@ if ( !$url ) {
   $status['http_code'] = 400;
   $status['status_text'] = 'Bad Request';
   
-} else if ( !preg_match( $valid_url_regex, $url ) ) {
+} else if ( !preg_match( $valid_forcecom_url_regex, $url ) && !preg_match( $valid_databasecom_url_regex, $url )) {
   
   // Passed url doesn't match $valid_url_regex.
   $contents = 'ERROR: invalid url';

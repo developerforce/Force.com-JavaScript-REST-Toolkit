@@ -195,17 +195,18 @@ if (forcetk.Client === undefined) {
      **/
     forcetk.Client.prototype.getChatterFile = function(path,mimeType,callback,error,retry) {
         var that = this;
-    
         var url = this.instanceUrl + path;
 
         var request = new XMLHttpRequest();
-        
-                
-        request.open("GET", url, true);
+                  
+        request.open("GET",  (this.proxyUrl !== null) ? this.proxyUrl: url, true);
         request.responseType = "arraybuffer";
         
         request.setRequestHeader(that.authzHeader, "OAuth " + that.sessionId);
         request.setRequestHeader('X-User-Agent', 'salesforce-toolkit-rest-javascript/' + that.apiVersion);
+        if (this.proxyUrl !== null) {
+            request.setRequestHeader('SalesforceProxy-Endpoint', url);
+        }
         
         request.onreadystatechange = function() {
             // continue if the process is completed

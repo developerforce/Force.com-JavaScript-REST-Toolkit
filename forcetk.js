@@ -249,8 +249,9 @@ if (forcetk.Client === undefined) {
      * @param [error=null] function to which jqXHR will be passed in case of error
      * @param [method="GET"] HTTP method for call
      * @param [payload=null] payload for POST/PATCH etc
+	 * @param [paramMap={}] parameters to send as header values for POST/PATCH etc
      */
-    forcetk.Client.prototype.apexrest = function(path, callback, error, method, payload, retry) {
+    forcetk.Client.prototype.apexrest = function(path, callback, error, method, payload, paramMap, retry) {
         var that = this;
         var url = this.instanceUrl + '/services/apexrest' + path;
 
@@ -280,6 +281,13 @@ if (forcetk.Client === undefined) {
                 if (that.proxyUrl !== null) {
                     xhr.setRequestHeader('SalesforceProxy-Endpoint', url);
                 }
+				//Add any custom headers
+				if (paramMap === null) {
+					paramMap = {};
+				}
+				for (paramName in paramMap) {
+					xhr.setRequestHeader(paramName, paramMap[paramName]);
+				}
                 xhr.setRequestHeader(that.authzHeader, "OAuth " + that.sessionId);
                 xhr.setRequestHeader('X-User-Agent', 'salesforce-toolkit-rest-javascript/' + that.apiVersion);
             }

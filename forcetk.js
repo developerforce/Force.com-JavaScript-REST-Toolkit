@@ -250,6 +250,7 @@ if (forcetk.Client === undefined) {
      * @param [method="GET"] HTTP method for call
      * @param [payload=null] payload for POST/PATCH etc
 	 * @param [paramMap={}] parameters to send as header values for POST/PATCH etc
+	 * @param [retry] specifies whether to retry on error
      */
     forcetk.Client.prototype.apexrest = function(path, callback, error, method, payload, paramMap, retry) {
         var that = this;
@@ -269,7 +270,7 @@ if (forcetk.Client === undefined) {
                     that.refreshAccessToken(function(oauthResponse) {
                         that.setSessionToken(oauthResponse.access_token, null,
                         oauthResponse.instance_url);
-                        that.ajax(path, callback, error, method, payload, true);
+                        that.apexrest(path, callback, error, method, payload, paramMap, true);
                     },
                     error);
                 } else {

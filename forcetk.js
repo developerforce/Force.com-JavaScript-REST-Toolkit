@@ -431,7 +431,7 @@ if (forcetk.Client === undefined) {
         , callback, error);
     }
     
-	/*
+    /*
      * Queries the next set of records based on pagination.
      * <p>This should be used if performing a query that retrieves more than can be returned
      * in accordance with http://www.salesforce.com/us/developer/docs/api_rest/Content/dome_query.htm</p>

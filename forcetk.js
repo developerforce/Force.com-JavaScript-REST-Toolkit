@@ -442,18 +442,17 @@ if (forcetk.Client === undefined) {
      * @param [error=null] function to which jqXHR will be passed in case of error
      */
     forcetk.Client.prototype.queryMore = function( url, callback, error ){
-    	
-    	//-- ajax call adds on services/data to the url call, so only send the url after
-    	var serviceData = "services/data";
-		var index = url.indexOf( serviceData );
-		
-		if( index > -1 ){
-			url = url.substr( index + serviceData.length );
-		} else {
-			//-- leave alone
-		}
-    	
-    	this.ajax( url, callback, error );
+        //-- ajax call adds on services/data to the url call, so only send the url after
+        var serviceData = "services/data";
+        var index = url.indexOf( serviceData );
+        
+        if( index > -1 ){
+        	url = url.substr( index + serviceData.length );
+        } else {
+        	//-- leave alone
+        }
+        
+        this.ajax( url, callback, error );
     }
 
     /*

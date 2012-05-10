@@ -430,6 +430,31 @@ if (forcetk.Client === undefined) {
         this.ajax('/' + this.apiVersion + '/query?q=' + escape(soql)
         , callback, error);
     }
+    
+	/*
+	 * Queries the next set of records based on pagination.
+	 * <p>This should be used if performing a query that retrieves more than can be returned
+	 * in accordance with http://www.salesforce.com/us/developer/docs/api_rest/Content/dome_query.htm</p>
+	 * <p>Ex: forcetkClient.queryMore( successResponse.nextRecordsUrl, successHandler, failureHandler )</p>
+	 * 
+	 * @param url - the url retrieved from nextRecordsUrl or prevRecordsUrl
+	 * @param callback function to which response will be passed
+     * @param [error=null] function to which jqXHR will be passed in case of error
+     */
+    forcetk.Client.prototype.queryMore = function( url, callback, error ){
+    	
+    	//-- ajax call adds on services/data to the url call, so only send the url after
+    	var serviceData = "services/data";
+		var index = url.indexOf( serviceData );
+		
+		if( index > -1 ){
+			url = url.substr( index + serviceData.length );
+		} else {
+			//-- leave alone
+		}
+    	
+    	this.ajax( url, callback, error );
+    }
 
     /*
      * Executes the specified SOSL search.

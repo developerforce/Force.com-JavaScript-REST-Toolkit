@@ -54,7 +54,7 @@ Your Visualforce page will need to include the component, then create a client o
 	    <p>The first account I see is <span id="accountname"></span>.</p>
 	</apex:page>
 	
-A more fully featured sample is provided in [RemoteTKExample.page](Force.com-JavaScript-REST-Toolkit/blob/master/RemoteTKExample.page).
+More fully featured samples are provided in [RemoteTKExample.page](Force.com-JavaScript-REST-Toolkit/blob/master/RemoteTKExample.page) and  [RemoteTKMobile.page](Force.com-JavaScript-REST-Toolkit/blob/master/RemoteTKMobile.page).
 
 Using ForceTK in a Visualforce page
 -----------------------------------

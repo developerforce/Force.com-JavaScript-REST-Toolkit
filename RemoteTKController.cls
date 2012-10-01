@@ -102,13 +102,20 @@ public class RemoteTKController {
     
     @remoteAction
     public static String retrieve(String objtype, String id, String fieldlist) {
-        // TODO - handle missing fieldlist - retrieve all fields
-        String fieldString = '';
+        // TODO - handle null fieldlist - retrieve all fields
+        Boolean containsId = false;
         for (String field : fieldlist.split(',')) {
-            fieldString += ','+field;
+            if (field.equalsIgnoreCase('id')){
+                containsId = true;
+                break;
+            }
         }
         
-        String soql = 'SELECT Id'+fieldString+' FROM '+objtype+' WHERE Id = \''+id+'\'';
+        if (!containsId) {
+            fieldlist = 'Id,'+fieldlist;
+        }
+        
+        String soql = 'SELECT '+fieldlist+' FROM '+objtype+' WHERE Id = \''+id+'\'';
         List<sObject> records;
         try {
             records = Database.query(soql);

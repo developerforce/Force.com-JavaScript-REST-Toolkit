@@ -1,17 +1,19 @@
 Force.com JavaScript REST Toolkit
 =================================
 
-This minimal toolkit allows JavaScript in Visualforce pages to call the Force.com REST API either via the Ajax Proxy (in the case of web apps) or directly (from a PhoneGap app), providing an easy-to-use JavaScript wrapper.
+This minimal toolkit allows JavaScript in Visualforce pages to call the Force.com REST API in a number of different ways.
 
 Background
 ----------
 
 Due to the [same origin policy](http://en.wikipedia.org/wiki/Same_origin_policy), JavaScript running in Visualforce pages may not use [XmlHttpRequest](http://en.wikipedia.org/wiki/XMLHttpRequest) to directly invoke the REST API, since Visualforce pages have hostnames of the form abc.na1.visual.force.com, and the REST API endpoints are of the form na1.salesforce.com.
 
-We can work around this restriction by using the [AJAX Proxy](http://www.salesforce.com/us/developer/docs/ajax/Content/sforce_api_ajax_queryresultiterator.htm#ajax_proxy). Since the AJAX proxy is present on all
-Visualforce hosts with an endpoint of the form https://abc.na1.visual.force.com/services/proxy, our Visualforce-hosted JavaScript can invoke it, passing the desired resource URL in an HTTP header.
+The RemoteTK Visualforce Component (comprising RemoteTK.component and RemoteTKController.cls) provides an abstraction very similar to the REST API, implemented via `@RemoteAction` methods in the component's controller. The advantage of this mechanism is that no API calls are consumed. A disadvantage is that upsert is not currently implemented.
 
-Alternatively, to host JavaScript outside the Force.com platform, we can deploy a simple PHP proxy to perform the same function as the AJAX proxy.
+Alternatively, the ForceTK JavaScript library works around the same origin restriction by using the [AJAX Proxy](http://www.salesforce.com/us/developer/docs/ajax/Content/sforce_api_ajax_queryresultiterator.htm#ajax_proxy) to give full access to the REST API. Since the AJAX proxy is present on all
+Visualforce hosts with an endpoint of the form https://abc.na1.visual.force.com/services/proxy, our Visualforce-hosted JavaScript can invoke it, passing the desired resource URL in an HTTP header. A drawback here is that using the REST API, even from a Visualforce page, consumes API calls.
+
+To host JavaScript outside the Force.com platform, we can deploy a simple PHP proxy to perform the same function as the AJAX proxy.
 
 [PhoneGap](http://www.phonegap.com/) provides a way for HTML5/JavaScript apps to run as native applications; in this configuration a proxy is not required - the toolkit simply provides a convenient abstraction of the REST API.
 
@@ -23,10 +25,39 @@ The toolkit uses [jQuery](http://jquery.com/). It has been tested on jQuery 1.4.
 Configuration
 -------------
 
-You must add the correct REST endpoint hostname for your instance (i.e. https://na1.salesforce.com/ or similar) as a remote site in *Your Name > Administration Setup > Security Controls > Remote Site Settings*.
+RemoteTK requires no configuration.
 
-Using the Toolkit in a Visualforce page
----------------------------------------
+ForceTK requires that you add the correct REST endpoint hostname for your instance (i.e. https://na1.salesforce.com/ or similar) as a remote site in *Your Name > Administration Setup > Security Controls > Remote Site Settings*.
+
+Using RemoteTK in a Visualforce page
+------------------------------------
+
+Add RemoteTKController.cls and RemoteTK.component to your org by creating an Apex Class and a Component and pasting in the respective content, pasting the files into a [Force.com IDE](http://wiki.developerforce.com/page/Force.com_IDE) project, or by using the [Force.com Migration Tool](http://wiki.developerforce.com/page/Migration_Tool_Guide).
+
+Your Visualforce page will need to include the component, then create a client object, passing a session ID to the constructor. An absolutely minimal sample is:
+
+	<apex:page>
+	    <!-- Include the RemoteTK component -->
+	    <c:RemoteTK />
+        <apex:includeScript value="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js" />
+	    <script type="text/javascript">
+	        // Get a reference to jQuery that we can work with
+	        $j = jQuery.noConflict();
+        
+			// Get an instance of the RemoteTK client
+			var client = new remotetk.Client();
+        
+	        client.query("SELECT Name FROM Account LIMIT 1", function(response){
+	            $j('#accountname').html(response.records[0].Name);
+	        });
+	    </script>
+	    <p>The first account I see is <span id="accountname"></span>.</p>
+	</apex:page>
+	
+A more fully featured sample is provided in [RemoteTKExample.page](Force.com-JavaScript-REST-Toolkit/blob/master/RemoteTKExample.page).
+
+Using ForceTK in a Visualforce page
+-----------------------------------
 
 Create a zip file containing app.js, forcetk.js, jquery.js, and any other static resources your project may need. Upload the zip via *Your Name > App Setup > Develop > Static Resources*.
 

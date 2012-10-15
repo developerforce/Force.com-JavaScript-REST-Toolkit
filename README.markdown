@@ -1,7 +1,7 @@
 Force.com JavaScript REST Toolkit
 =================================
 
-This minimal toolkit allows JavaScript in Visualforce pages to call the Force.com REST API in a number of different ways.
+This minimal toolkit allows JavaScript in web pages to call the Force.com REST API in a number of different ways.
 
 Background
 ----------
@@ -13,7 +13,7 @@ The RemoteTK Visualforce Custom Component (comprising RemoteTK.component and Rem
 Alternatively, the ForceTK JavaScript library works around the same origin restriction by using the [AJAX Proxy](http://www.salesforce.com/us/developer/docs/ajax/Content/sforce_api_ajax_queryresultiterator.htm#ajax_proxy) to give full access to the REST API. Since the AJAX proxy is present on all
 Visualforce hosts with an endpoint of the form https://abc.na1.visual.force.com/services/proxy, our Visualforce-hosted JavaScript can invoke it, passing the desired resource URL in an HTTP header. A drawback here is that using the REST API, even from a Visualforce page, consumes API calls.
 
-To host JavaScript outside the Force.com platform, we can deploy a simple PHP proxy to perform the same function as the AJAX proxy.
+To host JavaScript *outside* the Force.com platform, we can deploy a simple PHP proxy to perform the same function as the AJAX proxy.
 
 [PhoneGap](http://www.phonegap.com/) provides a way for HTML5/JavaScript apps to run as native applications; in this configuration a proxy is not required - the toolkit simply provides a convenient abstraction of the REST API.
 

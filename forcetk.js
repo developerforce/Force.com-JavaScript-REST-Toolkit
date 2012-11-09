@@ -147,6 +147,9 @@ if (forcetk.Client === undefined) {
      */
     forcetk.Client.prototype.ajax = function(path, callback, error, method, payload, retry) {
         var that = this;
+        if (path.substring(0, 14) != '/services/data') {
+            path = '/services/data' + path;
+        }
         var url = this.instanceUrl + '/services/data' + path;
 
         $j.ajax({

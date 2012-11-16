@@ -260,6 +260,10 @@ if ( !$url ) {
 	// Pass through the Content-Type header
 	array_push($headers, "Content-Type: ".$_SERVER['CONTENT_TYPE'] );
   }	
+  if ( isset($_SERVER['HTTP_SOAPACTION']) ) {
+  // Pass through the SOAPAction header
+    array_push($headers, "SOAPAction: ".$_SERVER['HTTP_SOAPACTION'] );
+  }
   if ( isset($_SERVER['HTTP_X_USER_AGENT']) ) {
 	// Pass through the X-User-Agent header
 	array_push($headers, "X-User-Agent: ".$_SERVER['HTTP_X_USER_AGENT'] );

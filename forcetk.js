@@ -439,7 +439,7 @@ if (forcetk.Client === undefined) {
      * @param [error=null] function to which jqXHR will be passed in case of error
      */
     forcetk.Client.prototype.search = function(sosl, callback, error) {
-        this.ajax('/' + this.apiVersion + '/search?s=' + escape(sosl)
+        this.ajax('/' + this.apiVersion + '/search?q=' + escape(sosl)
         , callback, error);
     }
 }

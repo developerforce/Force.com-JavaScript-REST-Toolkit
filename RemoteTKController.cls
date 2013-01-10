@@ -45,6 +45,13 @@ public class RemoteTKController {
             field.put('type', descField.getType().name().toLowerCase());
             field.put('name', descField.getName());
             field.put('label', descField.getLabel());
+            List<String> references = new List<String>();
+            for (Schema.sObjectType t: descField.getReferenceTo()) {
+                references.add(t.getDescribe().getName());
+            }
+            if (!references.isEmpty()) {
+                field.put('referenceTo', references);
+            }
             
             fields.add(field);
         }
@@ -224,6 +231,8 @@ public class RemoteTKController {
         
         Map<String, Object> result = new Map<String, Object>();
         result.put('records', records);
+        result.put('totalSize', records.size());
+        result.put('done', true);
         
         return JSON.serialize(result);
     }

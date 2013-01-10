@@ -66,7 +66,7 @@ if (remotetk.Client === undefined) {
      * @param [error=null] function to which jqXHR will be passed in case of error
      */
     remotetk.Client.prototype.describe = function(objtype, callback, error) {
-        RemoteTKController.describe(objtype, function(result){
+        Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.RemoteTKController.describe}', objtype, function(result){
             handleResult(result, callback, error);
         }, { 
             escape: false
@@ -83,7 +83,7 @@ if (remotetk.Client === undefined) {
      * @param [error=null] function to which jqXHR will be passed in case of error
      */
     remotetk.Client.prototype.create = function(objtype, fields, callback, error) {
-        RemoteTKController.create(objtype, JSON.stringify(fields), function(result){
+        Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.RemoteTKController.create}', objtype, JSON.stringify(fields), function(result){
             handleResult(result, callback, error);
         }, { 
             escape: false
@@ -100,7 +100,7 @@ if (remotetk.Client === undefined) {
      * @param [error=null] function to which jqXHR will be passed in case of error
      */
     remotetk.Client.prototype.retrieve = function(objtype, id, fieldlist, callback, error) {
-        RemoteTKController.retrieve(objtype, id, fieldlist, function(result){
+        Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.RemoteTKController.retrieve}', objtype, id, fieldlist, function(result){
             handleResult(result, callback, error);
         }, { 
             escape: false
@@ -121,7 +121,7 @@ if (remotetk.Client === undefined) {
      */
     /*
     remotetk.Client.prototype.upsert = function(objtype, externalIdField, externalId, fields, callback, error) {
-        RemoteTKController.upser(objtype, externalIdField, externalId, JSON.stringify(fields), function(result){
+        Visualforce.remoting.Manager.invokeAction('$RemoteAction.RemoteTKController.upser', objtype, externalIdField, externalId, JSON.stringify(fields), function(result){
             handleResult(result, callback, error, true);
         }, { 
                 escape: false
@@ -140,7 +140,7 @@ if (remotetk.Client === undefined) {
      * @param [error=null] function to which jqXHR will be passed in case of error
      */
     remotetk.Client.prototype.update = function(objtype, id, fields, callback, error) {
-        RemoteTKController.updat(objtype, id, JSON.stringify(fields), function(result){
+        Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.RemoteTKController.updat}', objtype, id, JSON.stringify(fields), function(result){
             handleResult(result, callback, error, true);
         }, { 
             escape: false
@@ -156,7 +156,7 @@ if (remotetk.Client === undefined) {
      * @param [error=null] function to which jqXHR will be passed in case of error
      */
     remotetk.Client.prototype.del = function(objtype, id, callback, error) {
-        RemoteTKController.del(objtype, id, function(result){
+        Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.RemoteTKController.del}', objtype, id, function(result){
             handleResult(result, callback, error, true);
         }, { 
             escape: false
@@ -171,7 +171,7 @@ if (remotetk.Client === undefined) {
      * @param [error=null] function to which jqXHR will be passed in case of error
      */
     remotetk.Client.prototype.query = function(soql, callback, error) {
-        RemoteTKController.query(soql, function(result){
+        Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.RemoteTKController.query}', soql, function(result){
             handleResult(result, callback, error);
         }, { 
             escape: false
@@ -186,7 +186,7 @@ if (remotetk.Client === undefined) {
      * @param [error=null] function to which jqXHR will be passed in case of error
      */
     remotetk.Client.prototype.search = function(sosl, callback, error) {
-        RemoteTKController.search(sosl, function(result){
+        Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.RemoteTKController.search}', sosl, function(result){
             handleResult(result, callback, error);
         }, { 
             escape: false

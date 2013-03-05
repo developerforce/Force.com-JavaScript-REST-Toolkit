@@ -126,11 +126,20 @@ if (forcetk.Client === undefined) {
         this.apiVersion = (typeof apiVersion === 'undefined' || apiVersion === null)
         ? 'v24.0': apiVersion;
         if (typeof instanceUrl === 'undefined' || instanceUrl == null) {
-            // location.hostname can be of the form 'abc.na1.visual.force.com' or
-            // 'na1.salesforce.com'. Split on '.', and take the [1] or [0] element
-            // as appropriate
+            // location.hostname can be of the form 'abc.na1.visual.force.com',
+            // 'na1.salesforce.com' or 'abc.my.salesforce.com' (custom domains). 
+            // Split on '.', and take the [1] or [0] element as appropriate
             var elements = location.hostname.split(".");
-            var instance = (elements.length == 3) ? elements[0] : elements[1];
+            
+            var instance = null;
+            if(elements.length == 4 && elements[1] === 'my') {
+                instance = elements[0] + '.' + elements[1];
+            } else if(elements.length == 3){
+                instance = elements[0];
+            } else {
+                instance = elements[1];
+            }
+            
             this.instanceUrl = "https://" + instance + ".salesforce.com";
         } else {
             this.instanceUrl = instanceUrl;

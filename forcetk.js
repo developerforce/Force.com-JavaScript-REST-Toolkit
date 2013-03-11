@@ -96,7 +96,7 @@ if (forcetk.Client === undefined) {
     forcetk.Client.prototype.refreshAccessToken = function(callback, error) {
         var that = this;
         var url = this.loginUrl + '/services/oauth2/token';
-        $j.ajax({
+        return $j.ajax({
             type: 'POST',
             url: (this.proxyUrl !== null) ? this.proxyUrl: url,
             cache: false,
@@ -158,7 +158,7 @@ if (forcetk.Client === undefined) {
         var that = this;
         var url = this.instanceUrl + '/services/data' + path;
 
-        $j.ajax({
+        return $j.ajax({
             type: method || "GET",
             async: this.asyncAjax,
             url: (this.proxyUrl !== null) ? this.proxyUrl: url,
@@ -265,7 +265,7 @@ if (forcetk.Client === undefined) {
         var that = this;
         var url = this.instanceUrl + '/services/apexrest' + path;
 
-        $j.ajax({
+        return $j.ajax({
             type: method || "GET",
             async: this.asyncAjax,
             url: (this.proxyUrl !== null) ? this.proxyUrl: url,
@@ -312,7 +312,7 @@ if (forcetk.Client === undefined) {
      * @param [error=null] function to which jqXHR will be passed in case of error
      */
     forcetk.Client.prototype.versions = function(callback, error) {
-        this.ajax('/', callback, error);
+        return this.ajax('/', callback, error);
     }
 
     /*
@@ -322,7 +322,7 @@ if (forcetk.Client === undefined) {
      * @param [error=null] function to which jqXHR will be passed in case of error
      */
     forcetk.Client.prototype.resources = function(callback, error) {
-        this.ajax('/' + this.apiVersion + '/', callback, error);
+        return this.ajax('/' + this.apiVersion + '/', callback, error);
     }
 
     /*
@@ -332,7 +332,7 @@ if (forcetk.Client === undefined) {
      * @param [error=null] function to which jqXHR will be passed in case of error
      */
     forcetk.Client.prototype.describeGlobal = function(callback, error) {
-        this.ajax('/' + this.apiVersion + '/sobjects/', callback, error);
+        return this.ajax('/' + this.apiVersion + '/sobjects/', callback, error);
     }
 
     /*
@@ -342,7 +342,7 @@ if (forcetk.Client === undefined) {
      * @param [error=null] function to which jqXHR will be passed in case of error
      */
     forcetk.Client.prototype.metadata = function(objtype, callback, error) {
-        this.ajax('/' + this.apiVersion + '/sobjects/' + objtype + '/'
+        return this.ajax('/' + this.apiVersion + '/sobjects/' + objtype + '/'
         , callback, error);
     }
 
@@ -354,7 +354,7 @@ if (forcetk.Client === undefined) {
      * @param [error=null] function to which jqXHR will be passed in case of error
      */
     forcetk.Client.prototype.describe = function(objtype, callback, error) {
-        this.ajax('/' + this.apiVersion + '/sobjects/' + objtype
+        return this.ajax('/' + this.apiVersion + '/sobjects/' + objtype
         + '/describe/', callback, error);
     }
 
@@ -368,7 +368,7 @@ if (forcetk.Client === undefined) {
      * @param [error=null] function to which jqXHR will be passed in case of error
      */
     forcetk.Client.prototype.create = function(objtype, fields, callback, error) {
-        this.ajax('/' + this.apiVersion + '/sobjects/' + objtype + '/'
+        return this.ajax('/' + this.apiVersion + '/sobjects/' + objtype + '/'
         , callback, error, "POST", JSON.stringify(fields));
     }
 
@@ -405,7 +405,7 @@ if (forcetk.Client === undefined) {
      * @param [error=null] function to which jqXHR will be passed in case of error
      */
     forcetk.Client.prototype.upsert = function(objtype, externalIdField, externalId, fields, callback, error) {
-        this.ajax('/' + this.apiVersion + '/sobjects/' + objtype + '/' + externalIdField + '/' + externalId 
+        return this.ajax('/' + this.apiVersion + '/sobjects/' + objtype + '/' + externalIdField + '/' + externalId 
         + '?_HttpMethod=PATCH', callback, error, "POST", JSON.stringify(fields));
     }
 
@@ -420,7 +420,7 @@ if (forcetk.Client === undefined) {
      * @param [error=null] function to which jqXHR will be passed in case of error
      */
     forcetk.Client.prototype.update = function(objtype, id, fields, callback, error) {
-        this.ajax('/' + this.apiVersion + '/sobjects/' + objtype + '/' + id 
+        return this.ajax('/' + this.apiVersion + '/sobjects/' + objtype + '/' + id 
         + '?_HttpMethod=PATCH', callback, error, "POST", JSON.stringify(fields));
     }
 
@@ -433,7 +433,7 @@ if (forcetk.Client === undefined) {
      * @param [error=null] function to which jqXHR will be passed in case of error
      */
     forcetk.Client.prototype.del = function(objtype, id, callback, error) {
-        this.ajax('/' + this.apiVersion + '/sobjects/' + objtype + '/' + id
+        return this.ajax('/' + this.apiVersion + '/sobjects/' + objtype + '/' + id
         , callback, error, "DELETE");
     }
 
@@ -445,7 +445,7 @@ if (forcetk.Client === undefined) {
      * @param [error=null] function to which jqXHR will be passed in case of error
      */
     forcetk.Client.prototype.query = function(soql, callback, error) {
-        this.ajax('/' + this.apiVersion + '/query?q=' + escape(soql)
+        return this.ajax('/' + this.apiVersion + '/query?q=' + escape(soql)
         , callback, error);
     }
     
@@ -470,7 +470,7 @@ if (forcetk.Client === undefined) {
         	//-- leave alone
         }
         
-        this.ajax( url, callback, error );
+        return this.ajax( url, callback, error );
     }
 
     /*
@@ -481,7 +481,7 @@ if (forcetk.Client === undefined) {
      * @param [error=null] function to which jqXHR will be passed in case of error
      */
     forcetk.Client.prototype.search = function(sosl, callback, error) {
-        this.ajax('/' + this.apiVersion + '/search?q=' + escape(sosl)
+        return this.ajax('/' + this.apiVersion + '/search?q=' + escape(sosl)
         , callback, error);
     }
 }

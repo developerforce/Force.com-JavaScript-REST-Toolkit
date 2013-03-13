@@ -8,7 +8,7 @@ Background
 
 Due to the [same origin policy](http://en.wikipedia.org/wiki/Same_origin_policy), JavaScript running in Visualforce pages may not use [XmlHttpRequest](http://en.wikipedia.org/wiki/XMLHttpRequest) to directly invoke the REST API, since Visualforce pages have hostnames of the form abc.na1.visual.force.com, and the REST API endpoints are of the form na1.salesforce.com.
 
-The RemoteTK Visualforce Custom Component (comprising RemoteTK.component and RemoteTKController.cls) provides an abstraction very similar to the REST API, implemented via `@RemoteAction` methods in the component's controller. The advantage of this mechanism is that no API calls are consumed. A disadvantage is that upsert is not currently implemented.
+The RemoteTK Visualforce Custom Component (comprising RemoteTK.component and RemoteTKController.cls) provides an abstraction very similar to the REST API, implemented via `@RemoteAction` methods in the component's controller. The advantage of this mechanism is that no API calls are consumed.
 
 Alternatively, the ForceTK JavaScript library works around the same origin restriction by using the [AJAX Proxy](http://www.salesforce.com/us/developer/docs/ajax/Content/sforce_api_ajax_queryresultiterator.htm#ajax_proxy) to give full access to the REST API. Since the AJAX proxy is present on all
 Visualforce hosts with an endpoint of the form https://abc.na1.visual.force.com/services/proxy, our Visualforce-hosted JavaScript can invoke it, passing the desired resource URL in an HTTP header. A drawback here is that using the REST API, even from a Visualforce page, consumes API calls.

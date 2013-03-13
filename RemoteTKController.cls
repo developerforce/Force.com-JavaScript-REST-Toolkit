@@ -145,7 +145,6 @@ public class RemoteTKController {
         return JSON.serialize(records[0]);
     }
     
-    /*
     @remoteAction
     public static String upser(String objtype, String externalIdField, String externalId, String fields) {
         Schema.SObjectType targetType = Schema.getGlobalDescribe().get(objtype);
@@ -161,11 +160,10 @@ public class RemoteTKController {
         
         Schema.SObjectField sobjField = targetType.getDescribe().fields.getMap().get(externalIdField);
         
-        // Database.Upsert(obj, sobjField); // error - upsert requires a concrete sobject type
+        Database.Upsert(obj, sobjField);
         
         return null;
     }
-    */
 
     @remoteAction
     public static String updat(String objtype, String id, String fields) {

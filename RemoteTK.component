@@ -57,6 +57,12 @@ if (remotetk.Client === undefined) {
      */
     remotetk.Client = function(){
     }
+
+    /** NOOP: for compatibility with forcetk
+    */
+    remotetk.Client.prototype.setSessionToken = function() {}
+    remotetk.Client.prototype.setRefreshToken = function() {}
+    remotetk.Client.prototype.setUserAgentString = function() {}
         
     /*
      * Completely describes the individual metadata at all levels for the 

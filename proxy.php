@@ -234,7 +234,8 @@ if ( !$url ) {
       isset($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : 'GET' );
 
   // Pass on content, regardless of request method
-  if ( isset($_SERVER['CONTENT_LENGTH'] ) && $_SERVER['CONTENT_LENGTH'] > 0 ) {
+  if ( (isset($_SERVER['CONTENT_LENGTH'] ) && $_SERVER['CONTENT_LENGTH'] > 0) ||
+       (isset($_SERVER['HTTP_CONTENT_LENGTH'] ) && $_SERVER['HTTP_CONTENT_LENGTH'] > 0) ) {
     curl_setopt( $ch, CURLOPT_POSTFIELDS, file_get_contents("php://input") );
   }
 
@@ -259,9 +260,12 @@ if ( !$url ) {
   if ( isset($_SERVER['CONTENT_TYPE']) ) {
 	// Pass through the Content-Type header
 	array_push($headers, "Content-Type: ".$_SERVER['CONTENT_TYPE'] );
-  }	
+  } elseif ( isset($_SERVER['HTTP_CONTENT_TYPE']) ) {
+    // Pass through the Content-Type header
+    array_push($headers, "Content-Type: ".$_SERVER['HTTP_CONTENT_TYPE'] );
+  }
   if ( isset($_SERVER['HTTP_SOAPACTION']) ) {
-  // Pass through the SOAPAction header
+    // Pass through the SOAPAction header
     array_push($headers, "SOAPAction: ".$_SERVER['HTTP_SOAPACTION'] );
   }
   if ( isset($_SERVER['HTTP_X_USER_AGENT']) ) {

@@ -58,6 +58,7 @@ public class RemoteTKController {
     @remoteAction
     public static String create(String objtype, String fields) {
         Schema.SObjectType targetType = Schema.getGlobalDescribe().get(objtype);
+        Map<String, Schema.sObjectField> targetFields = targetType.getDescribe().fields.getMap();
         if (targetType == null) {
             return '[{"message":"The requested resource does not exist","errorCode":"NOT_FOUND"}]';
         }
@@ -73,7 +74,18 @@ public class RemoteTKController {
         
         try {
             for (String key : fieldMap.keySet()) {
-                obj.put(key, fieldMap.get(key));
+                if (targetFields.get(key).getDescribe().getType() == Schema.DisplayType.Date) {
+                    obj.put(key, Date.valueOf((String)fieldMap.get(key)));
+                } else if (targetFields.get(key).getDescribe().getType() == Schema.DisplayType.Percent ||
+                       targetFields.get(key).getDescribe().getType() == Schema.DisplayType.Currency) {
+                    obj.put(key, String.valueOf(fieldMap.get(key)) == '' ? null : Decimal.valueOf((String)fieldMap.get(key)));
+                } else if (targetFields.get(key).getDescribe().getType() == Schema.DisplayType.Double) {
+                    obj.put(key, String.valueOf(fieldMap.get(key)) == '' ? null : Double.valueOf(fieldMap.get(key)));
+                } else if (targetFields.get(key).getDescribe().getType() == Schema.DisplayType.Integer) {
+                    obj.put(key, Integer.valueOf(fieldMap.get(key)));
+                } else {
+                    obj.put(key, fieldMap.get(key));
+                }
             }
         } catch (SObjectException soe) {
             return '[{"message":"'+soe.getMessage()+'","errorCode":"INVALID_FIELD"}]';

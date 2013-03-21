@@ -25,12 +25,24 @@
  */
 
 public class RemoteTKController {
+    private static String makeError(String message, String errorCode) {
+        JSONGenerator gen = JSON.createGenerator(false);
+        gen.writeStartArray();
+        gen.writeStartObject();
+        gen.writeStringField('message', message);
+        gen.writeStringField('errorCode', errorCode);
+        gen.writeEndObject();
+        gen.writeEndArray();
+        
+        return gen.getAsString();
+    }
+    
     @remoteAction
     public static String describe(String objtype) {
         // Just enough to make the sample app work!
         Schema.SObjectType targetType = Schema.getGlobalDescribe().get(objtype);
         if (targetType == null) {
-            return '[{"message":"The requested resource does not exist","errorCode":"NOT_FOUND"}]';
+            return makeError('The requested resource does not exist', 'NOT_FOUND');
         }
         
         Schema.DescribeSObjectResult sobjResult = targetType.getDescribe();
@@ -65,9 +77,8 @@ public class RemoteTKController {
     @remoteAction
     public static String create(String objtype, String fields) {
         Schema.SObjectType targetType = Schema.getGlobalDescribe().get(objtype);
-        Map<String, Schema.sObjectField> targetFields = targetType.getDescribe().fields.getMap();
         if (targetType == null) {
-            return '[{"message":"The requested resource does not exist","errorCode":"NOT_FOUND"}]';
+            return makeError('The requested resource does not exist', 'NOT_FOUND');
         }
         
         SObject obj = targetType.newSObject();
@@ -76,11 +87,17 @@ public class RemoteTKController {
         try {
             fieldMap = (Map<String, Object>)JSON.deserializeUntyped(fields);
         } catch (JSONException je) {
-            return '[{"message":"'+je.getMessage()+'","errorCode":"JSON_PARSER_ERROR"}]';
+            return makeError(je.getMessage(), 'JSON_PARSER_ERROR');
         }
+        
+        Map<String, Schema.sObjectField> targetFields = targetType.getDescribe().fields.getMap();
         
         try {
             for (String key : fieldMap.keySet()) {
+                if (targetFields.get(key) == null) {
+                    return '[{"message":"Field '+key+' does not exist on object type '+objtype+'","errorCode":"INVALID_FIELD"}]';
+                }
+                
                 if (targetFields.get(key).getDescribe().getType() == Schema.DisplayType.Date) {
                     obj.put(key, Date.valueOf((String)fieldMap.get(key)));
                 } else if (targetFields.get(key).getDescribe().getType() == Schema.DisplayType.Percent ||
@@ -95,7 +112,7 @@ public class RemoteTKController {
                 }
             }
         } catch (SObjectException soe) {
-            return '[{"message":"'+soe.getMessage()+'","errorCode":"INVALID_FIELD"}]';
+            return makeError(soe.getMessage(), 'INVALID_FIELD');
         }
         
         try {
@@ -139,7 +156,7 @@ public class RemoteTKController {
         try {
             records = Database.query(soql);
         } catch (QueryException qe) {
-            return '[{"message":"'+qe.getMessage()+'","errorCode":"INVALID_QUERY"}]';
+            return makeError(qe.getMessage(), 'INVALID_QUERY');
         }
         
         return JSON.serialize(records[0]);
@@ -148,14 +165,21 @@ public class RemoteTKController {
     @remoteAction
     public static String upser(String objtype, String externalIdField, String externalId, String fields) {
         Schema.SObjectType targetType = Schema.getGlobalDescribe().get(objtype);
+        if (targetType == null) {
+            return makeError('The requested resource does not exist', 'NOT_FOUND');
+        }
         
         SObject obj = targetType.newSObject();
         obj.put(externalIdField, externalId);
         
         Map<String, Object> fieldMap = 
            (Map<String, Object>)JSON.deserializeUntyped(fields);
-        for (String key : fieldMap.keySet()) {
-            obj.put(key, fieldMap.get(key));
+        try {
+            for (String key : fieldMap.keySet()) {
+                obj.put(key, fieldMap.get(key));
+            }
+        } catch (SObjectException soe) {
+            return makeError(soe.getMessage(), 'INVALID_FIELD');
         }
         
         Schema.SObjectField sobjField = targetType.getDescribe().fields.getMap().get(externalIdField);
@@ -169,7 +193,7 @@ public class RemoteTKController {
     public static String updat(String objtype, String id, String fields) {
         Schema.SObjectType targetType = Schema.getGlobalDescribe().get(objtype);
         if (targetType == null) {
-            return '[{"message":"The requested resource does not exist","errorCode":"NOT_FOUND"}]';
+            return makeError('The requested resource does not exist', 'NOT_FOUND');
         }
         
         SObject obj = targetType.newSObject(id);
@@ -178,7 +202,7 @@ public class RemoteTKController {
         try {
             fieldMap = (Map<String, Object>)JSON.deserializeUntyped(fields);
         } catch (JSONException je) {
-            return '[{"message":"'+je.getMessage()+'","errorCode":"JSON_PARSER_ERROR"}]';
+            return makeError(je.getMessage(), 'JSON_PARSER_ERROR');
         }
 
         try {
@@ -186,7 +210,7 @@ public class RemoteTKController {
                 obj.put(key, fieldMap.get(key));
             }
         } catch (SObjectException soe) {
-            return '[{"message":"'+soe.getMessage()+'","errorCode":"INVALID_FIELD"}]';
+            return makeError(soe.getMessage(), 'INVALID_FIELD');
         }
         
         try {
@@ -209,7 +233,7 @@ public class RemoteTKController {
     public static String del(String objtype, String id) {
         Schema.SObjectType targetType = Schema.getGlobalDescribe().get(objtype);
         if (targetType == null) {
-            return '[{"message":"The requested resource does not exist","errorCode":"NOT_FOUND"}]';
+            return makeError('The requested resource does not exist', 'NOT_FOUND');
         }
         
         SObject obj = targetType.newSObject(id);
@@ -236,7 +260,7 @@ public class RemoteTKController {
         try {
             records = Database.query(soql);
         } catch (QueryException qe) {
-            return '[{"message":"'+qe.getMessage()+'","errorCode":"INVALID_QUERY"}]';
+            return makeError(qe.getMessage(), 'INVALID_QUERY');
         }
         
         Map<String, Object> result = new Map<String, Object>();
@@ -252,8 +276,10 @@ public class RemoteTKController {
         List<List<SObject>> result;        
         try {
             result = Search.query(sosl);
+        } catch (QueryException qe) {
+            return makeError(qe.getMessage(), 'INVALID_SEARCH');
         } catch (SearchException se) {
-            return '[{"message":"'+se.getMessage()+'","errorCode":"INVALID_SEARCH"}]';
+            return makeError(se.getMessage(), 'INVALID_SEARCH');
         }
         
         return JSON.serialize(result);

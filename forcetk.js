@@ -382,7 +382,7 @@ if (forcetk.Client === undefined) {
      * @param [error=null] function to which jqXHR will be passed in case of error
      */
     forcetk.Client.prototype.retrieve = function(objtype, id, fieldlist, callback, error) {
-        if (!arguments[4]) {
+        if (arguments.length == 4) {
             error = callback;
             callback = fieldlist;
             fieldlist = null;

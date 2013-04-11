@@ -25,6 +25,23 @@
  */
 
 public class RemoteTKController {
+
+    public class picklistValues {
+        String label {get; set;}
+        String value {get; set;}
+    }
+
+    public class Select2Data {
+        String id         {get; set;}
+        String name       {get; set;}
+        String searchName {get; set;}
+    }
+
+    public class QueryString {
+        String selectClause {get; set;}
+        String fromClause   {get; set;}
+    }
+
     private static String makeError(String message, String errorCode) {
         JSONGenerator gen = JSON.createGenerator(false);
         gen.writeStartArray();
@@ -72,6 +89,25 @@ public class RemoteTKController {
         result.put('fields', fields);
         
         return JSON.serialize(result);
+    }
+
+    @remoteAction
+    public static String describeFieldSet(String objtype, String fieldSetName) {
+        Schema.SObjectType token = Schema.getGlobalDescribe().get(objtype);
+        Schema.DescribeSObjectResult dr = token.getDescribe();
+        Map<String, Schema.FieldSet> FsMap = dr.fieldSets.getMap();
+        return JSON.serialize(FsMap.get(FieldSetName).getFields());
+    }
+
+    @remoteAction
+    public static String getObjType(String Id) {
+        Id objId = (id) Id;
+        Schema.SObjectType token = objId.getSObjectType();
+        Schema.DescribeSObjectResult dr = token.getDescribe();
+        String objName = dr.getName();
+        Map<String,String> retObj = new Map<String,String>();
+        retObj.put('type', objName);
+        return JSON.serialize(retObj);
     }
     
     @remoteAction
@@ -137,6 +173,58 @@ public class RemoteTKController {
     }
     
     @remoteAction
+    public static String getPicklistValues(String objtype, String fieldName) {
+        Schema.SObjectType token = Schema.getGlobalDescribe().get(objtype);
+        Schema.DescribeSObjectResult dr = token.getDescribe();
+        Map<String, Schema.SObjectField> field_map = dr.fields.getMap();
+        List<Schema.PicklistEntry> pickListValues = field_map.get(fieldName).getDescribe().getPickListValues();
+        List<pickListValues> options = new List<picklistValues>();
+        for(Schema.PicklistEntry plv : pickListValues){
+            pickListValues pv = new pickListValues();
+            pv.label = plv.getLabel();
+            pv.value = plv.getValue();
+            options.add(pv);
+        }
+        return JSON.serialize(options);
+    }
+
+    @remoteAction
+    public static String getQueryResultsAsSelect2Data(String soql) {
+        List<sObject> records;
+        try {
+            records = Database.query(soql);
+        } catch (QueryException qe) {
+            return '[{"message":"'+qe.getMessage()+'","errorCode":"INVALID_QUERY"}]';
+        }
+        List<Select2Data> sData = new List<Select2Data>();
+        for(sObject r : records) {
+            Select2Data s = new Select2Data();
+            s.id = r.id;
+            s.name = (String) r.get('Name');
+            s.searchName = (String) r.get('SearchName__c');
+            sData.add(s);
+        }
+        return JSON.serialize(sData);
+    }
+
+    @remoteAction
+    public static String queryFromFieldSet(String id, String fieldSetName){
+        Id objId = (id) Id;
+        Schema.SObjectType token = objId.getSObjectType();
+        Schema.DescribeSObjectResult dr = token.getDescribe();
+        Map<String, Schema.FieldSet> FsMap = dr.fieldSets.getMap();
+        String queryString = 'SELECT Id';
+        List<Schema.FieldSetMember> querySet = new List<Schema.FieldSetMember>();
+        querySet = FsMap.get(FieldSetName).getFields();
+        for(Schema.FieldSetMember f : querySet) {
+            queryString += ', '+ f.getFieldPath();
+        }
+        queryString += ' FROM ' + dr.getName() + ' WHERE id = \''+ objId +'\' LIMIT 1';
+        system.debug(queryString);
+        return JSON.serialize(database.Query(queryString));
+    }
+
+    @remoteAction
     public static String retrieve(String objtype, String id, String fieldlist) {
         // TODO - handle null fieldlist - retrieve all fields
         Boolean containsId = false;
@@ -161,7 +249,52 @@ public class RemoteTKController {
         
         return JSON.serialize(records[0]);
     }
+
+    @remoteAction
+    public static String sObjectKlone(String iId) {
+        Id id = (id) iId; 
+        sObjectType type = id.getSObjectType();
+        Schema.DescribeSObjectResult dr = type.getDescribe();
+        map<String, Schema.SObjectField> fieldMap = dr.fields.getMap(); 
+        String qs = 'SELECT Id';
+        Set<string> querySet = new Set<string>();
+        querySet.addAll(fieldMap.keySet());
+        querySet.remove('id');
+        for(String f : querySet) {
+            qs += ', '+ f;
+        }
+        qs += ' FROM ' + dr.getName() + ' WHERE id = \'' + id + '\' LIMIT 1';
+        sObject toClone = Database.query(qs);
+        sObject cloned = toClone.clone(false,true,false,false);
+        String results;
+        try{
+            upsert cloned;
+            results = cloned.id;
+        } catch (DMLException e) {
+            system.debug(e);
+            results = e.getMessage();
+        }
+        return JSON.serialize(results);
+    }
     
+    @remoteAction
+    public static String soqlFromFieldSet(String objtype, String fieldSetName) {
+        Schema.SObjectType token = Schema.getGlobalDescribe().get(objtype);
+        Schema.DescribeSObjectResult dr = token.getDescribe();
+        Map<String, Schema.FieldSet> FsMap = dr.fieldSets.getMap();
+        String selectClause = 'SELECT Id';
+        Set<Schema.FieldSetMember> querySet = new Set<Schema.FieldSetMember>();
+        querySet.addAll(FsMap.get(FieldSetName).getFields());
+        for(Schema.FieldSetMember f : querySet) {
+            selectClause += ', '+ f.getFieldPath();
+        }
+        String fromClause = ' FROM ' + dr.getName(); 
+        QueryString qs = new QueryString();
+        qs.selectClause = selectClause;
+        qs.fromClause = fromClause;
+        return JSON.serialize(qs);
+    }
+
     @remoteAction
     public static String upser(String objtype, String externalIdField, String externalId, String fields) {
         Schema.SObjectType targetType = Schema.getGlobalDescribe().get(objtype);

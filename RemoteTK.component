@@ -24,8 +24,10 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 POSSIBILITY OF SUCH DAMAGE.
 -->
 <apex:component controller="RemoteTKController">
+    <apex:attribute name="buffer" type="Boolean" default="true" description="Batch up Remoting calls"/>
     <script>
 var remotetk = window.remotetk;
+var enableBuffer = {!buffer};
 
 if (remotetk === undefined) {
     remotetk = {};
@@ -75,6 +77,7 @@ if (remotetk.Client === undefined) {
         Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.RemoteTKController.describe}', objtype, function(result){
             handleResult(result, callback, error);
         }, { 
+            buffer: enableBuffer,
             escape: false
         });
     }
@@ -92,6 +95,7 @@ if (remotetk.Client === undefined) {
         Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.RemoteTKController.create}', objtype, JSON.stringify(fields), function(result){
             handleResult(result, callback, error);
         }, { 
+            buffer: enableBuffer,
             escape: false
         });
     }
@@ -109,6 +113,7 @@ if (remotetk.Client === undefined) {
         Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.RemoteTKController.retrieve}', objtype, id, fieldlist, function(result){
             handleResult(result, callback, error);
         }, { 
+            buffer: enableBuffer,
             escape: false
         });
     }
@@ -129,7 +134,8 @@ if (remotetk.Client === undefined) {
         Visualforce.remoting.Manager.invokeAction('$RemoteAction.RemoteTKController.upser', objtype, externalIdField, externalId, JSON.stringify(fields), function(result){
             handleResult(result, callback, error, true);
         }, { 
-                escape: false
+            buffer: enableBuffer,
+            escape: false
         });
     }
         
@@ -147,6 +153,7 @@ if (remotetk.Client === undefined) {
         Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.RemoteTKController.updat}', objtype, id, JSON.stringify(fields), function(result){
             handleResult(result, callback, error, true);
         }, { 
+            buffer: enableBuffer,
             escape: false
         });
     }
@@ -163,6 +170,7 @@ if (remotetk.Client === undefined) {
         Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.RemoteTKController.del}', objtype, id, function(result){
             handleResult(result, callback, error, true);
         }, { 
+            buffer: enableBuffer,
             escape: false
         });
     }
@@ -178,6 +186,7 @@ if (remotetk.Client === undefined) {
         Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.RemoteTKController.query}', soql, function(result){
             handleResult(result, callback, error);
         }, { 
+            buffer: enableBuffer,
             escape: false
         });
     }        
@@ -193,6 +202,7 @@ if (remotetk.Client === undefined) {
         Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.RemoteTKController.search}', sosl, function(result){
             handleResult(result, callback, error);
         }, { 
+            buffer: enableBuffer,
             escape: false
         });
     }

@@ -88,9 +88,14 @@ public class TestRemoteTKController{
                                'Wrong account number in '+method+' result');
     }
     
-    static private Id testCreate(String accName, String accNumber) {
+    static private Id testCreate(String accName, String accNumber, String fields) {
         // Assume we can create an account
-        String jsonResult = RemoteTKController.create('Account', '{"Name": "'+accName+'", "AccountNumber" : "'+accNumber+'"}');
+        
+        // Try with data in correct types
+        String jsonResult = RemoteTKController.create('Account', 
+            '{"Name": "'+accName+'", '+
+             '"AccountNumber" : "'+accNumber+'",'+
+             fields+'}');
         
         System.assertNotEquals(null, jsonResult, 
                                'RemoteTKController.create returned null');
@@ -203,22 +208,22 @@ public class TestRemoteTKController{
         assertError(jsonResult, 'INVALID_SEARCH', 'RemoteTKController.search');
     }
 
-    static private void testUpdate(String accName, String accNumber, Id id) {
-        String jsonResult = RemoteTKController.updat('Account', id, '{"Name":"'+accName+'1", "AccountNumber":"'+accNumber+'1"}'); 
+    static private void testUpdate(String accName, String accNumber, Id id, String fields) {
+        String jsonResult = RemoteTKController.updat('Account', id, '{"Name":"'+accName+'", "AccountNumber":"'+accNumber+'"}'); 
         System.assertEquals(null, jsonResult, 
                                'Non-null result from RemoteTKController.updat');
         Account account = [SELECT Id, Name, AccountNumber FROM Account WHERE Id = :id LIMIT 1];
         System.assertNotEquals(null, account, 
                                'Couldn\'t find account record after RemoteTKController.updat');
-        System.assertEquals(accName+'1', account.Name, 
+        System.assertEquals(accName, account.Name, 
                                'Account name doesn\'t match after RemoteTKController.updat');
-        System.assertEquals(accNumber+'1', account.AccountNumber, 
+        System.assertEquals(accNumber, account.AccountNumber, 
                                'Account number doesn\'t match after RemoteTKController.updat');
         
-        jsonResult = RemoteTKController.updat('QXZXQZXZQXZQ', id, '{"Name":"'+accName+'1"}');
+        jsonResult = RemoteTKController.updat('QXZXQZXZQXZQ', id, '{"Name":"'+accName+'"}');
         assertError(jsonResult, 'NOT_FOUND', 'RemoteTKController.updat');
         
-        jsonResult = RemoteTKController.updat('Account', id, '{"XQZXQZXQZXQZ" : "'+accName+'1"}');
+        jsonResult = RemoteTKController.updat('Account', id, '{"XQZXQZXQZXQZ" : "'+accName+'"}');
         assertError(jsonResult, 'INVALID_FIELD', 'RemoteTKController.updat');
 
         jsonResult = RemoteTKController.updat('Account', id, '{"Name" "'+accName+'"}');
@@ -228,22 +233,27 @@ public class TestRemoteTKController{
         assertError(jsonResult, 'STRING_TOO_LONG', 'RemoteTKController.updat');
     }
 
-    static private void testUpsert(String accName, String accNumber, Id id) {
-        String jsonResult = RemoteTKController.upser('Account', 'Id', (String)id, '{"Name":"'+accName+'2", "AccountNumber":"'+accNumber+'2"}');
+    static private void testUpsert(String accName, String accNumber, Id id, String fields) {
+        String jsonResult = RemoteTKController.upser('Account', 
+                                                     'Id', 
+                                                     (String)id, 
+                                                     '{"Name":"'+accName+'", '+
+                                                     '"AccountNumber":"'+accNumber+'",'+
+                                                     fields+'}');
         System.assertEquals(null, jsonResult, 
                                'Non-null result from RemoteTKController.upser');
         Account account = [SELECT Id, Name, AccountNumber FROM Account WHERE Id = :id LIMIT 1];
         System.assertNotEquals(null, account, 
                                'Couldn\'t find account record after RemoteTKController.upser');
-        System.assertEquals(accName+'2', account.Name, 
+        System.assertEquals(accName, account.Name, 
                                'Account name doesn\'t match after RemoteTKController.upser');
-        System.assertEquals(accNumber+'2', account.AccountNumber, 
+        System.assertEquals(accNumber, account.AccountNumber, 
                                'Account number doesn\'t match after RemoteTKController.upser');
         
-        jsonResult = RemoteTKController.upser('QXZXQZXZQXZQ', 'Id', (String)id, '{"Name":"'+accName+'2"}');
+        jsonResult = RemoteTKController.upser('QXZXQZXZQXZQ', 'Id', (String)id, '{"Name":"'+accName+'"}');
         assertError(jsonResult, 'NOT_FOUND', 'RemoteTKController.upser');
         
-        jsonResult = RemoteTKController.upser('Account', 'Id', (String)id, '{"XQZXQZXQZXQZ" : "'+accName+'2"}');
+        jsonResult = RemoteTKController.upser('Account', 'Id', (String)id, '{"XQZXQZXQZXQZ" : "'+accName+'"}');
         assertError(jsonResult, 'INVALID_FIELD', 'RemoteTKController.upser');
     }
 
@@ -266,12 +276,31 @@ public class TestRemoteTKController{
         String accName = 'Test1';
         String accNumber = '1234';
         
-        Id id = testCreate(accName, accNumber);
+        // String field values
+        Id id = testCreate(accName, accNumber, '"AnnualRevenue" : "1000000",'+
+             '"NumberOfEmployees" : "1000",'+
+             '"Phone" : "(111) 222-3333"');
+        testDelete(id);
+        
+        // Integer field values
+        id = testCreate(accName, accNumber, '"AnnualRevenue" : 1000000,'+
+             '"NumberOfEmployees" : 1000,'+
+             '"Phone" : "(111) 222-3333"');
         testRetrieve(accName, accNumber, id);
         testQuery(accName, accNumber);
         testSearch(accName, accNumber, id);
-        testUpdate(accName, accNumber, id);
-        testUpsert(accName, accNumber, id);
+        testUpdate(accName+'1', accNumber+'1', id, '"AnnualRevenue" : "1100000",'+
+             '"NumberOfEmployees" : "1100",'+
+             '"Phone" : "(112) 222-3333"');
+        testUpdate(accName+'2', accNumber+'2', id, '"AnnualRevenue" : "2000000",'+
+             '"NumberOfEmployees" : "2000",'+
+             '"Phone" : "(222) 222-3333"');
+        testUpsert(accName+'3', accNumber+'3', id, '"AnnualRevenue" : 3000000,'+
+             '"NumberOfEmployees" : 3000,'+
+             '"Phone" : "(333) 222-3333"');
+        testUpsert(accName+'4', accNumber+'4', id, '"AnnualRevenue" : 4000000,'+
+             '"NumberOfEmployees" : 4000,'+
+             '"Phone" : "(444) 222-3333"');
         testDelete(id);
     }
 }

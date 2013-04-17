@@ -37,6 +37,55 @@ public class RemoteTKController {
         return gen.getAsString();
     }
     
+    private static String writeFields(String objtype, SObject obj, String fields) {
+        Map<String, Object> fieldMap = null;
+        try {
+            fieldMap = (Map<String, Object>)JSON.deserializeUntyped(fields);
+        } catch (JSONException je) {
+            return makeError(je.getMessage(), 'JSON_PARSER_ERROR');
+        }
+        
+        Schema.SObjectType targetType = Schema.getGlobalDescribe().get(objtype);
+        
+        Map<String, Schema.sObjectField> targetFields = targetType.getDescribe().fields.getMap();
+        
+        try {
+            for (String key : fieldMap.keySet()) {
+                if (targetFields.get(key) == null) {
+                    return '[{"message":"Field '+key+' does not exist on object type '+objtype+'","errorCode":"INVALID_FIELD"}]';
+                }
+                
+                Object value = fieldMap.get(key);
+                Schema.DisplayType valueType = targetFields.get(key).getDescribe().getType();
+                
+                if (value instanceof String && valueType != Schema.DisplayType.String) {
+                    // Coerce an incoming String to the correct type
+                    String svalue = (String)value;
+                    
+                    if (valueType == Schema.DisplayType.Date) {
+                        obj.put(key, Date.valueOf(svalue));
+                    } else if (valueType == Schema.DisplayType.Percent ||
+                           valueType == Schema.DisplayType.Currency) {
+                        obj.put(key, svalue == '' ? null : Decimal.valueOf(svalue));
+                    } else if (valueType == Schema.DisplayType.Double) {
+                        obj.put(key, svalue == '' ? null : Double.valueOf(svalue));
+                    } else if (valueType == Schema.DisplayType.Integer) {
+                        obj.put(key, Integer.valueOf(svalue));
+                    } else {
+                        obj.put(key, svalue);
+                    }
+                } else {
+                    // Just try putting the incoming value on the object
+                    obj.put(key, value);
+                }
+            }
+        } catch (SObjectException soe) {
+            return makeError(soe.getMessage(), 'INVALID_FIELD');
+        }
+        
+        return null;
+    }
+    
     @remoteAction
     public static String describe(String objtype) {
         // Just enough to make the sample app work!
@@ -82,39 +131,12 @@ public class RemoteTKController {
         }
         
         SObject obj = targetType.newSObject();
-        
-        Map<String, Object> fieldMap = null;
-        try {
-            fieldMap = (Map<String, Object>)JSON.deserializeUntyped(fields);
-        } catch (JSONException je) {
-            return makeError(je.getMessage(), 'JSON_PARSER_ERROR');
+
+        String error = writeFields(objType, obj, fields);
+        if (error != null) {
+            return error;
         }
-        
-        Map<String, Schema.sObjectField> targetFields = targetType.getDescribe().fields.getMap();
-        
-        try {
-            for (String key : fieldMap.keySet()) {
-                if (targetFields.get(key) == null) {
-                    return '[{"message":"Field '+key+' does not exist on object type '+objtype+'","errorCode":"INVALID_FIELD"}]';
-                }
-                
-                if (targetFields.get(key).getDescribe().getType() == Schema.DisplayType.Date) {
-                    obj.put(key, Date.valueOf((String)fieldMap.get(key)));
-                } else if (targetFields.get(key).getDescribe().getType() == Schema.DisplayType.Percent ||
-                       targetFields.get(key).getDescribe().getType() == Schema.DisplayType.Currency) {
-                    obj.put(key, String.valueOf(fieldMap.get(key)) == '' ? null : Decimal.valueOf((String)fieldMap.get(key)));
-                } else if (targetFields.get(key).getDescribe().getType() == Schema.DisplayType.Double) {
-                    obj.put(key, String.valueOf(fieldMap.get(key)) == '' ? null : Double.valueOf(fieldMap.get(key)));
-                } else if (targetFields.get(key).getDescribe().getType() == Schema.DisplayType.Integer) {
-                    obj.put(key, Integer.valueOf(fieldMap.get(key)));
-                } else {
-                    obj.put(key, fieldMap.get(key));
-                }
-            }
-        } catch (SObjectException soe) {
-            return makeError(soe.getMessage(), 'INVALID_FIELD');
-        }
-        
+
         try {
             insert obj;
         } catch (DMLException dmle) {
@@ -172,14 +194,9 @@ public class RemoteTKController {
         SObject obj = targetType.newSObject();
         obj.put(externalIdField, externalId);
         
-        Map<String, Object> fieldMap = 
-           (Map<String, Object>)JSON.deserializeUntyped(fields);
-        try {
-            for (String key : fieldMap.keySet()) {
-                obj.put(key, fieldMap.get(key));
-            }
-        } catch (SObjectException soe) {
-            return makeError(soe.getMessage(), 'INVALID_FIELD');
+        String error = writeFields(objType, obj, fields);
+        if (error != null) {
+            return error;
         }
         
         Schema.SObjectField sobjField = targetType.getDescribe().fields.getMap().get(externalIdField);
@@ -198,21 +215,11 @@ public class RemoteTKController {
         
         SObject obj = targetType.newSObject(id);
         
-        Map<String, Object> fieldMap = null;
-        try {
-            fieldMap = (Map<String, Object>)JSON.deserializeUntyped(fields);
-        } catch (JSONException je) {
-            return makeError(je.getMessage(), 'JSON_PARSER_ERROR');
+        String error = writeFields(objType, obj, fields);
+        if (error != null) {
+            return error;
         }
 
-        try {
-            for (String key : fieldMap.keySet()) {
-                obj.put(key, fieldMap.get(key));
-            }
-        } catch (SObjectException soe) {
-            return makeError(soe.getMessage(), 'INVALID_FIELD');
-        }
-        
         try {
             update obj;
         } catch (DMLException dmle) {

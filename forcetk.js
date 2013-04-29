@@ -124,7 +124,7 @@ if (forcetk.Client === undefined) {
     forcetk.Client.prototype.setSessionToken = function(sessionId, apiVersion, instanceUrl) {
         this.sessionId = sessionId;
         this.apiVersion = (typeof apiVersion === 'undefined' || apiVersion === null)
-        ? 'v24.0': apiVersion;
+        ? 'v27.0': apiVersion;
         if (typeof instanceUrl === 'undefined' || instanceUrl == null) {
             // location.hostname can be of the form 'abc.na1.visual.force.com',
             // 'na1.salesforce.com' or 'abc.my.salesforce.com' (custom domains). 
@@ -162,7 +162,7 @@ if (forcetk.Client === undefined) {
             type: method || "GET",
             async: this.asyncAjax,
             url: (this.proxyUrl !== null) ? this.proxyUrl: url,
-            contentType: 'application/json',
+            contentType: method == "DELETE"  ? null : 'application/json',
             cache: false,
             processData: false,
             data: payload,

@@ -1,0 +1,112 @@
+<apex:page controller="LABJS_SimpleController" standardStylesheets="false" sidebar="false" showHeader="false">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>    
+    <apex:stylesheet value="{!URLFOR($Resource.LABJS_Bootstrap, 'bootstrap231/css/bootstrap.min.css')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.LABJS_jQuery, 'jquery191/jquery-1.9.1.min.js')}" />
+    <apex:includeScript value="{!URLFOR($Resource.LABJS_Bootstrap, 'bootstrap231/js/bootstrap.min.js')}" />
+    <apex:form >
+    <apex:actionFunction name="updateTargetContact" action="{!updateTargetContact}"
+        rerender="mainContactDetail" status="methodStatus" >
+        <apex:param name="firstParam" assignTo="{!targetContactId}" value="" />
+    </apex:actionFunction>
+    </apex:form>
+    <style>
+      body {
+        padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
+      }
+    </style>   
+    <script type="text/javascript">
+    	$(function() {
+        	$('#mylistview').on('click', 'li', function() {
+        		//alert("Works " + $(this)[0].id); 
+        		updateTargetContact($(this)[0].id);
+        		$('#contactModal').modal('show');
+	    	});
+        });
+        
+    </script>
+
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="brand" href="#">Bootstrap Hello</a>
+          <div class="nav-collapse collapse">
+            <ul class="nav">
+              <li class="active"><a href="#">Home</a></li>
+              <li><a href="#about">Boring Menu Item</a></li>
+              <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Select A Contact <b class="caret"></b></a>
+                <ul id="mylistview" class="dropdown-menu">
+					<apex:repeat value="{!contacts}" var="current">
+                        <li id="{!current.id}"><a ><apex:outputText value="{!current.name}" /></a></li>
+                    </apex:repeat>
+                  </ul>
+              </li>                
+                
+                
+              <li><apex:outputLink value="{!URLFOR($Page.LABJS_Bootstrap231)}">LAB Javascript Playground</apex:outputLink></li>  
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+
+      <h1>Bootstrap starter template</h1>
+        <p>Use this document as a way to quick start any new project.<br /> All you get is this message and a barebones HTML document.</p>
+
+        <h1>Be sure to look at the black bar up at the top.</h1>
+        
+        <p>Because that's the magic in a basic Bootstrap Hello Page.</p>
+
+        <!-- Button to trigger modal -->
+        <a href="#demoModal" role="button" class="btn" data-toggle="modal">Launch demo modal</a>
+        
+        <h1>Select A Contact</h1>
+        
+        <p>Be sure to try the "Select a contact" drop down on the menu bar.</p>
+        
+    </div> <!-- /container -->
+
+ 
+<!-- Modal -->
+<div id="demoModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h3 id="myModalLabel">Demo Modal Header</h3>
+  </div>
+  <div class="modal-body">
+    <p>One fine body…</p>
+  </div>
+  <div class="modal-footer">
+    <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+    <button class="btn btn-primary">Save changes</button>
+  </div>
+</div>
+
+
+<div id="contactModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+<apex:outputPanel id="mainContactDetail">
+ 	<div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h3 id="myModalLabel">{!targetContact.name}</h3>
+  </div>
+  <div class="modal-body">
+    <p>One fine body…</p>
+  </div>
+  <div class="modal-footer">
+    <apex:outputPanel id="output" >    <apex:actionStatus startText="requesting..." id="methodStatus">
+        <apex:facet name="stop">done</apex:facet>
+    </apex:actionStatus></apex:outputPanel>      
+    <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Close</button>
+  </div>
+</apex:outputPanel>
+</div>
+
+    
+</apex:page>

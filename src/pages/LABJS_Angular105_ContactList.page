@@ -1,0 +1,36 @@
+<apex:page controller="LABJS_SimpleController" >
+    
+    
+    
+    <apex:includeScript value="{!URLFOR($Resource.LABJS_Angular, 'angular105/angular.min.js')}" />
+    <script type="text/javascript">
+        function ContactCtrl($scope) {
+	        $scope.contacts = <apex:outputText value="{!contactsJson}" />;
+        
+        	
+        
+        }
+    </script>
+    <style>
+        .rowEven {
+        	background-color: #ccc;
+        }
+    </style>
+
+    <apex:pageBlock title="About">
+        <p>Declares an inline controller, grabs contacts as a JSON string, and displays them using an Angular repeat control with alternating styling, also courtesy of Angular.</p>
+    </apex:pageBlock>
+    
+    
+    <div class="ng-app">
+		<div ng-controller="ContactCtrl" style="width: 50%; float: left;">
+            <ul>
+                <li id="{{current.Id}}" ng-repeat="current in contacts" ng-class-even="'rowEven'">{{current.Name}}</li>
+            </ul>
+        </div>
+        
+        
+    </div>
+    
+    
+</apex:page>

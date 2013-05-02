@@ -1,0 +1,43 @@
+<apex:page controller="LABJS_SimpleController" >
+    <apex:includeScript value="{!URLFOR($Resource.LABJS_jQuery, 'jquery191/jquery-1.9.1.min.js')}" />
+    <style>
+        .redContact {
+            background-color: #f00;
+            color: #fff;
+        }
+    </style>
+    <script type="text/javascript" >
+        function turnRed() {
+            $('p.myContact').each( 
+                function() {
+                        $(this).addClass('redContact');
+                }
+            );
+        }
+
+        function removeRed() {
+            $('p.myContact').each( 
+                function() {
+                        $(this).removeClass('redContact');
+                }
+            );
+        }
+        
+    </script>
+    <apex:pageBlock title="About">
+        <p>This changes the background color on the accounts to Red or White.  &nbsp;
+            <apex:outputLink value="{!URLFOR($Page.LABJS_JQuery191)}" title="Main JQuery 1.9.1 Page" >Main JQuery 1.9.1 Page</apex:outputLink></p>
+    </apex:pageBlock>
+    <apex:pageBlock title="Contacts">
+        <form>
+            <input type="button" value="Add Red Backgrounds" onclick="javascript:turnRed();" />
+            <input type="button" value="Remove Red Backgrounds" onclick="javascript:removeRed();" />            
+        </form>
+
+        <apex:repeat value="{!contacts}" var="current">
+            <p class="myContact"><apex:outputText value="{!current.name}" /></p>
+        </apex:repeat>
+    
+    </apex:pageBlock>
+    
+</apex:page>

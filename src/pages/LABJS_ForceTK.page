@@ -1,0 +1,16 @@
+<apex:page >
+
+    <apex:pageBlock title="Force TK">
+        <p>The Force Toolkit is a great way to access Force.com REST services from Javascript.  
+        Read more on the <a href="https://github.com/developerforce/Force.com-JavaScript-REST-Toolkit">Github Repo</a>.</p>
+    
+        <p> Note that you must add the REST endpoint hostname for your instance (i.e. 
+		https://na1.salesforce.com/ or similar) as a remote site - in the admin
+            console, go to Your Name | Setup | Security Controls | Remote Site Settings</p>
+        
+        <p><apex:outputLink value="{!URLFOR($Page.LABJS_ForceTK_AccountList)}">ForceTK Account List</apex:outputLink> Basic Example Page</p>
+        
+        
+    </apex:pageBlock>
+
+</apex:page>

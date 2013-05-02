@@ -1,0 +1,2342 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"pro",
+				"promise"
+			],
+			[
+				"pr",
+				"promise"
+			],
+			[
+				"new",
+				"newDate"
+			],
+			[
+				"Test",
+				"TestUtils"
+			],
+			[
+				"Deal",
+				"DealBuilderExt"
+			],
+			[
+				"fie",
+				"fieldset"
+			],
+			[
+				"return",
+				"returnObject"
+			],
+			[
+				"Flat",
+				"Flat_Fee_to_Display__c"
+			],
+			[
+				"target",
+				"targetType"
+			],
+			[
+				"SOb",
+				"SObject"
+			],
+			[
+				"inc",
+				"incomingFieldJsonObject"
+			],
+			[
+				"fieldma",
+				"fieldMapList"
+			],
+			[
+				"plat",
+				"Platform_Line_Item__c"
+			],
+			[
+				"line",
+				"lineItem"
+			],
+			[
+				"to",
+				"toggleShowHide"
+			],
+			[
+				"Plat",
+				"PlatformLineItem__c"
+			],
+			[
+				"In",
+				"Inventory_Type__c"
+			],
+			[
+				"Ser",
+				"Service_Type__c"
+			],
+			[
+				"lineItemFiel",
+				"lineItemFieldsetString"
+			],
+			[
+				"Rec",
+				"RecordTypeID"
+			],
+			[
+				"text",
+				"text-decoration"
+			],
+			[
+				"title",
+				"title-group"
+			],
+			[
+				"G",
+				"Group__c"
+			],
+			[
+				"pos",
+				"position"
+			],
+			[
+				"set",
+				"setPublicLibraryItems"
+			],
+			[
+				"added",
+				"addedIds"
+			],
+			[
+				"existing",
+				"existingIds"
+			],
+			[
+				"existin",
+				"existingIds"
+			],
+			[
+				"dropped",
+				"droppedOnObject"
+			],
+			[
+				"Applie",
+				"Applied_Component__c"
+			],
+			[
+				"mar",
+				"marginCollection"
+			],
+			[
+				"hid",
+				"hiddenfields"
+			],
+			[
+				"details",
+				"details_hidden"
+			],
+			[
+				"field",
+				"fieldPath"
+			],
+			[
+				"linI",
+				"lineItemFieldset"
+			],
+			[
+				"in",
+				"ineditable"
+			],
+			[
+				"lineIt",
+				"lineItemFieldset"
+			],
+			[
+				"label",
+				"labelOverride"
+			],
+			[
+				"from",
+				"fromClause"
+			],
+			[
+				"fields",
+				"fieldSetName"
+			],
+			[
+				"lin",
+				"lineItem"
+			],
+			[
+				"clon",
+				"clonedLibraryItemId"
+			],
+			[
+				"clone",
+				"clonedLibFields"
+			],
+			[
+				"update",
+				"updateFields"
+			],
+			[
+				"LIb",
+				"Library_Item__c"
+			],
+			[
+				"dragg",
+				"draggedObject"
+			],
+			[
+				"get",
+				"getName"
+			],
+			[
+				"result",
+				"results"
+			],
+			[
+				"group",
+				"groupIdSet"
+			],
+			[
+				"librar",
+				"libraryItemFields"
+			],
+			[
+				"Lib",
+				"Library_Item__c"
+			],
+			[
+				"L",
+				"Library_Item__c"
+			],
+			[
+				"drop",
+				"droppedOnObject"
+			],
+			[
+				"addedc",
+				"addedComponentContainer"
+			],
+			[
+				"open",
+				"openMessageBox"
+			],
+			[
+				"create",
+				"createdContainerId"
+			],
+			[
+				"Compon",
+				"Component_Container__c"
+			],
+			[
+				"obj",
+				"objType"
+			],
+			[
+				"ob",
+				"objName"
+			],
+			[
+				"sele",
+				"selectedComponents"
+			],
+			[
+				"failure",
+				"failureCallback"
+			],
+			[
+				"select",
+				"SelectData"
+			],
+			[
+				"Se",
+				"Select2Data"
+			],
+			[
+				"Pick",
+				"picklistValues"
+			],
+			[
+				"me",
+				"Media_Type__c"
+			],
+			[
+				"Compn",
+				"Component__r"
+			],
+			[
+				"oppid",
+				"OppId"
+			],
+			[
+				"drag",
+				"draggedObject"
+			],
+			[
+				"need",
+				"neededInitiativeNamesList"
+			],
+			[
+				"marg",
+				"margin-top"
+			],
+			[
+				"Platfor",
+				"Platform__c"
+			],
+			[
+				"Platform",
+				"platform__c"
+			],
+			[
+				"IOP",
+				"IOProduct__c"
+			],
+			[
+				"IO",
+				"IOProduct__c"
+			],
+			[
+				"Cas",
+				"CascadeInsertId__c"
+			],
+			[
+				"strat",
+				"strategy__c"
+			],
+			[
+				"cloned",
+				"clonedFlight"
+			],
+			[
+				"App",
+				"AppliedFLStrategy__c"
+			],
+			[
+				"Ap",
+				"AppliedFLStrategy__c"
+			],
+			[
+				"Applied",
+				"AppliedFLStrategy__c"
+			],
+			[
+				"io",
+				"ioproduct__c"
+			],
+			[
+				"place",
+				"placementDetails"
+			],
+			[
+				"placement",
+				"PlacementFieldsetSize"
+			],
+			[
+				"placem",
+				"PlacementFieldsetSize"
+			],
+			[
+				"Place",
+				"PlacementFieldsetSize"
+			],
+			[
+				"Fields",
+				"FieldSetMember"
+			],
+			[
+				"fi",
+				"fieldsetSize"
+			],
+			[
+				"remo",
+				"RemoteAction"
+			],
+			[
+				"sub",
+				"subObjQueryString"
+			],
+			[
+				"query",
+				"queryString"
+			],
+			[
+				"bs-bt",
+				"bs-btn-group"
+			],
+			[
+				"stra",
+				"strategyId"
+			],
+			[
+				"C",
+				"Category__c"
+			],
+			[
+				"newStrat",
+				"newStrategy"
+			],
+			[
+				"opp",
+				"opportunityId"
+			],
+			[
+				"fls_for",
+				"fls_for_flight"
+			],
+			[
+				"pla",
+				"placement"
+			],
+			[
+				"pjax",
+				"pjaxLoadPlacementFieldsetDetails"
+			],
+			[
+				"commandbu",
+				"commandsButtons"
+			],
+			[
+				"st",
+				"strategy"
+			],
+			[
+				"pls",
+				"plsId"
+			],
+			[
+				"not",
+				"Notes__c"
+			],
+			[
+				"Crea",
+				"Creative__c"
+			],
+			[
+				"Data",
+				"DataProduct__c"
+			],
+			[
+				"Name",
+				"NameToId"
+			],
+			[
+				"dropp",
+				"droppedOnObj"
+			],
+			[
+				"margin",
+				"margin-left"
+			],
+			[
+				"Stra",
+				"Strategy__r"
+			],
+			[
+				"newp",
+				"newPLStrategyModal"
+			],
+			[
+				"Dat",
+				"DataProduct__c"
+			],
+			[
+				"Placement",
+				"Placement__c"
+			],
+			[
+				"droppabl",
+				"droppableId"
+			],
+			[
+				"applied_",
+				"Applied_Strategies__r"
+			],
+			[
+				"Strategy",
+				"Strategy__c"
+			],
+			[
+				"append",
+				"appendTo"
+			],
+			[
+				"app",
+				"appendTo"
+			],
+			[
+				"selected",
+				"selectedProduct"
+			],
+			[
+				"ret",
+				"retPlacement"
+			],
+			[
+				"Pla",
+				"Placement__c"
+			],
+			[
+				"product",
+				"io_product__c"
+			],
+			[
+				"platform",
+				"platformid"
+			],
+			[
+				"incoming",
+				"incomingIdentifier"
+			],
+			[
+				"incomin",
+				"incomingIdentifier"
+			],
+			[
+				"newPlacem",
+				"newPlacementModal"
+			],
+			[
+				"selec",
+				"selectedPlatform"
+			],
+			[
+				"selecte",
+				"selectedProduct"
+			],
+			[
+				"IOPro",
+				"ioproduct__c"
+			],
+			[
+				"platfo",
+				"platform__c"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "resource-bundles/ngForce.resource/ngForce/services/ngForce.js",
+			"settings":
+			{
+				"buffer_size": 13581,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "src/pages/ngForceDemo.page",
+			"settings":
+			{
+				"buffer_size": 3376,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "resource-bundles/ngForce.resource/ngForce/controllers/oppBoxCtrl.js",
+			"settings":
+			{
+				"buffer_size": 498,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "src/pages/oppBoxTmpl.page",
+			"settings":
+			{
+				"buffer_size": 423,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "src/classes/RemoteTKController.cls",
+			"settings":
+			{
+				"buffer_size": 19006,
+				"line_ending": "Unix"
+			}
+		}
+	],
+	"build_system": "",
+	"command_palette":
+	{
+		"height": 205.0,
+		"selected_items":
+		[
+			[
+				"depl",
+				"MavensMate: Deploy Resource Bundle"
+			],
+			[
+				"gist",
+				"Gist: Create Private Gist"
+			],
+			[
+				"depll",
+				"MavensMate: Deploy Resource Bundle"
+			],
+			[
+				"dpel",
+				"DocBlockr: Reparse comment block"
+			],
+			[
+				"tab",
+				"Indentation: Convert to Tabs"
+			],
+			[
+				"deplo",
+				"MavensMate: Deploy Resource Bundle"
+			],
+			[
+				"install",
+				"Package Control: Install Package"
+			],
+			[
+				"visual",
+				"MavensMate: New Visualforce Page"
+			],
+			[
+				"javasc",
+				"Set Syntax: JavaScript"
+			],
+			[
+				"deplol",
+				"MavensMate: Deploy Resource Bundle"
+			],
+			[
+				"visualfor",
+				"MavensMate: New Visualforce Page"
+			],
+			[
+				"form",
+				"Format: Javascript"
+			],
+			[
+				"format",
+				"Format: Javascript"
+			],
+			[
+				"for",
+				"Format: Javascript"
+			],
+			[
+				"tabs",
+				"Indentation: Convert to Tabs"
+			],
+			[
+				"source",
+				"SourceTree: Open SourceTree"
+			],
+			[
+				"javascript",
+				"Set Syntax: JavaScript"
+			],
+			[
+				"resour",
+				"MavensMate: Create Resource Bundle"
+			],
+			[
+				"resour	",
+				"MavensMate: Create Resource Bundle"
+			],
+			[
+				"resoue",
+				"MavensMate: Create Resource Bundle"
+			],
+			[
+				"resourc",
+				"MavensMate: Create Resource Bundle"
+			],
+			[
+				"apextes",
+				"MavensMate: Run Apex Tests"
+			],
+			[
+				"apex test",
+				"MavensMate: Run Apex Tests"
+			],
+			[
+				"apex cla",
+				"MavensMate: New Apex Class"
+			],
+			[
+				"apexcla",
+				"MavensMate: New Apex Class"
+			],
+			[
+				"run tests",
+				"MavensMate: Run Apex Tests"
+			],
+			[
+				"apex",
+				"MavensMate: New Apex Class"
+			],
+			[
+				"sort",
+				"Sort Lines"
+			],
+			[
+				"depol",
+				"MavensMate: Deploy Resource Bundle"
+			],
+			[
+				"dep",
+				"MavensMate: Deploy Resource Bundle"
+			],
+			[
+				"page",
+				"MavensMate: New Visualforce Page"
+			],
+			[
+				"visu",
+				"MavensMate: New Visualforce Page"
+			],
+			[
+				"de",
+				"MavensMate: Deploy To Server"
+			],
+			[
+				"jav",
+				"Set Syntax: Java"
+			],
+			[
+				"deploy",
+				"MavensMate: Deploy Resource Bundle"
+			],
+			[
+				"reindent",
+				"Indentation: Reindent Lines"
+			],
+			[
+				"java",
+				"Set Syntax: Java"
+			],
+			[
+				"install ",
+				"Package Control: Install Package"
+			],
+			[
+				"depk",
+				"Package Control: Disable Package"
+			],
+			[
+				"visualforce",
+				"MavensMate: New Visualforce Page"
+			],
+			[
+				"deol",
+				"MavensMate: Deploy Resource Bundle"
+			],
+			[
+				"deply",
+				"RubyMotionBuilder: Deploy"
+			],
+			[
+				"deplou",
+				"MavensMate: Deploy Resource Bundle"
+			],
+			[
+				"indet",
+				"Indentation: Reindent Lines"
+			],
+			[
+				"VISUA",
+				"MavensMate: New Visualforce Page"
+			],
+			[
+				"javascr",
+				"Set Syntax: JavaScript"
+			],
+			[
+				"deployu",
+				"MavensMate: Deploy Resource Bundle"
+			],
+			[
+				"ji",
+				"Set Syntax: JavaScript"
+			],
+			[
+				"javascri",
+				"Set Syntax: JavaScript"
+			],
+			[
+				"javascrip",
+				"Set Syntax: JavaScript"
+			],
+			[
+				"GIST",
+				"Gist: Create Private Gist"
+			],
+			[
+				"epl",
+				"Emmet: Split\\Join Tag"
+			],
+			[
+				"js",
+				"Set Syntax: JavaScript"
+			],
+			[
+				"git gui",
+				"Git: Gui"
+			],
+			[
+				"git comm",
+				"Git: Commit"
+			],
+			[
+				"git add",
+				"Git: Add..."
+			],
+			[
+				"visualf",
+				"MavensMate: New Visualforce Page"
+			],
+			[
+				"rein",
+				"Indentation: Reindent Lines"
+			],
+			[
+				"reind",
+				"Indentation: Reindent Lines"
+			],
+			[
+				"reinde",
+				"Indentation: Reindent Lines"
+			],
+			[
+				"inde",
+				"Indentation: Reindent Lines"
+			],
+			[
+				"vis",
+				"MavensMate: New Visualforce Page"
+			],
+			[
+				"markdown",
+				"Set Syntax: Markdown"
+			],
+			[
+				"deo",
+				"MavensMate: Deploy Resource Bundle"
+			],
+			[
+				"snipp table",
+				"Snippet: Bootstrap tabbable navigation tabs"
+			],
+			[
+				"html",
+				"Set Syntax: HTML"
+			],
+			[
+				"del",
+				"DocBlockr: Decorate line comment"
+			],
+			[
+				"text",
+				"Set Syntax: Plain Text"
+			],
+			[
+				"ind",
+				"Indentation: Reindent Lines"
+			],
+			[
+				"visualcom",
+				"MavensMate: New Visualforce Component"
+			],
+			[
+				"visualfor page",
+				"MavensMate: New Visualforce Page"
+			],
+			[
+				"snippet dire",
+				"Snippet: directive"
+			],
+			[
+				"resource",
+				"MavensMate: Create Resource Bundle"
+			],
+			[
+				"javas",
+				"Set Syntax: JavaScript"
+			],
+			[
+				"indent",
+				"Indentation: Convert to Tabs"
+			],
+			[
+				"apexc",
+				"MavensMate: New Apex Class"
+			],
+			[
+				"apex cl",
+				"MavensMate: New Apex Class"
+			],
+			[
+				"visual page",
+				"MavensMate: New Visualforce Page"
+			],
+			[
+				"visua",
+				"MavensMate: New Visualforce Page"
+			],
+			[
+				"visualfopag",
+				"MavensMate: New Visualforce Page"
+			],
+			[
+				"apex ",
+				"MavensMate: New Apex Class"
+			],
+			[
+				"apexcl",
+				"MavensMate: New Apex Class"
+			],
+			[
+				"mavens new ape",
+				"MavensMate: New Apex Class"
+			],
+			[
+				"DEPL",
+				"MavensMate: Deploy Resource Bundle"
+			],
+			[
+				"reinden",
+				"Indentation: Reindent Lines"
+			],
+			[
+				"Dep",
+				"MavensMate: Deploy Resource Bundle"
+			],
+			[
+				"deployl",
+				"MavensMate: Deploy Resource Bundle"
+			],
+			[
+				"detail",
+				"Indentation: Reindent Lines"
+			],
+			[
+				"ddepl",
+				"RubyMotionBuilder: Deploy"
+			],
+			[
+				"git status",
+				"Git: Status"
+			],
+			[
+				"place",
+				"Package Control: Add Channel"
+			],
+			[
+				"deplo reso",
+				"MavensMate: Deploy Resource Bundle"
+			],
+			[
+				"package contro up",
+				"Package Control: Upgrade/Overwrite All Packages"
+			],
+			[
+				"package",
+				"Package Control: Remove Package"
+			],
+			[
+				"package control rem",
+				"Package Control: Remove Package"
+			],
+			[
+				"deploy ",
+				"MavensMate: Deploy Resource Bundle"
+			],
+			[
+				"resou de",
+				"MavensMate: Deploy Resource Bundle"
+			],
+			[
+				"resource d",
+				"MavensMate: Deploy Resource Bundle"
+			],
+			[
+				"dep res",
+				"MavensMate: Deploy Resource Bundle"
+			],
+			[
+				"deployre",
+				"MavensMate: Deploy Resource Bundle"
+			],
+			[
+				"json",
+				"Set Syntax: JSON"
+			],
+			[
+				"resou",
+				"MavensMate: Create Resource Bundle"
+			],
+			[
+				"tidy",
+				"Tidy HTML"
+			],
+			[
+				"create",
+				"MavensMate: Create Resource Bundle"
+			],
+			[
+				"bea",
+				"BeautifyRuby"
+			],
+			[
+				"b",
+				"BeautifyRuby"
+			],
+			[
+				"",
+				"BeautifyRuby"
+			],
+			[
+				"be",
+				"BeautifyRuby"
+			],
+			[
+				"ruby",
+				"Set Syntax: Ruby"
+			],
+			[
+				"beaut",
+				"BeautifyRuby"
+			],
+			[
+				"beau",
+				"BeautifyRuby"
+			],
+			[
+				"beat",
+				"BeautifyRuby"
+			],
+			[
+				"beu",
+				"BeautifyRuby"
+			],
+			[
+				"instal",
+				"Package Control: Install Package"
+			],
+			[
+				"git",
+				"Git: Init"
+			],
+			[
+				"inst",
+				"Package Control: Install Package"
+			],
+			[
+				"push",
+				"Git: Push"
+			],
+			[
+				"comm",
+				"Git: Commit"
+			],
+			[
+				"git add ",
+				"Git: Add..."
+			],
+			[
+				"inden",
+				"Indentation: Reindent Lines"
+			],
+			[
+				"xml",
+				"Set Syntax: XML"
+			],
+			[
+				"constant",
+				"Snippet: constant"
+			],
+			[
+				"syn jav",
+				"Set Syntax: Java"
+			],
+			[
+				"re",
+				"Indentation: Reindent Lines"
+			],
+			[
+				"pack insta",
+				"Package Control: Install Package"
+			]
+		],
+		"width": 579.0
+	},
+	"console":
+	{
+		"height": 102.0
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"file_history":
+	[
+		"/Users/kpoorman/Documents/mavensmate/NgForce/src/classes/RemoteTKController.cls",
+		"/Users/kpoorman/Documents/mavensmate/NgForce/src/package.xml",
+		"/Users/kpoorman/Documents/mavensmate/NgForce/src/pages/ngForceDemo.page-meta.xml",
+		"/Users/kpoorman/Documents/mavensmate/NgForce/resource-bundles/ngForce.resource/ngForce/directives/oppBox.js",
+		"/Users/kpoorman/Documents/mavensmate/NgForce/resource-bundles/ngForce.resource/ngForce/ngForceDemoApp.js",
+		"/Users/kpoorman/Documents/mavensmate/NgForce/resource-bundles/ngForce.resource/ngForce/js/angular.min.js",
+		"/Users/kpoorman/Documents/mavensmate/NgForce/resource-bundles/ngForce.resource/ngForce/js/log.js",
+		"/Users/kpoorman/Documents/mavensmate/NgForce/src/components/RemoteTK.component",
+		"/Users/kpoorman/Documents/mavensmate/NgForce/resource-bundles/LABJS_Angular.resource/angular105/angular-resource.min.js",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/src/pages/lineItemTemplate.page",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/src/classes/preferedSpendingOptions.cls",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/src/classes/SelectOptionsCtrl.cls",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/src/classes/selectOptionsCtrl_TEST.cls",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/src/classes/preferredSpendingOptions_TEST.cls",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/src/classes/DealBuilderExt_TEST.cls",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/src/classes/DealBuilderExt.cls",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/src/pages/DealBuilderPlatform.page",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/src/pages/dealBuilder.page",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/src/pages/priceScheduleTemplate.page-meta.xml",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/src/pages/groupDirectiveTemplate.page",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/resource-bundles/cs.resource/ng/controllers/groupCtrl.js",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/resource-bundles/cs.resource/ng/controllers/dragNdropCtrl.js",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/resource-bundles/cs.resource/ng/dealBuilder.js",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/resource-bundles/cs.resource/ng/controllers/platformLineItemCtrl.js",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/src/pages/platformLineItemTemplate.page",
+		"/Users/kpoorman/Downloads/ComponentProviderName.csv",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/config/.settings",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/src/pages/Start_Here.page",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/src/classes/startHereController.cls",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/resource-bundles/cs.resource/ng/services/tk.js",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/src/pages/priceScheduleTemplate.page",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/resource-bundles/cs.resource/ng/controllers/priceScheduleCtrl.js",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/resource-bundles/cs.resource/ng/controllers/groupLevelComponentCtrl.js",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/resource-bundles/cs.resource/ng/directives/xeditable.js",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/src/pages/psaTPL.page",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/resource-bundles/cs.resource/ng/directives/psa.js",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/resource-bundles/cs.resource/ng/controllers/psaCtrl.js",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/src/pages/preferredSpendingOptions.page",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/src/pages/SelectOptions.page",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/src/pages/newPlatformLineItemModal.page",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/resource-bundles/cs.resource/ng/directives/platformLineItem.js",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/resource-bundles/cs.resource/ng/directives/groupLevelComponents.js",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/resource-bundles/cs.resource/ng/directives/group.js",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/resource-bundles/cs.resource/js/log.js",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/resource-bundles/cs.resource/ng/directives/priceschedule.js",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/resource-bundles/cs.resource/ng/controllers/appliedComponentCtrl.js",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/resource-bundles/cs.resource/ng/controllers/componentContainerCtrl.js",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/resource-bundles/cs.resource/ng/directives/componentContainer.js",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/src/pages/addComponentTemplate.page-meta.xml",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/resource-bundles/cs.resource/ng/controllers/lineItemCtrl.js",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/src/classes/RemoteTKController.cls",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/src/components/RemoteTK.component",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/resource-bundles/cs.resource/js/jquery-1.9.1.min.js",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/resource-bundles/cs.resource/ng/controllers/rightSideCtrl.js",
+		"/Users/kpoorman/.zshrc",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/src/pages/oppDetail.page",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/src/pages/myLibrary.page",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/src/pages/publicLibrary.page",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/resource-bundles/cs.resource/ng/services/percent.js",
+		"/Users/kpoorman/src/salesforceIRC/salesforce/Utils.cls",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/resource-bundles/cs.resource/ng/directives/newPlatformLineItem.js",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/src/pages/newLineItemTemplate.page",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/resource-bundles/cs.resource/ng/controllers/newLineItemCtrl.js",
+		"/Users/kpoorman/Dropbox/Apps/SublimeText/Packages/User/Preferences.sublime-settings",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/resource-bundles/cs.resource/ng/directives/lineItem.js",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/src/pages/groupLevelComponentDirectiveTPL.page",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/resource-bundles/cs.resource/css/bootstrap-custom.css",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/src/pages/groupLevelLibraryDetails.page",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/src/pages/componentContainerTemplate.page",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/src/pages/addComponentTemplate.page",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/resource-bundles/cs.resource/ng/controllers/libraryModalCtrl.js",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/resource-bundles/cs.resource/ng/directives/groupLevelLineItemDetail.js",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/resource-bundles/cs.resource/js/ui-bootstrap-tpls-0.2.0.js",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/resource-bundles/cs.resource/ng/directives/addComponent.js",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/src/pages/myLibrary.page-meta.xml",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/src/pages/libraryModalTemplate.page",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/src/pages/AppliedComponentsTemplate.page",
+		"/Users/kpoorman/src/MadronaBI/Rakefile",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/resource-bundles/cs.resource/ng/directives/newLibraryItem.js",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/resource-bundles/cs.resource/ng/directives/libraryModal.js",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/resource-bundles/cs.resource/ng/directives/publicLibrary.js",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/resource-bundles/cs.resource/ng/directives/myLibrary.js",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/src/pages/newLibraryItem.page",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/resource-bundles/cs.resource/ng/controllers/navModalCtrl.js",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/resource-bundles/cs.resource/ng/directives/droppable.js",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/resource-bundles/cs.resource/ng/directives/component.js",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/resource-bundles/cs.resource/js/underscore.js",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/resource-bundles/cs.resource/js/bootstrap-editable.js",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/resource-bundles/cs.resource/js/bootstrap-tooltip.js",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/resource-bundles/cs.resource/js/boostrap-tooltip.js",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/resource-bundles/cs.resource/js/bootstrap-popover.js",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/resource-bundles/cs.resource/js/angular.min.js",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/resource-bundles/cs.resource/js/bootstrap-editable.min.js",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/resource-bundles/cs.resource/js/angular-dragdrop.min.js",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/src/pages/componentContainerTemplate.page-meta.xml",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/src/package.xml",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/resource-bundles/cs.resource/js/select2.min.js",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/resource-bundles/cs.resource/ng/directives/selectFromMany.js",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/src/classes/startHereController.cls-meta.xml",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/src/pages/AppliedComponentsTemplate.page-meta.xml",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/src/pages/groupLevelComponentDirectiveTPL.page-meta.xml",
+		"/Users/kpoorman/Downloads/Deal Builder Components - DataImportToSF.csv",
+		"/Users/kpoorman/Desktop/providers",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/resource-bundles/cs.resource/ng/detrius.js",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/resource-bundles/cs.resource/ng/directives/newLineItem.js",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/resource-bundles/cs.resource/ng/directives/newLineItemModal.js",
+		"/Users/kpoorman/Library/Application Support/Sublime Text 2/Packages/User/Preferences.sublime-settings",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/resource-bundles/cs.resource/ng/controllers/dealBuilder.js",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/resource-bundles/cs.resource/ng/navModalCtrl.js",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/src/pages/angularTest.page",
+		"/Users/kpoorman/Library/Application Support/Sublime Text 2/Packages/User/mavensmate.sublime-settings",
+		"/Users/kpoorman/Library/Application Support/Sublime Text 2/Packages/MavensMate/mavensmate.sublime-settings",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/resource-bundles/cs.resource/ng/directives/draggable.js",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/resource-bundles/cs.resource/js/angular-ui-ieshiv.js",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/resource-bundles/cs.resource/ng/controllers/dragNdrop.js",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/resource-bundles/cs.resource/css/bootstrap-responsive.min.css",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/src/classes/DealBuilderExt.cls-meta.xml",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/src/pages/dealBuilder.page-meta.xml",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/resource-bundles/cs.resource/css/bootstrap.css",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/resource-bundles/cs.resource/ng/directives/templates/group.html",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/src/pages/groupDirectiveTemplate.page-meta.xml",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/resource-bundles/cs.resource/cs/ng/dealBuilder.js",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/resource-bundles/cs.resource/cs/ng/directives/group.js",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/resource-bundles/cs.resource/cs/ng/directives/templates/group.html",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/resource-bundles/cs.resource/cs/directives/group.js",
+		"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/resource-bundles/cs.resource/cs/js/jquery-1.9.1.min.js",
+		"/Users/kpoorman/Documents/mavensmate/portfolio/src/pages/PortfolioTemplate.page",
+		"/Users/kpoorman/Documents/mavensmate/portfolio/src/pages/ProjectsList.page"
+	],
+	"find":
+	{
+		"height": 37.0
+	},
+	"find_in_files":
+	{
+		"height": 0.0,
+		"where_history":
+		[
+			"/Users/kpoorman/Documents/mavensmate/AngularAdaptv/src/pages",
+			"<project>",
+			"/Users/kpoorman/Documents/mavensmate/AngularAdaptv",
+			"<project>",
+			"/Users/kpoorman/Documents/mavensmate/AngularAdaptv",
+			"<project>",
+			""
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": true,
+		"find_history":
+		[
+			"}', ",
+			"{!$RemoteAction.",
+			"vfr.Client.",
+			".prototype.",
+			"remotetk",
+			"{!RecordType",
+			"\\t.*",
+			"*",
+			"unmanaged",
+			"log(",
+			"groupId",
+			"objId",
+			"$scope.psa",
+			"fieldMap",
+			"key",
+			"row",
+			"key",
+			"fieldmaplist",
+			"odd",
+			"pricingStruct",
+			"ng-show=",
+			"\"...\"(?)",
+			"\"...\"{1}",
+			"Line_Item__c",
+			"</option>",
+			"widemodal",
+			"getBoundingClientRect",
+			"popover",
+			"×",
+			"[0-9]",
+			"tool",
+			"tooltip",
+			"addedComponentContainer",
+			"oppTotal",
+			"resetSubtotal",
+			"lineItem.{{f.key}}",
+			"lineItemFieldset",
+			"describeFieldSet",
+			"getLineItmesForGroup",
+			"pluck",
+			"$scope.panes",
+			"newComponentShouldBeOpen",
+			"static content",
+			"panes",
+			"render",
+			"console.log",
+			"dr",
+			"fname",
+			"toUpdate",
+			"console.log",
+			"itemId",
+			"name__c",
+			"Adap.tv ",
+			"adap.tv",
+			"ng-controller=\"collapsable\"",
+			"componentContainerController",
+			"appliedControllerController",
+			"fields",
+			"ng-cloak",
+			"lineItemController",
+			"dataBus",
+			"ui.bootstrap.modal",
+			"modal",
+			"btn-success",
+			"btn	<apex:includeScript value=\"{!URLFOR($Resource.cs, '/ng/directives/lineItem.js')}\"/>\n	<apex:includeScript value=\"{!URLFOR($Resource.cs, '/ng/directives/lineItem.js')}\"/>\n	<apex:includeScript value=\"{!URLFOR($Resource.cs, '/ng/directives/lineItem.js')}\"/>\n.btn",
+			"btn	<apex:includeScript value=\"{!URLFOR($Resource.cs, '/ng/directives/lineItem.js')}\"/>\n	<apex:includeScript value=\"{!URLFOR($Resource.cs, '/ng/directives/lineItem.js')}\"/>\n	<apex:includeScript value=\"{!URLFOR($Resource.cs, '/ng/directives/lineItem.js')}\"/>\n",
+			"bs-btn",
+			"\"",
+			"remotetk.Client.prototype",
+			"flight",
+			"-flight",
+			"dealbuilder",
+			".btn-mini",
+			".btn",
+			"logger.",
+			"Log.Instance",
+			"^def .*checkout_project",
+			"checkout_project",
+			"logger",
+			"getFullFlightDetails",
+			"\nvoid",
+			"void",
+			"showhide",
+			"leftField",
+			"leftField.api_name",
+			".fieldpath",
+			"[leftField]",
+			"[f]",
+			"f.",
+			"[f]",
+			"f.",
+			"newPlacement",
+			"drawplacementboxandtitle",
+			"AppliedStrategy__c",
+			"right",
+			"popover",
+			"bs-btn",
+			"command-copy",
+			"button",
+			"showhide",
+			"z-index",
+			"AppliedStrategy__c",
+			"placement__c",
+			"notes__",
+			"showhide",
+			"console.log",
+			"e.datepicker.initialized",
+			"$.fn.datepicker",
+			"http://packages.debian.org/experimental/ghc",
+			"$.fn.datepicker",
+			"$.fn.datepicker = ",
+			"$.fn.datepicker =",
+			"e.datepicker.initialized",
+			"$.fn.datepicker",
+			"DPGlobal",
+			"editable",
+			"flightdetails",
+			"showhide",
+			"addNewFlight",
+			"sidenav",
+			"save",
+			"remove",
+			"x.",
+			"v.",
+			"}\n",
+			"btn",
+			"AcceptsPlacementAndFLSDrops",
+			"acceptsPlacementAndStrategyDrops"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"', ",
+			"",
+			"vfr.",
+			".",
+			"vfr",
+			"",
+			"AccountId",
+			"groupId",
+			"current",
+			"property",
+			"key",
+			"row",
+			"incomingFieldJsonObject",
+			"left",
+			"ui-if=",
+			"label: $1",
+			"PlatformLineItem__c",
+			"",
+			"odd.namespacedKey",
+			"lineItemFieldsetString",
+			"//console.log",
+			"describeResult",
+			"fieldToUpdate",
+			"objectToUpdate",
+			"ObjectToUpdate",
+			"//console.log",
+			"containerId",
+			"Adap.tv",
+			"newLineItemFields",
+			"newGroupFields",
+			"btn",
+			"",
+			"this",
+			"group",
+			"-group",
+			"dealBuilder",
+			".bs-btn-mini",
+			".bs-btn",
+			"rightField",
+			"leftFieldName",
+			".api_name",
+			"[leftFieldName]",
+			"[leftField]",
+			"leftField.",
+			"[left]",
+			"left.",
+			"placement__c",
+			"btn",
+			"AppliedFLStrategy__c",
+			"AppliedStrategy__c",
+			"fls.",
+			"obj.",
+			"bs-btn",
+			"addObjAndReturnDetails",
+			"(id incomingId)",
+			"html();",
+			"setDropZones",
+			"",
+			"http://cdn1.iconfinder.com/data/icons/CrystalClear/128x128/actions/decrypted.png",
+			"2013,1,28,11,15",
+			"2013,1,28,11,10",
+			"data",
+			"@data",
+			"\" =>",
+			",\\n",
+			"\\n",
+			"",
+			"\"nil\"",
+			", \\n",
+			"380px",
+			"width:380px",
+			"",
+			">\\n<",
+			"ClientOrgRegistrationExt",
+			"baseUrl",
+			"sidebar_css",
+			"csSidebar",
+			"\\n17:04",
+			"\\n17:02",
+			"\\n16:12",
+			"\\n15:32",
+			"\\n15:28",
+			"\\n15:02",
+			"\\n14:59",
+			"\\n14:53",
+			"\\n14:51",
+			"\\n14:46",
+			"\\n14:43",
+			"\"detailRow\"",
+			"detailRow[",
+			"detailRow",
+			"\"detailColumn\"",
+			"detailColumn.",
+			"",
+			"inputField",
+			"ctlExt",
+			"AgencyGridTemplateBuilderExtension",
+			"ListToSort",
+			"SelectOptionListSort",
+			"20120913",
+			"QuoteExcelExtension_Old",
+			"",
+			", 'a1eW00000000O0a'",
+			"",
+			"\\n",
+			"s67",
+			"s68",
+			"T13:50:03.323",
+			""
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 2,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "resource-bundles/ngForce.resource/ngForce/services/ngForce.js",
+					"settings":
+					{
+						"buffer_size": 13581,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								171,
+								171
+							]
+						],
+						"settings":
+						{
+							"annotations":
+							[
+								"TODO",
+								"README",
+								"FIXME"
+							],
+							"bh_regions":
+							[
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_curly",
+								"bh_curly_center",
+								"bh_curly_open",
+								"bh_curly_close",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close",
+								"bh_single_quote",
+								"bh_single_quote_center",
+								"bh_single_quote_open",
+								"bh_single_quote_close"
+							],
+							"csslint_options":
+							{
+								"adjoining-classes": "warning",
+								"box-model": true,
+								"box-sizing": "warning",
+								"compatible-vendor-prefixes": "warning",
+								"display-property-grouping": true,
+								"duplicate-background-images": "warning",
+								"duplicate-properties": true,
+								"empty-rules": true,
+								"errors": true,
+								"fallback-colors": "warning",
+								"floats": "warning",
+								"font-faces": "warning",
+								"font-sizes": "warning",
+								"gradients": "warning",
+								"ids": "warning",
+								"import": "warning",
+								"important": "warning",
+								"known-properties": true,
+								"outline-none": "warning",
+								"overqualified-elements": "warning",
+								"qualified-headings": "warning",
+								"regex-selectors": "warning",
+								"rules-count": "warning",
+								"shorthand": "warning",
+								"star-property-hack": "warning",
+								"text-indent": "warning",
+								"underscore-property-hack": "warning",
+								"unique-headings": "warning",
+								"universal-selector": "warning",
+								"vendor-prefix": true,
+								"zero-units": "warning"
+							},
+							"gjslint_ignore":
+							[
+								110.0
+							],
+							"gjslint_options":
+							[
+							],
+							"is_xml": false,
+							"javascript_linter": "jshint",
+							"jshint_options":
+							{
+								"browser": true,
+								"evil": true,
+								"regexdash": true,
+								"sub": true,
+								"trailing": true,
+								"wsh": true
+							},
+							"pep8": true,
+							"pep8_ignore":
+							[
+								"E501"
+							],
+							"perl_linter": "perlcritic",
+							"pyflakes_ignore":
+							[
+							],
+							"pyflakes_ignore_import_*": true,
+							"sublimelinter": true,
+							"sublimelinter_delay": 2.0,
+							"sublimelinter_disable":
+							[
+							],
+							"sublimelinter_executable_map":
+							{
+							},
+							"sublimelinter_fill_outlines": false,
+							"sublimelinter_gutter_marks": false,
+							"sublimelinter_mark_style": "outline",
+							"sublimelinter_notes": false,
+							"sublimelinter_objj_check_ascii": false,
+							"sublimelinter_popup_errors_on_save": false,
+							"sublimelinter_syntax_map":
+							{
+								"C++": "c",
+								"Python Django": "python",
+								"Ruby on Rails": "ruby"
+							},
+							"sublimelinter_wrap_find": true,
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "src/pages/ngForceDemo.page",
+					"settings":
+					{
+						"buffer_size": 3376,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2456,
+								2456
+							]
+						],
+						"settings":
+						{
+							"annotations":
+							[
+								"TODO",
+								"README",
+								"FIXME"
+							],
+							"bh_regions":
+							[
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_curly",
+								"bh_curly_center",
+								"bh_curly_open",
+								"bh_curly_close",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close",
+								"bh_single_quote",
+								"bh_single_quote_center",
+								"bh_single_quote_open",
+								"bh_single_quote_close"
+							],
+							"csslint_options":
+							{
+								"adjoining-classes": "warning",
+								"box-model": true,
+								"box-sizing": "warning",
+								"compatible-vendor-prefixes": "warning",
+								"display-property-grouping": true,
+								"duplicate-background-images": "warning",
+								"duplicate-properties": true,
+								"empty-rules": true,
+								"errors": true,
+								"fallback-colors": "warning",
+								"floats": "warning",
+								"font-faces": "warning",
+								"font-sizes": "warning",
+								"gradients": "warning",
+								"ids": "warning",
+								"import": "warning",
+								"important": "warning",
+								"known-properties": true,
+								"outline-none": "warning",
+								"overqualified-elements": "warning",
+								"qualified-headings": "warning",
+								"regex-selectors": "warning",
+								"rules-count": "warning",
+								"shorthand": "warning",
+								"star-property-hack": "warning",
+								"text-indent": "warning",
+								"underscore-property-hack": "warning",
+								"unique-headings": "warning",
+								"universal-selector": "warning",
+								"vendor-prefix": true,
+								"zero-units": "warning"
+							},
+							"gjslint_ignore":
+							[
+								110.0
+							],
+							"gjslint_options":
+							[
+							],
+							"is_xml": false,
+							"javascript_linter": "jshint",
+							"jshint_options":
+							{
+								"browser": true,
+								"evil": true,
+								"regexdash": true,
+								"sub": true,
+								"trailing": true,
+								"wsh": true
+							},
+							"pep8": true,
+							"pep8_ignore":
+							[
+								"E501"
+							],
+							"perl_linter": "perlcritic",
+							"pyflakes_ignore":
+							[
+							],
+							"pyflakes_ignore_import_*": true,
+							"sublimelinter": true,
+							"sublimelinter_delay": 2.0,
+							"sublimelinter_disable":
+							[
+							],
+							"sublimelinter_executable_map":
+							{
+							},
+							"sublimelinter_fill_outlines": false,
+							"sublimelinter_gutter_marks": false,
+							"sublimelinter_mark_style": "outline",
+							"sublimelinter_notes": false,
+							"sublimelinter_objj_check_ascii": false,
+							"sublimelinter_popup_errors_on_save": false,
+							"sublimelinter_syntax_map":
+							{
+								"C++": "c",
+								"Python Django": "python",
+								"Ruby on Rails": "ruby"
+							},
+							"sublimelinter_wrap_find": true,
+							"syntax": "Packages/HTML/HTML.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 743.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "resource-bundles/ngForce.resource/ngForce/controllers/oppBoxCtrl.js",
+					"settings":
+					{
+						"buffer_size": 498,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								235,
+								235
+							]
+						],
+						"settings":
+						{
+							"bh_regions":
+							[
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_curly",
+								"bh_curly_center",
+								"bh_curly_open",
+								"bh_curly_close",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close",
+								"bh_single_quote",
+								"bh_single_quote_center",
+								"bh_single_quote_open",
+								"bh_single_quote_close"
+							],
+							"is_xml": false,
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "src/pages/oppBoxTmpl.page",
+					"settings":
+					{
+						"buffer_size": 423,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								294,
+								294
+							]
+						],
+						"settings":
+						{
+							"annotations":
+							[
+								"TODO",
+								"README",
+								"FIXME"
+							],
+							"bh_regions":
+							[
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_curly",
+								"bh_curly_center",
+								"bh_curly_open",
+								"bh_curly_close",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close",
+								"bh_single_quote",
+								"bh_single_quote_center",
+								"bh_single_quote_open",
+								"bh_single_quote_close"
+							],
+							"csslint_options":
+							{
+								"adjoining-classes": "warning",
+								"box-model": true,
+								"box-sizing": "warning",
+								"compatible-vendor-prefixes": "warning",
+								"display-property-grouping": true,
+								"duplicate-background-images": "warning",
+								"duplicate-properties": true,
+								"empty-rules": true,
+								"errors": true,
+								"fallback-colors": "warning",
+								"floats": "warning",
+								"font-faces": "warning",
+								"font-sizes": "warning",
+								"gradients": "warning",
+								"ids": "warning",
+								"import": "warning",
+								"important": "warning",
+								"known-properties": true,
+								"outline-none": "warning",
+								"overqualified-elements": "warning",
+								"qualified-headings": "warning",
+								"regex-selectors": "warning",
+								"rules-count": "warning",
+								"shorthand": "warning",
+								"star-property-hack": "warning",
+								"text-indent": "warning",
+								"underscore-property-hack": "warning",
+								"unique-headings": "warning",
+								"universal-selector": "warning",
+								"vendor-prefix": true,
+								"zero-units": "warning"
+							},
+							"gjslint_ignore":
+							[
+								110.0
+							],
+							"gjslint_options":
+							[
+							],
+							"is_xml": false,
+							"javascript_linter": "jshint",
+							"jshint_options":
+							{
+								"browser": true,
+								"evil": true,
+								"regexdash": true,
+								"sub": true,
+								"trailing": true,
+								"wsh": true
+							},
+							"pep8": true,
+							"pep8_ignore":
+							[
+								"E501"
+							],
+							"perl_linter": "perlcritic",
+							"pyflakes_ignore":
+							[
+							],
+							"pyflakes_ignore_import_*": true,
+							"sublimelinter": true,
+							"sublimelinter_delay": 2.0,
+							"sublimelinter_disable":
+							[
+							],
+							"sublimelinter_executable_map":
+							{
+							},
+							"sublimelinter_fill_outlines": false,
+							"sublimelinter_gutter_marks": false,
+							"sublimelinter_mark_style": "outline",
+							"sublimelinter_notes": false,
+							"sublimelinter_objj_check_ascii": false,
+							"sublimelinter_popup_errors_on_save": false,
+							"sublimelinter_syntax_map":
+							{
+								"C++": "c",
+								"Python Django": "python",
+								"Ruby on Rails": "ruby"
+							},
+							"sublimelinter_wrap_find": true,
+							"syntax": "Packages/HTML/HTML.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "src/classes/RemoteTKController.cls",
+					"settings":
+					{
+						"buffer_size": 19006,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								19006
+							]
+						],
+						"settings":
+						{
+							"annotations":
+							[
+								"TODO",
+								"README",
+								"FIXME"
+							],
+							"bh_regions":
+							[
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_curly",
+								"bh_curly_center",
+								"bh_curly_open",
+								"bh_curly_close",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close",
+								"bh_single_quote",
+								"bh_single_quote_center",
+								"bh_single_quote_open",
+								"bh_single_quote_close"
+							],
+							"csslint_options":
+							{
+								"adjoining-classes": "warning",
+								"box-model": true,
+								"box-sizing": "warning",
+								"compatible-vendor-prefixes": "warning",
+								"display-property-grouping": true,
+								"duplicate-background-images": "warning",
+								"duplicate-properties": true,
+								"empty-rules": true,
+								"errors": true,
+								"fallback-colors": "warning",
+								"floats": "warning",
+								"font-faces": "warning",
+								"font-sizes": "warning",
+								"gradients": "warning",
+								"ids": "warning",
+								"import": "warning",
+								"important": "warning",
+								"known-properties": true,
+								"outline-none": "warning",
+								"overqualified-elements": "warning",
+								"qualified-headings": "warning",
+								"regex-selectors": "warning",
+								"rules-count": "warning",
+								"shorthand": "warning",
+								"star-property-hack": "warning",
+								"text-indent": "warning",
+								"underscore-property-hack": "warning",
+								"unique-headings": "warning",
+								"universal-selector": "warning",
+								"vendor-prefix": true,
+								"zero-units": "warning"
+							},
+							"gjslint_ignore":
+							[
+								110.0
+							],
+							"gjslint_options":
+							[
+							],
+							"javascript_linter": "jshint",
+							"jshint_options":
+							{
+								"browser": true,
+								"evil": true,
+								"regexdash": true,
+								"sub": true,
+								"trailing": true,
+								"wsh": true
+							},
+							"pep8": true,
+							"pep8_ignore":
+							[
+								"E501"
+							],
+							"perl_linter": "perlcritic",
+							"pyflakes_ignore":
+							[
+							],
+							"pyflakes_ignore_import_*": true,
+							"sublimelinter": true,
+							"sublimelinter_delay": 2.0,
+							"sublimelinter_disable":
+							[
+							],
+							"sublimelinter_executable_map":
+							{
+							},
+							"sublimelinter_fill_outlines": false,
+							"sublimelinter_gutter_marks": false,
+							"sublimelinter_mark_style": "outline",
+							"sublimelinter_notes": false,
+							"sublimelinter_objj_check_ascii": false,
+							"sublimelinter_popup_errors_on_save": false,
+							"sublimelinter_syntax_map":
+							{
+								"C++": "c",
+								"Python Django": "python",
+								"Ruby on Rails": "ruby"
+							},
+							"sublimelinter_wrap_find": true,
+							"syntax": "Packages/Java/Java.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 34.0
+	},
+	"input":
+	{
+		"height": 35.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.MavensMate-OutputPanel":
+	{
+		"height": 329.0
+	},
+	"output.exec":
+	{
+		"height": 114.0
+	},
+	"output.git":
+	{
+		"height": 114.0
+	},
+	"replace":
+	{
+		"height": 66.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+			[
+				"remotetk",
+				"src/classes/RemoteTKController.cls"
+			],
+			[
+				"groupctrl",
+				"resource-bundles/cs.resource/ng/controllers/groupCtrl.js"
+			],
+			[
+				"right",
+				"resource-bundles/cs.resource/ng/controllers/rightSideCtrl.js"
+			],
+			[
+				"xedit",
+				"resource-bundles/cs.resource/ng/directives/xeditable.js"
+			],
+			[
+				"ui",
+				"src/classes/UiObjectTree.cls"
+			],
+			[
+				"config/dep",
+				"config/deploy.rb"
+			],
+			[
+				"cap",
+				"Capfile"
+			],
+			[
+				"gemfil",
+				"Gemfile"
+			],
+			[
+				"fuel_surcharge_hel",
+				"app/helpers/fuel_surcharges_helper.rb"
+			],
+			[
+				"",
+				"config/objects/Account.object"
+			],
+			[
+				"cco_",
+				"src/classes/ccoAPIProxyClass_20120913.cls"
+			],
+			[
+				"templatedout",
+				"src/pages/TemplatedQuoteExcelOutput.page"
+			],
+			[
+				"testagencygridtempl",
+				"src/classes/TestAgencyGridTemplateBuilderExtension.cls"
+			],
+			[
+				"agencygridtemplbuildtest",
+				"src/classes/AgencyGridTemplateBuilderControllerTest.cls"
+			],
+			[
+				"agencygridtemplatebuilderext",
+				"src/classes/AgencyGridTemplateBuilderExtension.cls"
+			],
+			[
+				"templated",
+				"src/pages/TemplatedQuoteExcelOutput.page"
+			],
+			[
+				"agencygridutil",
+				"src/classes/AgencyGridUtil.cls"
+			]
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 500.0,
+		"selected_items":
+		[
+		],
+		"width": 380.0
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 308.0,
+	"status_bar_visible": true
+}

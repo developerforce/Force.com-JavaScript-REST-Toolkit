@@ -1,0 +1,57 @@
+<apex:page >
+    <apex:includeScript value="{!URLFOR($Resource.LABJS_jQuery, 'jquery191/jquery-1.9.1.min.js')}"  />
+    <apex:includeScript value="{!URLFOR($Resource.LABJS_ForceTK, 'forcetk20130401/forcetk.js')}"  />
+    <apex:includeScript value="{!URLFOR($Resource.LABJS_Angular, 'angular105/angular.min.js')}" />
+	<c:RemoteTK />    
+    <script type="text/javascript">
+        
+        function ContactCtrl($scope) {
+        	$scope.contacts = [{"Id":"One", "Name":"Name1"}];
+        
+        	$scope.refreshContacts = function(newContacts) {
+        		$scope.contacts.length = 0;
+        		$scope.contacts = newContacts;
+        	}
+        }        
+
+        // Get a reference to jQuery that we can work with
+        $j = jQuery.noConflict();
+
+        // Create the RemoteTK client - no session id required!
+        var client = new remotetk.Client();
+        client.query(
+            'Select Id, Name, LeadSource, Sortable_Index__c From Contact Order By Sortable_Index__c LIMIT 100',
+            function(response) {
+                e = document.getElementById('angularContactList');
+                scope = angular.element(e).scope();
+                scope.$apply(function() {
+                    scope.refreshContacts(response.records);
+                });     
+            }, 
+            function(response) { 
+            alert ('error!'); 
+            console.log(response);
+        });
+        
+    </script>
+
+    <apex:pageBlock title="Angular features ForceTK">
+    	<p>Similar to the previous Angular, however this implementation has no Apex controller.  
+            It relies entirely on ForceTK and RemoteTK.  Note that RemoteTKComponent has a minimum controller designed
+            to give you access to core API functionality.</p>
+    </apex:pageBlock>
+        <div class="ng-app">
+		<div id="angularContactList" ng-controller="ContactCtrl" style="width: 50%; float: left;">
+            <ul>
+                <li id="{{current.Id}}" ng-repeat="current in contacts" ng-class-even="'rowEven'">{{current.Name}}</li>
+            </ul>
+                        
+        </div>
+        
+        
+    </div>
+
+		
+    
+    
+</apex:page>

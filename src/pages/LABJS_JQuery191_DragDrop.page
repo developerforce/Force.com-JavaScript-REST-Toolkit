@@ -1,0 +1,84 @@
+<apex:page controller="LABJS_SimpleController" >
+    <apex:includeScript value="{!URLFOR($Resource.LABJS_jQuery, 'jquery191/jquery-1.9.1.min.js')}" />
+    <apex:includeScript value="{!URLFOR($Resource.LABJS_jQuery, 'jquery191/jquery-ui.min.js')}" />
+    <apex:form >
+    <apex:actionFunction name="updateTargetContact" action="{!updateContactLeadSource}"
+        rerender="output" status="methodStatus" >
+        <apex:param name="firstParam" assignTo="{!targetContactId}" value="" />
+        <apex:param name="secondParam" assignTo="{!targetContactLeadSource}" value=""  />
+    </apex:actionFunction>
+    </apex:form>
+<apex:outputPanel id="output" >    <apex:actionStatus startText="requesting..." id="methodStatus">
+        <apex:facet name="stop">done</apex:facet>
+    </apex:actionStatus></apex:outputPanel>
+    <apex:pageBlock title="About">
+        <p>Pretty simple drag and drop.  Watch the events roll by in the black box on the right.
+            Note how the drop event calls the "dropLog" with details about what was dropped on what.  
+            ALSO, once dropped, the app updates the contact with the selected lead source. Reload to verify.
+            Back to&nbsp;<apex:outputLink value="{!URLFOR($Page.LABJS_JQuery191)}">JQuery 191 Demos</apex:outputLink></p>
+    </apex:pageBlock>    
+  <style>
+  .myContact { width: 200px; height: 25px; padding: 0.5em; margin: 10px 10px 10px 0; border: 1px black solid;}
+  .droppable { width: 150px; height: 50px; padding: 0.5em; float: left; margin: 10px; border: 1px blue solid;}
+  .redBackground {
+    background-color: #f00;
+    color: #fff;
+  }
+  </style>
+  <script>
+  $(function() {
+    makeDraggable();
+    $( ".droppable" ).droppable({
+      drop: function( event, ui ) {
+        console.log(ui);
+        console.log('dropped ' + ui.draggable[0].id + ' on ' + event.target.id);
+        updateTargetContact(ui.draggable[0].id, event.target.id);
+        dropLog('dropped ' + ui.draggable[0].id + ' on ' + event.target.id);
+        $(ui.draggable[0]).hide(500);
+        $( this )
+          .addClass( "redBackground" );
+      }
+    });
+  });
+      
+  function makeDraggable() {
+      $( ".myContact" ).draggable();
+  }
+      
+  function dropLog(text) {
+      $('#dropHistory').append(text + '<br/>');
+      console.log('attempting appending');
+      }
+
+  </script>  
+ 
+<div id="contactList" style="width:40%;float:left;background-color: #ccc;">
+    <apex:form >
+        <apex:commandButton rerender="allContacts" value="Show All Contacts" oncomplete="makeDraggable();" />
+    </apex:form>
+    <apex:outputPanel id="allContacts">
+<apex:repeat value="{!contacts}" var="current">        
+
+    <p id="{!current.id}" class="myContact"><apex:outputText value="{!current.name}" /> (<apex:outputText value="{!current.leadSource}" />)</p>
+        </apex:repeat>
+    </apex:outputPanel>
+    </div>
+
+<div id="dropZones" style="width:25%;float:left;background-color:#0ff;">
+    
+<apex:repeat value="{!leadSources}" var="current">
+    
+<div id="{!current}" class="droppable" >
+  <p>{!Current}</p>
+</div>
+ 
+    </apex:repeat>
+
+    </div>
+    <div id="dropHistory" style="width: 25%; float: left; background-color:#000; color:#fff;">
+        <p>Drop History</p>
+    </div>
+    
+    
+    
+</apex:page>

@@ -1,0 +1,8 @@
+<apex:page >
+
+    <apex:pageBlock title="jQuery Mobile 1.3.0 Examples">
+        <p><a href="http://www2.developerforce.com/mobile/getting-started/html5#jquery-heroku">Checkout the jQuery Mobile Pack</a></p>
+        <apex:outputLink value="{!URLFOR($Page.LABJS_JQueryMobile130_Hello)}">Hello, Contacts. See a list of contacts, click/tap on one to being up the detail screen.</apex:outputLink>
+
+        </apex:pageBlock>
+</apex:page>

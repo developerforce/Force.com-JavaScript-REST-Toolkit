@@ -2,13 +2,18 @@
 
 <!-- Css -->
 	<apex:stylesheet value="{!URLFOR($Resource.LABJS_Bootstrap, 'bootstrap231/css/bootstrap.min.css')}"/>
-	
+  <apex:stylesheet value="{!URLFOR($Resource.ngForce, 'ngForce/css/bootstrap-custom.css')}"/> 
+
 <!-- Javascript -->
 	<apex:includeScript value="{!URLFOR($Resource.ngForce, 'ngForce/js/jquery-2.0.0.min.js')}"/>
 	<apex:includeScript value="{!URLFOR($Resource.ngForce, 'ngForce/js/angular.min.1.1.4.js')}"/>
+  <apex:includeScript value="{!URLFOR($Resource.ngForce, 'ngForce/js/angular-ui.min.js')}"/>
+  <apex:includeScript value="{!URLFOR($Resource.ngForce, 'ngForce/js/ui-bootstrap-tpls-0.3.0.js')}"/>
 	<apex:includeScript value="{!URLFOR($Resource.ngForce, 'ngForce/js/log.js')}"/>
+
 <!-- This is the ngForce module and service that provides VF Remoting access to the API -->
 	<apex:includeScript value="{!URLFOR($Resource.ngForce, 'ngForce/services/ngForce.js')}"/>
+
 <!-- Angular Modules -->
 <!-- This includes the module that defines our application -->
 	<apex:includeScript value="{!URLFOR($Resource.ngForce, 'ngForce/ngForceDemoApp.js')}"/>
@@ -18,9 +23,11 @@
 <!-- Angular Controllers -->
   <apex:includeScript value="{!URLFOR($Resource.ngForce, 'ngForce/controllers/oppBoxCtrl.js')}"/>
   <apex:includeScript value="{!URLFOR($Resource.ngForce, 'ngForce/controllers/navCtrl.js')}"/>
+  <apex:includeScript value="{!URLFOR($Resource.ngForce, 'ngForce/controllers/oppDetailsCtrl.js')}"/>
 
 <!-- Angular Directives -->
 	<apex:includeScript value="{!URLFOR($Resource.ngForce, 'ngForce/directives/oppBox.js')}"/>
+  <apex:includeScript value="{!URLFOR($Resource.ngForce, 'ngForce/directives/oppDetails.js')}"/>
 
 <body ng-app="ngForceDemo">
     <apex:form>
@@ -40,9 +47,9 @@
               Logged in as <a href="#" class="navbar-link">{!$User.userName}</a>
             </p>
             <ul class="nav">
-              <li class="active"><a href="#">Home</a></li>
-              <li><a href="#about">About</a></li>
-              <li><a href="#contact">Contact</a></li>
+              <li class="active"><a href="#">Demo</a></li>
+              <li><a href="/006/o">Return to Standard View</a></li>
+              <li><a href="http://www.twitter.com/codefriar">@codefriar</a></li>
             </ul>
           </div><!--/.nav-collapse -->
         </div>
@@ -55,8 +62,11 @@
           <div class="well sidebar-nav" ng-controller="navCtrl">
             <ul class="nav nav-list">
               <li class="nav-header">Filter Opportunities By StageName</li>
+              <li>
+                <a href="#" ng-click="broadcastFilter('')">Show All</a>
+              </li>
               <li ng-repeat="name in stageNames">
-                <a href="#">{{name.label}}</a>
+                <a href="#" ng-click="broadcastFilter(name.label)">{{name.label}}</a>
               </li>
             </ul>
           </div><!--/.well -->
@@ -67,9 +77,8 @@
 			</div><!--/row-->
     
       <hr></hr>
-    
       <footer>
-        <p>© Ignoti et Quasi Oculti Declaravimus - 2013</p>
+        <p><a href="http://www.codefriar.com">© Ignoti et Quasi Oculti Declaravimus - 2013</a></p>
       </footer>
     
     </div><!--/.fluid-container-->

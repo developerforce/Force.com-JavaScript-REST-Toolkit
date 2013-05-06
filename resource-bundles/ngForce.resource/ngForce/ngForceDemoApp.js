@@ -1,1 +1,1 @@
-var app = angular.module('ngForceDemo', ['ngForce']);
+var app = angular.module('ngForceDemo', ['ui.bootstrap', 'ui', 'ngForce']);

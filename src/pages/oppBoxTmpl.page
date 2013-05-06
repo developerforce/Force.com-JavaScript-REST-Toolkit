@@ -1,17 +1,14 @@
 <apex:page showHeader="false" sidebar="false" standardstylesheets="false">
-
 <div class="row-fluid" ng-repeat="row in opportunities">
-	<div class="span4" ng-repeat="opp in row | filter:filterExpr">
-		<h2>{{opp.Account.Name}}</h2>
+	<div class="span4 well" style="height:228px;" ng-repeat="opp in row | filter:filterExpr">
+		<span class="label {{stageNameMap[opp.StageName]}}">{{opp.StageName}}</span>
+		<h3>{{opp.Account.Name}}</h3>
 		<p class="">
-			<span class="label {{stageNameMap[opp.StageName]}}">{{opp.StageName}}</span>
 			<div>
 				{{opp.Name}}
 			</div>
 		</p>
-		<p>
-			<a class="btn" href="#">View details »</a>
-		</p>
+		<div class="btn btn-block" ng-click="openDetailsDialog(opp.Id)">See Details</div>
 	</div><!--/span-->
 </div><!--/row-->
 </apex:page>

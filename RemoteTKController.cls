@@ -106,6 +106,8 @@ public class RemoteTKController {
             field.put('type', descField.getType().name().toLowerCase());
             field.put('name', descField.getName());
             field.put('label', descField.getLabel());
+            field.put('updateable', descField.isUpdateable());
+            field.put('createable', descField.isCreateable());
             List<String> references = new List<String>();
             for (Schema.sObjectType t: descField.getReferenceTo()) {
                 references.add(t.getDescribe().getName());

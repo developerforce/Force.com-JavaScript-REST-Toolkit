@@ -1,0 +1,7 @@
+<apex:component controller="ngForceController">
+<!-- 
+	This component is intentionally blank and is used soley to enforce the
+	inclusion of vf remoting capabilities within including page. Ie: 
+	force the inclusion of Salesforces VfRemote.js
+ -->
+</apex:component>

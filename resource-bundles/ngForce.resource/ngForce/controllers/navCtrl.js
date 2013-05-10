@@ -1,6 +1,6 @@
-app.controller('navCtrl', function($scope, $rootScope, vfRemote) {
+app.controller('navCtrl', function($scope, $rootScope, vfr) {
 
-	var pStageNames = vfRemote.describePicklistValues('Opportunity', 'StageName');
+	var pStageNames = vfr.describePicklistValues('Opportunity', 'StageName');
 
 	pStageNames.then(function(results){
 		$scope.stageNames = results;
@@ -10,7 +10,6 @@ app.controller('navCtrl', function($scope, $rootScope, vfRemote) {
 	});
 
 	$scope.broadcastFilter = function(filterExp) {
-		log('clicked on ' + filterExp);
 		$rootScope.$broadcast('UpdateFilter', {'StageName' : filterExp});
 	};
 

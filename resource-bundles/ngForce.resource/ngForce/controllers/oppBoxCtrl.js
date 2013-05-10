@@ -1,12 +1,8 @@
-app.controller('oppBoxCtrl', function($scope, $dialog, vfRemote) {
+app.controller('oppBoxCtrl', function($scope, $dialog, vfr) {
 
-	var pOppQuery = vfRemote.query("SELECT Id, Name, Account.Name, LeadSource, Probability, CloseDate, StageName, Amount FROM Opportunity ORDER BY CloseDate DESC");
+	var pOppQuery = vfr.query("SELECT Id, Name, Account.Name, LeadSource, Probability, CloseDate, StageName, Amount FROM Opportunity ORDER BY CloseDate DESC");
 	pOppQuery.then(function(d) {
-		$scope.opportunities = [];
-		var i, j, chunk = 3;
-		for (i=0, j=d.records.length; i<j; i+=chunk) {
-			$scope.opportunities.push(d.records.slice(i,i+chunk));
-		}
+		$scope.opportunities = d.records;
 		if(!$scope.$$phase) {
 			$scope.$digest();
 		}
@@ -20,13 +16,10 @@ app.controller('oppBoxCtrl', function($scope, $dialog, vfRemote) {
 	// -- navCtrl.js -- we'll "watch" for a broadcast message telling this
 	// controller to update the filter
 	$scope.$on('UpdateFilter', function(newValue, parameters) {
-		log('recieved broadcast to update filter with: ');
-		log(newValue);
 		$scope.filterExpr = parameters;
-		log($scope.filterExpr);
 	});
 
-	pOppQuery.fail(function(e){log(e);});
+	pOppQuery.fail(function(e){log(e);}); //if the query failes, log it.
 
 	$scope.stageNameMap = {
 		'Prospecting' : 'label label-info',
@@ -58,7 +51,6 @@ app.controller('oppBoxCtrl', function($scope, $dialog, vfRemote) {
 		};
 
 		var d = $dialog.dialog(dialogOpts);
-		log(d);
 		d.open().then(function(result){
 			if(result)
 			{
@@ -66,7 +58,5 @@ app.controller('oppBoxCtrl', function($scope, $dialog, vfRemote) {
 			}
 		});
 	};
-
-
 
 });

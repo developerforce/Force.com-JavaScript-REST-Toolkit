@@ -14,8 +14,8 @@
  */
 
 angular.module('ngForce', [], function($provide) {
-	$provide.factory('vfRemote', function() {
-		var vfr = {};
+	$provide.factory('vfr', function() {
+		var vfRemote = {};
 		/*
 		 * Large swaths of this have been lifted and modified from the RemoteTK
 		 * component provided as part of the
@@ -26,7 +26,7 @@ angular.module('ngForce', [], function($provide) {
 		 * based code.
 		 */
 
-		vfr.handleResult = function(result, callback, error, nullok, deferred) {
+		handleResult = function(result, callback, error, nullok, deferred) {
 			if (result) {
 				result = JSON.parse(result);
 				if (Array.isArray(result) && result[0].message && result[0].errorCode) {
@@ -63,7 +63,7 @@ angular.module('ngForce', [], function($provide) {
 		 * without consuming API calls.
 		 * @constructor
 		 */
-		// vfr.Client = function() {};
+		// vfRemote.Client = function() {};
 
 		/*
 		 * Creates a set of new records of the given type.
@@ -74,9 +74,9 @@ angular.module('ngForce', [], function($provide) {
 		 * @param callback function to which response will be passed
 		 * @param [error=null] function to which jqXHR will be passed in case of error
 		 */
-		vfr.bulkCreate = function(objtype, fields, callback, error) {
+		vfRemote.bulkCreate = function(objtype, fields, callback, error) {
 			var deferred = $.Deferred();
-			Visualforce.remoting.Manager.invokeAction('RemoteTKController.bulkCreate', objtype, JSON.stringify(fields), function(result) {
+			Visualforce.remoting.Manager.invokeAction('ngForceController.bulkCreate', objtype, JSON.stringify(fields), function(result) {
 				handleResult(result, callback, error, false, deferred);
 			}, {
 				escape: false
@@ -90,9 +90,9 @@ angular.module('ngForce', [], function($provide) {
 		 * @param callback function to which response will be passed
 		 * @param [error=null] function to which jqXHR will be passed in case of error
 		 */
-		vfr.clone = function(id, callback, error) {
+		vfRemote.clone = function(id, callback, error) {
 			var deferred = $.Deferred();
-			Visualforce.remoting.Manager.invokeAction('RemoteTKController.sObjectKlone}',
+			Visualforce.remoting.Manager.invokeAction('ngForceController.sObjectKlone}',
 			id, function(result) {
 				handleResult(result, callback, error, false, deferred);
 			}, {
@@ -110,9 +110,9 @@ angular.module('ngForce', [], function($provide) {
 		 * @param callback function to which response will be passed
 		 * @param [error=null] function to which jqXHR will be passed in case of error
 		 */
-		vfr.create = function(objtype, fields, callback, error) {
+		vfRemote.create = function(objtype, fields, callback, error) {
 			var deferred = $.Deferred();
-			Visualforce.remoting.Manager.invokeAction('RemoteTKController.create', objtype, JSON.stringify(fields), function(result) {
+			Visualforce.remoting.Manager.invokeAction('ngForceController.create', objtype, JSON.stringify(fields), function(result) {
 				handleResult(result, callback, error, false, deferred);
 			}, {
 				escape: false
@@ -128,9 +128,9 @@ angular.module('ngForce', [], function($provide) {
 		 * @param callback function to which response will be passed
 		 * @param [error=null] function to which jqXHR will be passed in case of error
 		 */
-		vfr.del = function(objtype, id, callback, error) {
+		vfRemote.del = function(objtype, id, callback, error) {
 			var deferred = $.Deferred();
-			Visualforce.remoting.Manager.invokeAction('RemoteTKController.del', objtype, id, function(result) {
+			Visualforce.remoting.Manager.invokeAction('ngForceController.del', objtype, id, function(result) {
 				handleResult(result, callback, error, true, deferred);
 			}, {
 				escape: false
@@ -145,9 +145,9 @@ angular.module('ngForce', [], function($provide) {
 		 * @param callback function to which response will be passed
 		 * @param [error=null] function to which jqXHR will be passed in case of error
 		 */
-		vfr.describe = function(objtype, callback, error) {
+		vfRemote.describe = function(objtype, callback, error) {
 			var deferred = $.Deferred();
-			Visualforce.remoting.Manager.invokeAction('RemoteTKController.describe', objtype, function(result) {
+			Visualforce.remoting.Manager.invokeAction('ngForceController.describe', objtype, function(result) {
 				handleResult(result, callback, error, false, deferred);
 			}, {
 				escape: false
@@ -163,9 +163,9 @@ angular.module('ngForce', [], function($provide) {
 		 * @param callback function to which response will be passed
 		 * @param [error=null] function to which jqXHR will be passed in case of error
 		 */
-		vfr.describeFieldSet = function(objtype, fieldSetName, callback, error) {
+		vfRemote.describeFieldSet = function(objtype, fieldSetName, callback, error) {
 			var deferred = $.Deferred();
-			Visualforce.remoting.Manager.invokeAction('RemoteTKController.describeFieldSet', objtype, fieldSetName, function(result) {
+			Visualforce.remoting.Manager.invokeAction('ngForceController.describeFieldSet', objtype, fieldSetName, function(result) {
 				handleResult(result, callback, error, false, deferred);
 			}, {
 				escape: false
@@ -181,9 +181,9 @@ angular.module('ngForce', [], function($provide) {
 		 * @param callback function to which response will be passed
 		 * @param [error=null] function to which jqXHR will be passed in case of error
 		 */
-		vfr.describePicklistValues = function(objtype, fieldName, callback, error) {
+		vfRemote.describePicklistValues = function(objtype, fieldName, callback, error) {
 			var deferred = $.Deferred();
-			Visualforce.remoting.Manager.invokeAction('RemoteTKController.getPicklistValues', objtype, fieldName, function(result) {
+			Visualforce.remoting.Manager.invokeAction('ngForceController.getPicklistValues', objtype, fieldName, function(result) {
 				handleResult(result, callback, error, false, deferred);
 			}, {
 				escape: false
@@ -197,9 +197,9 @@ angular.module('ngForce', [], function($provide) {
 		 * @param callback function to which response will be passed
 		 * @param [error=null] function to which jqXHR will be passed in case of error
 		 */
-		vfr.getObjectType = function(id, callback, error) {
+		vfRemote.getObjectType = function(id, callback, error) {
 			var deferred = $.Deferred();
-			Visualforce.remoting.Manager.invokeAction('RemoteTKController.getObjType}',
+			Visualforce.remoting.Manager.invokeAction('ngForceController.getObjType}',
 			id, function(result) {
 				handleResult(result, callback, error, false, deferred);
 			}, {
@@ -215,9 +215,9 @@ angular.module('ngForce', [], function($provide) {
 		 * @param callback function to which response will be passed
 		 * @param [error=null] function to which jqXHR will be passed in case of error
 		 */
-		vfr.getQueryResultsAsSelect2Data = function(soql, callback, error) {
+		vfRemote.getQueryResultsAsSelect2Data = function(soql, callback, error) {
 			var deferred = $.Deferred();
-			Visualforce.remoting.Manager.invokeAction('RemoteTKController.getQueryResultsAsSelect2Data', soql, function(result) {
+			Visualforce.remoting.Manager.invokeAction('ngForceController.getQueryResultsAsSelect2Data', soql, function(result) {
 				handleResult(result, callback, error, false, deferred);
 			}, {
 				escape: false
@@ -232,9 +232,9 @@ angular.module('ngForce', [], function($provide) {
 		 * @param callback function to which response will be passed
 		 * @param [error=null] function to which jqXHR will be passed in case of error
 		 */
-		vfr.query = function(soql, callback, error) {
+		vfRemote.query = function(soql, callback, error) {
 			var deferred = $.Deferred();
-			Visualforce.remoting.Manager.invokeAction('RemoteTKController.query', soql, function(result) {
+			Visualforce.remoting.Manager.invokeAction('ngForceController.query', soql, function(result) {
 				handleResult(result, callback, error, false, deferred);
 			}, {
 				escape: false
@@ -250,9 +250,9 @@ angular.module('ngForce', [], function($provide) {
 		 * @param callback function to which response will be passed
 		 * @param [error=null] function to which jqXHR will be passed in case of error
 		 */
-		vfr.queryFromFieldset = function(objId, fieldSetName, callback, error) {
+		vfRemote.queryFromFieldset = function(objId, fieldSetName, callback, error) {
 			var deferred = $.Deferred();
-			Visualforce.remoting.Manager.invokeAction('RemoteTKController.queryFromFieldSet', objId, fieldSetName, function(result) {
+			Visualforce.remoting.Manager.invokeAction('ngForceController.queryFromFieldSet', objId, fieldSetName, function(result) {
 				handleResult(result, callback, error, false, deferred);
 			}, {
 				escape: false
@@ -269,9 +269,9 @@ angular.module('ngForce', [], function($provide) {
 		 * @param callback function to which response will be passed
 		 * @param [error=null] function to which jqXHR will be passed in case of error
 		 */
-		vfr.retrieve = function(objtype, id, fieldlist, callback, error) {
+		vfRemote.retrieve = function(objtype, id, fieldlist, callback, error) {
 			var deferred = $.Deferred();
-			Visualforce.remoting.Manager.invokeAction('RemoteTKController.retrieve', objtype, id, fieldlist, function(result) {
+			Visualforce.remoting.Manager.invokeAction('ngForceController.retrieve', objtype, id, fieldlist, function(result) {
 				handleResult(result, callback, error, false, deferred);
 			}, {
 				escape: false
@@ -286,9 +286,9 @@ angular.module('ngForce', [], function($provide) {
 		 * @param callback function to which response will be passed
 		 * @param [error=null] function to which jqXHR will be passed in case of error
 		 */
-		vfr.search = function(sosl, callback, error) {
+		vfRemote.search = function(sosl, callback, error) {
 			var deferred = $.Deferred();
-			Visualforce.remoting.Manager.invokeAction('RemoteTKController.search', sosl, function(result) {
+			Visualforce.remoting.Manager.invokeAction('ngForceController.search', sosl, function(result) {
 				handleResult(result, callback, error, false, deferred);
 			}, {
 				escape: false
@@ -304,9 +304,9 @@ angular.module('ngForce', [], function($provide) {
 		 * @param callback function to which response will be passed
 		 * @param [error=null] function to which jqXHR will be passed in case of error
 		 */
-		vfr.soqlFromFieldSet = function(objtype, fieldSetName, callback, error) {
+		vfRemote.soqlFromFieldSet = function(objtype, fieldSetName, callback, error) {
 			var deferred = $.Deferred();
-			Visualforce.remoting.Manager.invokeAction('RemoteTKController.soqlFromFieldSet', objtype, fieldSetName, function(result) {
+			Visualforce.remoting.Manager.invokeAction('ngForceController.soqlFromFieldSet', objtype, fieldSetName, function(result) {
 				handleResult(result, callback, error, false, deferred);
 			}, {
 				escape: false
@@ -324,9 +324,9 @@ angular.module('ngForce', [], function($provide) {
 		 * @param callback function to which response will be passed
 		 * @param [error=null] function to which jqXHR will be passed in case of error
 		 */
-		vfr.update = function(objtype, id, fields, callback, error) {
+		vfRemote.update = function(objtype, id, fields, callback, error) {
 			var deferred = $.Deferred();
-			Visualforce.remoting.Manager.invokeAction('RemoteTKController.updat', objtype, id, JSON.stringify(fields), function(result) {
+			Visualforce.remoting.Manager.invokeAction('ngForceController.updat', objtype, id, JSON.stringify(fields), function(result) {
 				handleResult(result, callback, error, true, deferred);
 			}, {
 				escape: false
@@ -346,9 +346,9 @@ angular.module('ngForce', [], function($provide) {
 		 * @param callback function to which response will be passed
 		 * @param [error=null] function to which jqXHR will be passed in case of error
 		 */
-		vfr.upsert = function(objtype, externalIdField, externalId, fields, callback, error) {
+		vfRemote.upsert = function(objtype, externalIdField, externalId, fields, callback, error) {
 			var deferred = $.Deferred();
-			Visualforce.remoting.Manager.invokeAction('RemoteTKController.upser', objtype, externalIdField, externalId, JSON.stringify(fields), function(result) {
+			Visualforce.remoting.Manager.invokeAction('ngForceController.upser', objtype, externalIdField, externalId, JSON.stringify(fields), function(result) {
 				handleResult(result, callback, error, true, deferred);
 			}, {
 				escape: false
@@ -356,6 +356,6 @@ angular.module('ngForce', [], function($provide) {
 			return deferred.promise();
 		};
 
-		return vfr;
+		return vfRemote;
 	});
 });

@@ -1,0 +1,143 @@
+<!--
+Copyright (c) 2011, salesforce.com, inc.
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification, are permitted provided
+that the following conditions are met:
+
+Redistributions of source code must retain the above copyright notice, this list of conditions and the
+ following disclaimer.
+
+Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
+the following disclaimer in the documentation and/or other materials provided with the distribution.
+
+Neither the name of salesforce.com, inc. nor the names of its contributors may be used to endorse or
+promote products derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.
+-->
+<!--
+Sample Visualforce page showing use of Force.com JavaScript REST Toolkit from
+an HTML5 mobile app using jQuery Mobile
+-->
+<apex:page standardStylesheets="false" 
+    showHeader="false" 
+    sidebar="false"
+    contentType="text/html">
+<!--
+    HTML5 doctype
+-->
+<apex:outputText escape="false" value="{!"<!DOCTYPE html>"}"/>
+<html>
+<head>
+<title>Accounts</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<!--
+    You must download jQuery and jQuery Mobile and put them in a
+    static resource bundle like this to be able to correctly control ordering
+    of JS includes.
+-->
+<apex:stylesheet value="{!URLFOR($Resource.static, 'static/jquery.mobile-1.0a4.min.css')}"  />
+<apex:includeScript value="{!URLFOR($Resource.static, 'static/jquery-1.5.2.min.js')}"  />
+<apex:includeScript value="{!URLFOR($Resource.static, 'static/jquery.mobile-1.0a4.min.js')}"  />
+<apex:includeScript value="{!URLFOR($Resource.sample, 'forcetk.js')}"  />
+<apex:includeScript value="{!URLFOR($Resource.sample, 'mobileapp.js')}"  />
+<script type="application/javascript">
+// Get a reference to jQuery that we can work with
+$j = jQuery.noConflict();
+
+// Get an instance of the REST API client and set the session ID
+var client = new forcetk.Client();
+client.setSessionToken('{!$Api.Session_ID}');
+
+// Kick things off...
+$j(document).ready(function(){
+	addClickListeners();
+
+    $j.mobile.pageLoading();
+    getAccounts(function(){
+        $j.mobile.pageLoading(true);
+    });
+});
+</script>
+</head>
+
+<body>
+<div data-role="page" data-theme="b" id="mainpage">
+
+    <div data-role="header">
+        <h1>Account List</h1>
+    </div>
+    <div data-role="content">
+        <form>
+            <button data-role="button" id="newbtn">New</button>
+        </form>
+        <ul id="accountlist" data-inset="true" data-role="listview" 
+		  data-theme="c" data-dividertheme="b">
+        </ul>
+    </div>
+    <div data-role="footer">
+        <h4>Some Text</h4>
+    </div>
+</div>
+<div data-role="page" data-theme="b" id="detailpage">
+    <div data-role="header">
+        <h1>Account Detail</h1>
+    </div>
+    <div data-role="content">
+        <table>
+            <tr><td>Account Name:</td><td id="Name"></td></tr>
+            <tr><td>Industry:</td><td id="Industry"></td></tr>
+            <tr><td>Ticker Symbol:</td><td id="TickerSymbol"></td></tr>
+        </table>
+        <form name="accountdetail" id="accountdetail">
+            <input type="hidden" name="Id" id="Id" />
+            <button data-role="button" id="editbtn">Edit</button>
+            <button data-role="button" id="deletebtn" data-icon="delete" 
+			  data-theme="e">Delete</button>
+        </form>
+    </div>
+    <div data-role="footer">
+        <h4>Some Text</h4>
+    </div>
+</div>
+<div data-role="page" data-theme="b" id="editpage">
+    <div data-role="header">
+        <h1 id="accformheader">New Account</h1>
+    </div>
+    <div data-role="content">
+        <form name="accountform" id="accountform">
+            <input type="hidden" name="Id" id="Id" />
+            <table>
+                <tr>
+					<td>Account Name:</td>
+					<td><input name="Name" id="Name" data-theme="c"/></td>
+				</tr>
+                <tr>
+					<td>Industry:</td>
+					<td><input name="Industry" id="Industry" 
+					  data-theme="c"/></td>
+				</tr>
+                <tr>
+					<td>Ticker Symbol:</td>
+					<td><input name="TickerSymbol" id="TickerSymbol" 
+					  data-theme="c"/></td>
+				</tr>
+            </table>
+            <button data-role="button" id="actionbtn">Action</button>
+        </form>
+    </div>
+    <div data-role="footer">
+        <h4>Some Text</h4>
+    </div>
+</div>
+</body>
+</html>
+</apex:page>

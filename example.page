@@ -1,0 +1,150 @@
+<!--
+Copyright (c) 2011, salesforce.com, inc.
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification, are permitted provided
+that the following conditions are met:
+
+Redistributions of source code must retain the above copyright notice, this list of conditions and the
+ following disclaimer.
+
+Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
+the following disclaimer in the documentation and/or other materials provided with the distribution.
+
+Neither the name of salesforce.com, inc. nor the names of its contributors may be used to endorse or
+promote products derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.
+-->
+<!--
+Sample Visualforce page for Force.com JavaScript REST Toolkit
+-->
+<apex:page standardStylesheets="false" showHeader="false" sidebar="false">
+    <head>
+        <title>
+            Force.com JavaScript REST Toolkit
+        </title>
+        <!--
+        You will need to download jQuery, jQuery UI and Trimpath Template, 
+		and put them in a static resource bundle!
+        -->
+        <apex:stylesheet value="{!URLFOR($Resource.sample, '/style.css')}"  />
+        <apex:stylesheet value="{!URLFOR($Resource.static, '/static/jquery-ui.css')}"  />
+        <apex:includeScript value="{!URLFOR($Resource.static, '/static/jquery.js')}"  />
+        <apex:includeScript value="{!URLFOR($Resource.static, '/static/jquery-ui.js')}"  />
+        <apex:includeScript value="{!URLFOR($Resource.static, '/static/template.js')}"  />
+        <apex:includeScript value="{!URLFOR($Resource.sample, '/forcetk.js')}"  />
+        <apex:includeScript value="{!URLFOR($Resource.sample, '/app.js')}"  />      
+  		<script type="text/javascript">
+		/*
+		 * This is the Visualforce-specific JavaScript code for our sample app.
+		 * It must go in the VF page so that merge variables are processed.
+		 */
+
+		// Get a reference to jQuery that we can work with
+		$j = jQuery.noConflict();
+
+		// Get an instance of the REST API client and set the session ID
+		var client = new forcetk.Client();
+		client.setSessionToken('{!$Api.Session_ID}');
+
+		var ajaxgif = "<img src='{!URLFOR($Resource.sample, '/ajax.gif')}' />";
+
+		var $dialog = null;
+
+		$j(document).ready(function() {
+		    // Set up the dialog
+		    $dialog = $j('<div></div>')
+		        .dialog({
+		            autoOpen: false,
+		            width: 450
+		        });
+
+		    // Kick things off by doing a describe on Account...        
+		    $j('#prompt').html(ajaxgif+" loading metadata...");
+		    client.describe('Account', metadataCallback);
+		});
+		</script>
+    </head>
+    <body>
+        <div class="ui-widget" id="main">
+            <div id="prompt">
+            </div>
+            <div id="list">
+            </div>
+        </div>
+
+        <textarea id="prompt_jst" style="display:none;">
+            <form>
+                <h3 style="display:inline;">Filter on</h3>
+                <select id="field">
+                    {for f in fields}
+                        {if f.type == 'string'}
+                            <option value="${f.name}">${f.label}</option>
+                        {/if}
+                    {/for}
+                </select>
+                <input type="text" id="value" />
+                <input type="submit" id="go" name="search" value="Search" />
+            </form>
+            <form>
+                <input type="submit" id="new" name="new" value="New" />
+            </form>
+        </textarea>
+    
+        <textarea id="accounts_jst" style="display:none;">
+            <table class="main" id="accounts">
+                {for r in records}
+                    <tr><td class="id" id="${r.Id}">${r.Name}</td></tr>
+                {/for}
+            </table>
+            <br/>
+			<a href="#" id="logout">Logout</a>
+            <p>
+                <i>Running jQuery <span id="version">0.0.0</span>, jQuery UI <span id="uiversion">0.0.0</span></i>
+            </p>
+        </textarea>
+    
+        <textarea id="detail_jst" style="display:none;">
+            <table>
+                {if Website != null}
+                    <tr><td>Name:</td><td><a href="${Website}">${Name}</a></td></tr>
+                {else}
+                    <tr><td>Name:</td><td>${Name}</td></tr>
+                {/if}
+                {if Industry != null}
+                    <tr><td>Industry:</td><td><a href="#" id="industry">${Industry}</a></td></tr>
+                {/if}
+                {if TickerSymbol != null}
+                    <tr><td>Ticker Symbol:</td><td><a href="http://www.google.com/finance?q=${TickerSymbol}">${TickerSymbol}</a></td></tr>
+                {/if}
+            </table>
+            <br/>
+            <form>
+                <input type="hidden" name="id" id="id" value="${Id}" />
+                <button id="delete">Delete</button>
+                <button id="edit">Edit</button>
+            </form>
+        </textarea> 
+    
+        <textarea id="edit_jst" style="display:none;">
+            <form id="editform">
+                <input type="hidden" name="id" id="id" value="${Id}" />
+                <table>
+                    <tr><td>Name:</td><td><input name="Name" id="Name" value="${Name}"/></td></tr>
+                    <tr><td>Industry:</td><td><input name="Industry" id="Industry" value="${Industry}"/></td></tr>
+                    <tr><td>Ticker Symbol:</td><td><input name="TickerSymbol" id="TickerSymbol" value="${TickerSymbol}"/></td></tr>
+                </table>
+                <br/>
+                <button id="action" />
+            </form>
+        </textarea>
+    </body>
+</apex:page>

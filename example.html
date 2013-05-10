@@ -1,0 +1,216 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<!--
+Copyright (c) 2011, salesforce.com, inc.
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification, are permitted provided
+that the following conditions are met:
+
+Redistributions of source code must retain the above copyright notice, this list of conditions and the
+ following disclaimer.
+
+Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
+the following disclaimer in the documentation and/or other materials provided with the distribution.
+
+Neither the name of salesforce.com, inc. nor the names of its contributors may be used to endorse or
+promote products derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.
+-->
+<!--
+Sample HTML page for Force.com JavaScript REST Toolkit
+-->
+<html>
+	<head>
+		<title>
+			Force.com JavaScript REST Toolkit
+		</title>
+		<link rel="stylesheet" type="text/css" href="style.css">
+		<!--
+		jQuery UI - http://jqueryui.com/download
+		-->
+		<link rel="stylesheet" type="text/css" href="static/jquery-ui.css">
+		
+		<!-- 
+		jQuery - http://docs.jquery.com/Downloading_jQuery
+		-->
+		<script type="text/javascript" src="static/jquery.js"></script>
+		<!--
+		From jQuery-swip - http://code.google.com/p/jquery-swip/source/browse/trunk/jquery.popupWindow.js 
+		-->
+		<script type="text/javascript" src="static/jquery.popup.js"></script>
+		<!--
+		jQuery UI - http://jqueryui.com/download
+		-->
+		<script type="text/javascript" src="static/jquery-ui.js"></script>
+		<!--
+		TrimPath Template - http://code.google.com/p/trimpath/downloads/detail?name=trimpath-template-1.0.38.js
+		-->
+		<script type="text/javascript" src="static/template.js"></script>
+		<script type="text/javascript" src="forcetk.js"></script>
+		<script type="text/javascript" src="app.js"></script>
+		<script type="text/javascript">
+		/*
+		 * This code allows you to use the Force.com REST API sample from your own
+		 * server, using OAuth to obtain a session id.
+		 * Note that you will need to run proxy.php, since Javascript loaded from your
+		 * own server cannot directly call the REST API.
+		 */
+
+		// OAuth Configuration
+		var loginUrl    = 'https://login.salesforce.com/';
+		var clientId    = '3MVG9Km_cBLhsuPzTtcGHsZpj9FUvuQFAwccGnIozI2uV_.bet9.FyQ6Zdq86oJNkH53YnqhFGaiYE1r.FCS3';
+		var redirectUri = 'https://localhost/jsapp/oauthcallback.html';
+		var proxyUrl    = 'https://localhost/jsapp/proxy.php?mode=native';
+
+		var client = new forcetk.Client(clientId, loginUrl, proxyUrl);
+
+		var ajaxgif = "<img src='static/ajax.gif' />";
+
+		var $dialog = null;
+
+		// We use $j rather than $ for jQuery
+		if (window.$j === undefined) {
+		    $j = $;
+		}
+
+		$j(document).ready(function() {
+			$j('#login').popupWindow({ 
+				windowURL: getAuthorizeUrl(loginUrl, clientId, redirectUri),
+				windowName: 'Connect',
+				centerBrowser: 1,
+				height:524, 
+				width:675
+			});
+
+			$dialog = $j('<div></div>')
+				.dialog({
+					autoOpen: false,
+					width: 450
+				});
+		});
+
+		function getAuthorizeUrl(loginUrl, clientId, redirectUri){
+		    return loginUrl+'services/oauth2/authorize?display=popup'
+		        +'&response_type=token&client_id='+escape(clientId)
+		        +'&redirect_uri='+escape(redirectUri);
+		}
+
+		function hideButton(){
+			$j('#connect').html(ajaxgif+" connecting...");
+		}
+
+		function sessionCallback(oauthResponse) {
+		    if (typeof oauthResponse === 'undefined'
+		        || typeof oauthResponse['access_token'] === 'undefined') {
+		        //$j('#prompt').html('Error - unauthorized!');
+		        errorCallback({
+		            status: 0, 
+		            statusText: 'Unauthorized', 
+		            responseText: 'No OAuth response'
+		        });
+		    } else {
+		        client.setSessionToken(oauthResponse.access_token, null,
+		            oauthResponse.instance_url);
+
+		        // Kick things off by doing a describe on Account...  
+		        $j('#prompt').html(ajaxgif+" loading metadata...");
+		        client.describe('Account',metadataCallback, errorCallback);
+		    }
+		}
+		</script>
+	</head>
+	<body>
+		<div id="main">
+			<div id="prompt">
+				<button id="login" onclick="hideButton();">Login</button>
+			</div>
+			<div id="list">
+			</div>
+		</div>
+		
+	  	<textarea id="prompt_jst" style="display:none;">
+			<form>
+			    <h3 style="display:inline;">Filter on</h3>
+				<select id="field">
+			     	{for f in fields}
+						{if f.type == 'string'}
+							<option value="${f.name}">${f.label}</option>
+						{/if}
+					{/for}
+				</select>
+				<input type="text" id="value" />
+				<input type="submit" id="go" name="search" value="Search" />
+			</form>
+			<form>
+				<input type="submit" id="new" name="new" value="New" />
+			</form>
+	  	</textarea>
+	
+	  	<textarea id="accounts_jst" style="display:none;">
+		    <table class="main" id="accounts">
+		     	{for r in records}
+		         	<tr><td class="id" id="${r.Id}">${r.Name}</td></tr>
+     			{/for}
+		    </table>
+			<br/>
+			<a href="#" id="logout">Logout</a>
+            <p>
+                <i>Running jQuery <span id="version">0.0.0</span>, jQuery UI <span id="uiversion">0.0.0</span></i>
+            </p>
+	  	</textarea>
+	
+	  	<textarea id="detail_jst" style="display:none;">
+			<table>
+				{if Website != null}
+					<tr><td>Name:</td><td><a href="${Website}">${Name}</a></td></tr>
+				{else}
+					<tr><td>Name:</td><td>${Name}</td></tr>
+				{/if}
+				{if Industry != null}
+					<tr><td>Industry:</td><td><a href="#" id="industry">${Industry}</a></td></tr>
+				{/if}
+				{if TickerSymbol != null}
+					<tr><td>Ticker Symbol:</td><td><a href="http://www.google.com/finance?q=${TickerSymbol}">${TickerSymbol}</a></td></tr>
+				{/if}
+			</table>
+			<br/>
+			<form>
+				<input type="hidden" name="id" id="id" value="${Id}" />
+				<button id="delete">Delete</button>
+				<button id="edit">Edit</button>
+			</form>
+	  	</textarea>	
+	
+	  	<textarea id="edit_jst" style="display:none;">
+			<form id="editform">
+				<input type="hidden" name="id" id="id" value="${Id}" />
+				<table>
+					<tr><td>Name:</td><td><input name="Name" id="Name" value="${Name}"/></td></tr>
+					<tr><td>Industry:</td><td><input name="Industry" id="Industry" value="${Industry}"/></td></tr>
+					<tr><td>Ticker Symbol:</td><td><input name="TickerSymbol" id="TickerSymbol" value="${TickerSymbol}"/></td></tr>
+				</table>
+				<br/>
+				<button id="action" />
+			</form>
+	  	</textarea>
+	
+	  	<textarea id="error_jst" style="display:none;">
+			Error ${status} ${statusText}
+			<br/>
+			${responseText}
+			<br/>
+			<br/>
+			<form>
+				<button id="ok">OK</button>
+			</form>
+	  	</textarea>		
+	</body>
+</html>

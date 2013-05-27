@@ -63,7 +63,7 @@ public class RemoteTKController {
                     String svalue = (String)value;
                     
                     if (valueType == Schema.DisplayType.Date) {
-                        obj.put(key, Date.valueOf(svalue));
+                        obj.put(key, svalue == '' ? null : Date.valueOf(svalue));
                     } else if (valueType == Schema.DisplayType.Percent ||
                            valueType == Schema.DisplayType.Currency) {
                         obj.put(key, svalue == '' ? null : Decimal.valueOf(svalue));

@@ -214,7 +214,8 @@ public class RemoteTKController {
             return makeError('The requested resource does not exist', 'NOT_FOUND');
         }
         
-        SObject obj = targetType.newSObject(externalId);
+        SObject obj = targetType.newSObject();
+        obj.put(externalIdField, externalId);
         
         String error = writeFields(objType, obj, fields);
         if (error != null) {

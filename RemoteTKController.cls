@@ -160,17 +160,40 @@ public class RemoteTKController {
     
     @remoteAction
     public static String retrieve(String objtype, String id, String fieldlist) {
-        // TODO - handle null fieldlist - retrieve all fields
-        Boolean containsId = false;
-        for (String field : fieldlist.split(',')) {
-            if (field.equalsIgnoreCase('id')){
-                containsId = true;
-                break;
-            }
-        }
         
-        if (!containsId) {
-            fieldlist = 'Id,'+fieldlist;
+        //if no field list was specified, then retrieve a list of all of the fields for the object
+        //otherwise, use the field list for the query
+        if(fieldlist == null || fieldlist == '') {
+            
+            Schema.SObjectType targetType = Schema.getGlobalDescribe().get(objtype);
+            if (targetType == null) {
+                return makeError('The requested resource does not exist', 'NOT_FOUND');
+            }
+            
+            Map<String, Schema.sObjectField> targetFields = targetType.getDescribe().fields.getMap();
+            
+            fieldlist = '';
+            for (String field : targetFields.keySet()) {
+                if (fieldlist.length() > 0) {
+                    fieldlist += ',';
+                }
+                fieldlist += field;
+            }
+            
+        } else {
+        
+            Boolean containsId = false;
+            for (String field : fieldlist.split(',')) {
+                if (field.equalsIgnoreCase('id')){
+                    containsId = true;
+                    break;
+                }
+            }
+        
+            if (!containsId) {
+                fieldlist = 'Id,'+fieldlist;
+            }
+            
         }
         
         String soql = 'SELECT '+fieldlist+' FROM '+objtype+' WHERE Id = \''+id+'\'';
@@ -191,8 +214,7 @@ public class RemoteTKController {
             return makeError('The requested resource does not exist', 'NOT_FOUND');
         }
         
-        SObject obj = targetType.newSObject();
-        obj.put(externalIdField, externalId);
+        SObject obj = targetType.newSObject(externalId);
         
         String error = writeFields(objType, obj, fields);
         if (error != null) {

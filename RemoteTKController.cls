@@ -280,9 +280,11 @@ public class RemoteTKController {
 
     @remoteAction
     public static String search(String sosl) {
-        List<List<SObject>> result;        
+        List<SObject> result = new List<SObject>();        
         try {
-            result = Search.query(sosl);
+            List<List<SObject>> searchResults = Search.query(sosl);
+            for(List<SObject> sr : searchResults)
+            	result.addAll(sr);
         } catch (QueryException qe) {
             return makeError(qe.getMessage(), 'INVALID_SEARCH');
         } catch (SearchException se) {

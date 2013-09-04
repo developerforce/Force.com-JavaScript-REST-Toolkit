@@ -145,6 +145,59 @@ if (forcetk.Client === undefined) {
             this.instanceUrl = instanceUrl;
         }
     }
+    
+     /*
+     * This utility is required to call get user information like display name.
+     * @param id should be oauthResponse.id e.g https://login.salesforce.com/id/00D50000000IZ3ZEAW/00550000001fg5OAAQ
+     * format of id will be :- https://login.salesforce.com/id/orgID/userID
+     * @param callback function to which response will be passed
+     * @param [error=null] function to which jqXHR will be passed in case of error
+     * @param [payload=null] payload for POST/PATCH etc
+     */
+    forcetk.Client.prototype.userInfo = function(id, callback, error, payload, retry) {
+        var that = this;
+        var url = id;
+
+        return $j.ajax({
+            type: "GET",
+            async: this.asyncAjax,
+            url: (this.proxyUrl !== null) ? this.proxyUrl: url,
+            contentType:  'application/json',
+            cache: false,
+            processData: false,
+            data: payload,
+            success: function(response){
+                // HTTP response (example is shown below) with json data needs to be removed
+                // e.g HTTP/1.1 200 OK
+                // Date: Wed, 04 Sep 2013 14:52:38 GMT
+                // Content-Type: application/json;charset=UTF-8
+                // Transfer-Encoding: chunked
+                // {"id":"https://login.salesforce.com/id/00D90000000mCu7EAE/00590000001Cd2wAAC", .... }
+                response = response.substring(response.indexOf("{"), response.lastIndexOf("}") + 1);
+                response = JSON.parse(response);
+                callback(response);
+            },
+            error: (!this.refreshToken || retry ) ? error : function(jqXHR, textStatus, errorThrown) {
+                if (jqXHR.status === 401) {
+                    that.refreshAccessToken(function(oauthResponse) {
+                            that.setSessionToken(oauthResponse.access_token, null,
+                                oauthResponse.instance_url);
+                            that.UserInfo(id, callback, error, method, payload, true);
+                        },
+                        error);
+                } else {
+                    error(jqXHR, textStatus, errorThrown);
+                }
+            },
+            beforeSend: function(xhr) {
+                if (that.proxyUrl !== null) {
+                    xhr.setRequestHeader('SalesforceProxy-Endpoint', url);
+                }
+                xhr.setRequestHeader(that.authzHeader, "OAuth " + that.sessionId);
+                xhr.setRequestHeader('X-User-Agent', 'salesforce-toolkit-rest-javascript/' + that.apiVersion);
+            }
+        });
+    }
 
     /*
      * Low level utility function to call the Salesforce endpoint.

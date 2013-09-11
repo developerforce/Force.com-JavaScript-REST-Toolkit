@@ -388,7 +388,7 @@ if (forcetk.Client === undefined) {
             fieldlist = null;
         }
         var fields = fieldlist ? '?fields=' + fieldlist : '';
-        this.ajax('/' + this.apiVersion + '/sobjects/' + objtype + '/' + id
+        return this.ajax('/' + this.apiVersion + '/sobjects/' + objtype + '/' + id
         + fields, callback, error);
     }
 

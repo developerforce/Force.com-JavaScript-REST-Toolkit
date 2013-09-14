@@ -305,6 +305,16 @@ if (forcetk.Client === undefined) {
     }
 
     /*
+     * Lists the information about the current user including their ID, username,
+     * email address and more. Uses the Chatter REST API.
+     * @param callback function to which response will be passed
+     * @param [error=null] function to which jqXHR will be passed in case of error
+     */
+    forcetk.Client.prototype.currentUser = function(callback, error) {
+        return this.ajax('/' + this.apiVersion + '/chatter/users/me/', callback, error);
+    }
+
+    /*
      * Lists summary information about each Salesforce.com version currently 
      * available, including the version, label, and a link to each version's
      * root.

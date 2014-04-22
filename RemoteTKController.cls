@@ -86,6 +86,26 @@ public class RemoteTKController {
         return null;
     }
     
+    private static List<Object> picklistOptions(Schema.DescribeFieldResult field) {
+        List<Object> picklistOptions = new List<Object>();
+        Schema.DisplayType fieldType = field.getType();
+        if (fieldType != Schema.DisplayType.Picklist &&
+          fieldType != Schema.DisplayType.MultiPicklist &&
+          fieldType != Schema.DisplayType.Combobox) {
+            return picklistOptions;
+        }
+        List<Schema.PicklistEntry> picklistValues = field.getPicklistValues();
+        for (Schema.PicklistEntry picklistValue: picklistValues) {
+            Map<String, Object> picklistOption = new Map<String, Object>();
+            picklistOption.put('value', picklistValue.getValue());
+            picklistOption.put('label', picklistValue.getValue());
+            picklistOption.put('active', picklistValue.isActive());
+            picklistOption.put('defaultValue', picklistValue.isDefaultValue());
+            picklistOptions.add(picklistOption);
+        }
+        return picklistOptions;
+    }
+
     @remoteAction
     public static String describe(String objtype) {
         // Just enough to make the sample app work!
@@ -113,7 +133,8 @@ public class RemoteTKController {
             if (!references.isEmpty()) {
                 field.put('referenceTo', references);
             }
-            
+            field.put('picklistValues', picklistOptions(descField));
+
             fields.add(field);
         }
         

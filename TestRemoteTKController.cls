@@ -151,8 +151,14 @@ public class TestRemoteTKController{
         assertRecord(result, accName, accNumber, 'RemoteTKController.retrieve');        
         
         // TODO - test negative paths for retrieve
+        
+        jsonResult = RemoteTKController.retrieve('Account', id, null);
+        assertRecord(result, accName, accNumber, 'RemoteTKController.retrieve');
+        
+        jsonResult = RemoteTKController.retrieve('Account', id, '');
+        assertRecord(result, accName, accNumber, 'RemoteTKController.retrieve');
     }
-
+    
     static private void testQuery(String accName, String accNumber) {
         String jsonResult = RemoteTKController.query('SELECT Id, Name, AccountNumber FROM Account WHERE Name = \''+accName+'\'');
         

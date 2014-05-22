@@ -196,6 +196,26 @@ if (remotetk.Client === undefined) {
             escape: false
         });
     }
+
+    /*
+     *
+     * Helper function to ensure dates are properly formatted when using RemoteTK 
+     * Per Apex docs: the specified string should use the standard date format “yyyy-MM-dd HH:mm:ss” in the local time zone.
+     */
+    remotetk.Client.prototype.formatDateTime = function(jsDateObject) {
+        var output = jsDateObject.getFullYear() + '-';
+        if(jsDateObject.getMonth() + 1 < 10) output += '0';
+        output += jsDateObject.getMonth() + 1 + '-';
+        if(jsDateObject.getDate() < 10) output += '0';
+        output += jsDateObject.getDate() + ' ';
+        if(jsDateObject.getHours() < 10) output += '0';
+        output += jsDateObject.getHours() + ':';
+        if(jsDateObject.getMinutes() < 10) output += '0';
+        output += jsDateObject.getMinutes() + ':';
+        if(jsDateObject.getSeconds() < 10) output += '0';
+        output += jsDateObject.getSeconds();
+        return output;
+    }
 }
     </script>
 </apex:component>

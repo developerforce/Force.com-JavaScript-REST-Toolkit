@@ -64,6 +64,9 @@ public class RemoteTKController {
                     
                     if (valueType == Schema.DisplayType.Date) {
                         obj.put(key, Date.valueOf(svalue));
+                    } else if (valueType == Schema.DisplayType.DateTime) {
+                        // per apex docs: the specified string should use the standard date format “yyyy-MM-dd HH:mm:ss” in the local time zone.
+                        obj.put(key, DateTime.valueOf(svalue));
                     } else if (valueType == Schema.DisplayType.Percent ||
                            valueType == Schema.DisplayType.Currency) {
                         obj.put(key, svalue == '' ? null : Decimal.valueOf(svalue));

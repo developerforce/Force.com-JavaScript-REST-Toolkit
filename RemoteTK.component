@@ -32,21 +32,32 @@ if (remotetk === undefined) {
 }
 
 if (remotetk.Client === undefined) {
-    function handleResult(result, callback, error, nullok) {
+    function handleResult(result, callback, error, nullok, deferred) {
         if (result) {
             result = JSON.parse(result);
             if ( Array.isArray(result) && result[0].message && result[0].errorCode ) {
                 if ( typeof error === 'function' ) {
                     error(result);
                 }
+                deferred.reject(result);
             } else {
-                callback(result);
+                if ( typeof callback === 'function' ) {
+                    callback(result);
+                }
+                deferred.resolve(result);
             }
         } else if (typeof nullok !== 'undefined' && nullok) {
-            callback();
+            if ( typeof callback === 'function' ) {
+                callback();
+            }
+            deferred.resolve();
         } else {
-            error([{ message : "Null return from action method","errorCode":"NULL_RETURN"}]);
-        }        
+            var errorResult = [{ message : "Null return from action method","errorCode":"NULL_RETURN"}];
+            if ( typeof error === 'function' ) {
+                error(errorResult);
+            }
+            deferred.reject(errorResult);
+        }
     }
         
     /**
@@ -72,11 +83,13 @@ if (remotetk.Client === undefined) {
      * @param [error=null] function to which jqXHR will be passed in case of error
      */
     remotetk.Client.prototype.describe = function(objtype, callback, error) {
+        var deferred = $.Deferred();
         Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.RemoteTKController.describe}', objtype, function(result){
-            handleResult(result, callback, error);
-        }, { 
+            handleResult(result, callback, error, false, deferred);
+        }, {
             escape: false
         });
+        return deferred.promise();
     }
         
     /*
@@ -89,11 +102,13 @@ if (remotetk.Client === undefined) {
      * @param [error=null] function to which jqXHR will be passed in case of error
      */
     remotetk.Client.prototype.create = function(objtype, fields, callback, error) {
+        var deferred = $.Deferred();
         Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.RemoteTKController.create}', objtype, JSON.stringify(fields), function(result){
-            handleResult(result, callback, error);
-        }, { 
+            handleResult(result, callback, error, false, deferred);
+        }, {
             escape: false
         });
+        return deferred.promise();
     }
         
     /*
@@ -106,11 +121,13 @@ if (remotetk.Client === undefined) {
      * @param [error=null] function to which jqXHR will be passed in case of error
      */
     remotetk.Client.prototype.retrieve = function(objtype, id, fieldlist, callback, error) {
+        var deferred = $.Deferred();
         Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.RemoteTKController.retrieve}', objtype, id, fieldlist, function(result){
-            handleResult(result, callback, error);
-        }, { 
+            handleResult(result, callback, error, false, deferred);
+        }, {
             escape: false
         });
+        return deferred.promise();
     }
     
     /* 
@@ -126,11 +143,13 @@ if (remotetk.Client === undefined) {
      * @param [error=null] function to which jqXHR will be passed in case of error
      */
     remotetk.Client.prototype.upsert = function(objtype, externalIdField, externalId, fields, callback, error) {
+        var deferred = $.Deferred();
         Visualforce.remoting.Manager.invokeAction('$RemoteAction.RemoteTKController.upser', objtype, externalIdField, externalId, JSON.stringify(fields), function(result){
-            handleResult(result, callback, error, true);
-        }, { 
-                escape: false
+            handleResult(result, callback, error, true, deferred);
+        }, {
+            escape: false
         });
+        return deferred.promise();
     }
         
     /*
@@ -144,11 +163,13 @@ if (remotetk.Client === undefined) {
      * @param [error=null] function to which jqXHR will be passed in case of error
      */
     remotetk.Client.prototype.update = function(objtype, id, fields, callback, error) {
+        var deferred = $.Deferred();
         Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.RemoteTKController.updat}', objtype, id, JSON.stringify(fields), function(result){
-            handleResult(result, callback, error, true);
-        }, { 
+            handleResult(result, callback, error, true, deferred);
+        }, {
             escape: false
         });
+        return deferred.promise();
     }
 
     /*
@@ -160,11 +181,13 @@ if (remotetk.Client === undefined) {
      * @param [error=null] function to which jqXHR will be passed in case of error
      */
     remotetk.Client.prototype.del = function(objtype, id, callback, error) {
+        var deferred = $.Deferred();
         Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.RemoteTKController.del}', objtype, id, function(result){
-            handleResult(result, callback, error, true);
-        }, { 
+            handleResult(result, callback, error, true, deferred);
+        }, {
             escape: false
         });
+        return deferred.promise();
     }
 
     /*
@@ -175,12 +198,14 @@ if (remotetk.Client === undefined) {
      * @param [error=null] function to which jqXHR will be passed in case of error
      */
     remotetk.Client.prototype.query = function(soql, callback, error) {
+        var deferred = $.Deferred();
         Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.RemoteTKController.query}', soql, function(result){
-            handleResult(result, callback, error);
-        }, { 
+            handleResult(result, callback, error, false, deferred);
+        }, {
             escape: false
         });
-    }        
+        return deferred.promise();
+    }
 
     /*
      * Executes the specified SOSL search.
@@ -190,11 +215,13 @@ if (remotetk.Client === undefined) {
      * @param [error=null] function to which jqXHR will be passed in case of error
      */
     remotetk.Client.prototype.search = function(sosl, callback, error) {
+        var deferred = $.Deferred();
         Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.RemoteTKController.search}', sosl, function(result){
-            handleResult(result, callback, error);
-        }, { 
+            handleResult(result, callback, error, false, deferred);
+        }, {
             escape: false
         });
+        return deferred.promise();
     }
 }
     </script>

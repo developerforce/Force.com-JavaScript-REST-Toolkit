@@ -150,6 +150,15 @@ public class TestRemoteTKController{
         
         assertRecord(result, accName, accNumber, 'RemoteTKController.retrieve');        
         
+        // fieldlist == null
+        jsonResult = RemoteTKController.retrieve('Account', id, null);
+        result = (Map<String, Object>)JSON.deserializeUntyped(jsonResult);
+        assertRecord(result, accName, accNumber, 'RemoteTKController.retrieve');
+        
+        // fieldlist == null, unexisting object specified
+        jsonResult = RemoteTKController.retrieve('AccountX', id, null);
+        assertError(jsonResult, 'NOT_FOUND', 'RemoteTKController.retrieve');
+        
         // TODO - test negative paths for retrieve
     }
 

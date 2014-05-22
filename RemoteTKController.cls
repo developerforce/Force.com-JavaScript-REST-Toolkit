@@ -181,7 +181,22 @@ public class RemoteTKController {
     
     @remoteAction
     public static String retrieve(String objtype, String id, String fieldlist) {
-        // TODO - handle null fieldlist - retrieve all fields
+        // retrieve all fields if fieldlist is null
+        if (fieldlist == null){
+            fieldlist = '';
+            Schema.SObjectType targetType = Schema.getGlobalDescribe().get(objtype);
+            if (targetType == null) {
+                return makeError('The requested resource does not exist', 'NOT_FOUND');
+            }
+            Schema.DescribeSObjectResult sobjResult = targetType.getDescribe();
+            Map<String, Schema.SObjectField> fieldMap = sobjResult.fields.getMap();
+            for (String key : fieldMap.keySet()) {
+                Schema.DescribeFieldResult descField = fieldMap.get(key).getDescribe();
+                fieldlist += descField.getName() + ',';
+            }
+            fieldlist = fieldlist.removeEnd(',');
+        }
+
         Boolean containsId = false;
         for (String field : fieldlist.split(',')) {
             if (field.equalsIgnoreCase('id')){

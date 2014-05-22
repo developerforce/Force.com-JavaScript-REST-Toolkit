@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomTab xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label>jQuery 1.9.1</label>
+    <mobileReady>false</mobileReady>
+    <motif>Custom51: Apple</motif>
+    <page>LABJS_JQuery191</page>
+</CustomTab>

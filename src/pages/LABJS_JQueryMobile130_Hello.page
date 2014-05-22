@@ -1,0 +1,69 @@
+<apex:page controller="LABJS_SimpleController" showHeader="false" sidebar="false" >
+    <apex:stylesheet value="{!URLFOR($Resource.LABJS_jQueryMobile, 'jquerymobile130/jquery.mobile-1.3.0.min.css')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.LABJS_jQuery, 'jquery191/jquery-1.9.1.min.js')}" />
+    <apex:includeScript value="{!URLFOR($Resource.LABJS_jQueryMobile, 'jquerymobile130/jquery.mobile-1.3.0.min.js')}" />
+    <apex:form >
+    <apex:actionFunction name="updateTargetContact" action="{!updateTargetContact}"
+        rerender="mainContactDetail" status="methodStatus" >
+        <apex:param name="firstParam" assignTo="{!targetContactId}" value="" />
+    </apex:actionFunction>
+    </apex:form>
+    
+    <script type="text/javascript">
+    	$(function() {
+        	$('#mylistview').on('click', 'li', function() {
+		        //alert("Works " + $(this)[0].id); 
+        		updateTargetContact($(this)[0].id);
+	    	});
+        });
+        
+    </script>
+    
+<div data-role="page" id="myContactList">
+
+	<div data-role="header">
+		<h1>Foo</h1>
+	</div><!-- /header -->
+
+	<div data-role="content">	
+
+    <ul id="mylistview" data-role="listview" data-inset="true" data-filter="true">    
+    <apex:repeat value="{!contacts}" var="current">
+        <li id="{!current.id}"><a href="#contactDetail"><apex:outputText value="{!current.name}" /></a></li>
+    </apex:repeat>
+    </ul>        
+    
+    </div><!-- /content -->
+
+	<div data-role="footer">
+		<h4>Page Footer</h4>
+	</div><!-- /footer -->
+</div><!-- /page -->    
+    
+<div data-role="page" id="contactDetail"> 
+    
+	<div data-role="header">
+		<h1>Page Title</h1>
+	</div><!-- /header -->
+
+    <apex:outputPanel id="mainContactDetail">
+	<div data-role="content">
+        
+    <apex:outputPanel id="output" >    <apex:actionStatus startText="requesting..." id="methodStatus">
+        <apex:facet name="stop">done</apex:facet>
+    </apex:actionStatus></apex:outputPanel>
+        
+		<p>Page content goes here.</p>	
+        <p>Name: <apex:outputText value="{!targetContact.name}" /></p>
+        
+        
+	</div>
+    </apex:outputPanel>
+
+	<div data-role="footer">
+		<h4>Page Footer</h4>
+	</div><!-- /footer -->
+    
+    </div>     
+    
+</apex:page>

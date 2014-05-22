@@ -1,0 +1,6 @@
+<apex:page >
+    <apex:pageBlock title="Bootstrap 2.3.1 Examples">
+        <p><a href="http://twitter.github.com/bootstrap">Bootstrap on Github</a></p>
+        <p><apex:outputLink value="{!URLFOR($Page.LABJS_Bootstrap231_Hello)}"> Hello, Bootstrap.</apex:outputLink></p>
+    </apex:pageBlock>
+</apex:page>

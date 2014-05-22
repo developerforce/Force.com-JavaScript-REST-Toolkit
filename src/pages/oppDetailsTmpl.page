@@ -1,0 +1,11 @@
+<apex:page showHeader="false" sidebar="false" standardstylesheets="false">
+	<div class="modal-header">
+		<h4>Opportunity Details</h4>
+	</div>
+	<div class="modal-body">
+		<iframe frameborder="0" src="/apex/oppDetail?id={{oppId}}" style="width: 870px; height: 390px;"></iframe>
+	</div>
+	<div class="modal-footer">
+		<button class="btn btn-warning cancel" ng-click="close(result)">Close</button>
+	</div>
+</apex:page>

@@ -24,7 +24,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-public class RemoteTKController {
+global class RemoteTKController {
     private static String makeError(String message, String errorCode) {
         JSONGenerator gen = JSON.createGenerator(false);
         gen.writeStartArray();
@@ -107,7 +107,7 @@ public class RemoteTKController {
     }
 
     @remoteAction
-    public static String describe(String objtype) {
+    global static String describe(String objtype) {
         // Just enough to make the sample app work!
         Schema.SObjectType targetType = Schema.getGlobalDescribe().get(objtype);
         if (targetType == null) {
@@ -145,7 +145,7 @@ public class RemoteTKController {
     }
     
     @remoteAction
-    public static String create(String objtype, String fields) {
+    global static String create(String objtype, String fields) {
         Schema.SObjectType targetType = Schema.getGlobalDescribe().get(objtype);
         if (targetType == null) {
             return makeError('The requested resource does not exist', 'NOT_FOUND');
@@ -180,7 +180,7 @@ public class RemoteTKController {
     }
     
     @remoteAction
-    public static String retrieve(String objtype, String id, String fieldlist) {
+    global static String retrieve(String objtype, String id, String fieldlist) {
         // TODO - handle null fieldlist - retrieve all fields
         Boolean containsId = false;
         for (String field : fieldlist.split(',')) {
@@ -206,7 +206,7 @@ public class RemoteTKController {
     }
     
     @remoteAction
-    public static String upser(String objtype, String externalIdField, String externalId, String fields) {
+    global static String upser(String objtype, String externalIdField, String externalId, String fields) {
         Schema.SObjectType targetType = Schema.getGlobalDescribe().get(objtype);
         if (targetType == null) {
             return makeError('The requested resource does not exist', 'NOT_FOUND');
@@ -228,7 +228,7 @@ public class RemoteTKController {
     }
 
     @remoteAction
-    public static String updat(String objtype, String id, String fields) {
+    global static String updat(String objtype, String id, String fields) {
         Schema.SObjectType targetType = Schema.getGlobalDescribe().get(objtype);
         if (targetType == null) {
             return makeError('The requested resource does not exist', 'NOT_FOUND');
@@ -258,7 +258,7 @@ public class RemoteTKController {
     }
 
     @remoteAction
-    public static String del(String objtype, String id) {
+    global static String del(String objtype, String id) {
         Schema.SObjectType targetType = Schema.getGlobalDescribe().get(objtype);
         if (targetType == null) {
             return makeError('The requested resource does not exist', 'NOT_FOUND');
@@ -283,7 +283,7 @@ public class RemoteTKController {
     }
 
     @remoteAction
-    public static String query(String soql) {
+    global static String query(String soql) {
         List<sObject> records;
         try {
             records = Database.query(soql);
@@ -300,7 +300,7 @@ public class RemoteTKController {
     }
 
     @remoteAction
-    public static String search(String sosl) {
+    global static String search(String sosl) {
         List<List<SObject>> result;        
         try {
             result = Search.query(sosl);

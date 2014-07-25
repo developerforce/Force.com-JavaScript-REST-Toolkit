@@ -126,7 +126,7 @@ if (remotetk.Client === undefined) {
      * @param [error=null] function to which jqXHR will be passed in case of error
      */
     remotetk.Client.prototype.upsert = function(objtype, externalIdField, externalId, fields, callback, error) {
-        Visualforce.remoting.Manager.invokeAction('$RemoteAction.RemoteTKController.upser', objtype, externalIdField, externalId, JSON.stringify(fields), function(result){
+        Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.RemoteTKController.upser}', objtype, externalIdField, externalId, JSON.stringify(fields), function(result){
             handleResult(result, callback, error, true);
         }, { 
                 escape: false

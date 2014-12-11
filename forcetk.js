@@ -199,8 +199,8 @@ if (forcetk.Client === undefined) {
      * @param callback function to which response will be passed
      * @param [error=null] function to which request will be passed in case of error
      * @param retry true if we've already tried refresh token flow once
-     **/
-    forcetk.Client.prototype.getChatterFile = function(path,mimeType,callback,error,retry) {
+     */
+    forcetk.Client.prototype.getChatterFile = function(path, mimeType, callback, error, retry) {
         var that = this;
         var url = (this.visualforce ? '' : this.instanceUrl) + path;
 
@@ -504,7 +504,7 @@ if (forcetk.Client === undefined) {
             fieldlist = null;
         }
         var fields = fieldlist ? '?fields=' + fieldlist : '';
-        this.ajax('/' + this.apiVersion + '/sobjects/' + objtype + '/' + id
+        return this.ajax('/' + this.apiVersion + '/sobjects/' + objtype + '/' + id
         + fields, callback, error);
     }
 

@@ -117,7 +117,7 @@ if (forcetk.Client === undefined) {
      * Set a session token and the associated metadata in the client.
      * @param sessionId a salesforce.com session ID. In a Visualforce page,
      *                   use '{!$Api.sessionId}' to obtain a session ID.
-     * @param [apiVersion="21.0"] Force.com API version
+     * @param [apiVersion="27.0"] Force.com API version
      * @param [instanceUrl] Omit this if running on Visualforce; otherwise 
      *                   use the value from the OAuth token.
      */
@@ -200,9 +200,9 @@ if (forcetk.Client === undefined) {
      * @param mimetype of the file
      * @param callback function to which response will be passed
      * @param [error=null] function to which request will be passed in case of error
-     * @param rety true if we've already tried refresh token flow once
-     **/
-    forcetk.Client.prototype.getChatterFile = function(path,mimeType,callback,error,retry) {
+     * @param retry true if we've already tried refresh token flow once
+     */
+    forcetk.Client.prototype.getChatterFile = function(path, mimeType, callback, error, retry) {
         var that = this;
         var url = this.instanceUrl + path;
 
@@ -258,8 +258,8 @@ if (forcetk.Client === undefined) {
      * @param [error=null] function to which jqXHR will be passed in case of error
      * @param [method="GET"] HTTP method for call
      * @param [payload=null] payload for POST/PATCH etc
-	 * @param [paramMap={}] parameters to send as header values for POST/PATCH etc
-	 * @param [retry] specifies whether to retry on error
+     * @param [paramMap={}] parameters to send as header values for POST/PATCH etc
+     * @param [retry] specifies whether to retry on error
      */
     forcetk.Client.prototype.apexrest = function(path, callback, error, method, payload, paramMap, retry) {
         var that = this;
@@ -388,7 +388,7 @@ if (forcetk.Client === undefined) {
             fieldlist = null;
         }
         var fields = fieldlist ? '?fields=' + fieldlist : '';
-        this.ajax('/' + this.apiVersion + '/sobjects/' + objtype + '/' + id
+        return this.ajax('/' + this.apiVersion + '/sobjects/' + objtype + '/' + id
         + fields, callback, error);
     }
 

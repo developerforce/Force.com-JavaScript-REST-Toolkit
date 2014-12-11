@@ -74,7 +74,7 @@
 
 			    addClickListeners();
 
-			    $j('#logoutbtn').click(function(e) {
+			    $('#logoutbtn').click(function(e) {
 			        // Delete the saved refresh token
 			        window.plugins.keychain.removeForKey('refresh_token', 
 					    'forcetk',
@@ -82,8 +82,8 @@
 				            var cb = ChildBrowser.install();
 
 				            client.setRefreshToken(null);
-				            $j.mobile.changePage('#loginpage', "slide", false, true);
-				            $j.mobile.pageLoading();
+				            $.mobile.changePage('#loginpage', "slide", false, true);
+				            $.mobile.pageLoading();
 				            cb.onLocationChange = function(loc) {
 				                if (loc.startsWith(redirectUri)) {
 				                    cb.close();
@@ -95,10 +95,10 @@
 				    );
 			    });
 
-			    $j.mobile.changePage('#mainpage', "slide", false, true);
-			    $j.mobile.pageLoading();
+			    $.mobile.changePage('#mainpage', "slide", false, true);
+			    $.mobile.pageLoading();
 			    getAccounts(function() {
-			        $j.mobile.pageLoading(true);
+			        $.mobile.pageLoading(true);
 			    });
 			}
 
@@ -136,18 +136,18 @@
 			    }
 			}
 
-			// We use $j rather than $ for jQuery
-			if (window.$j === undefined) {
-			    $j = $;
+			// We use $ rather than $ for jQuery
+			if (window.$ === undefined) {
+			    $ = $;
 			}
 
-			$j(document).ready(function() {
+			$(document).ready(function() {
 			    var cb = ChildBrowser.install();
 			    SAiOSKeychainPlugin.install();
 			    window.plugins.keychain.getForKey('refresh_token',
 			    'forcetk',
 			    function(key, value) {
-			        $j.mobile.pageLoading();
+			        $.mobile.pageLoading();
 			        client.setRefreshToken(value);
 			        client.refreshAccessToken(sessionCallback,
 			        function(jqXHR, textStatus, errorThrown) {

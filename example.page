@@ -48,9 +48,6 @@ Sample Visualforce page for Force.com JavaScript REST Toolkit
 		 * It must go in the VF page so that merge variables are processed.
 		 */
 
-		// Get a reference to jQuery that we can work with
-		$j = jQuery.noConflict();
-
 		// Get an instance of the REST API client and set the session ID
 		var client = new forcetk.Client();
 		client.setSessionToken('{!$Api.Session_ID}');
@@ -59,16 +56,16 @@ Sample Visualforce page for Force.com JavaScript REST Toolkit
 
 		var $dialog = null;
 
-		$j(document).ready(function() {
+		$(document).ready(function() {
 		    // Set up the dialog
-		    $dialog = $j('<div></div>')
+		    $dialog = $('<div></div>')
 		        .dialog({
 		            autoOpen: false,
 		            width: 450
 		        });
 
 		    // Kick things off by doing a describe on Account...        
-		    $j('#prompt').html(ajaxgif+" loading metadata...");
+		    $('#prompt').html(ajaxgif+" loading metadata...");
 		    client.describe('Account', metadataCallback);
 		});
 		</script>

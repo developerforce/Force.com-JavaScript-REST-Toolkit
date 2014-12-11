@@ -76,13 +76,8 @@ Sample HTML page for Force.com JavaScript REST Toolkit
 
 		var $dialog = null;
 
-		// We use $j rather than $ for jQuery
-		if (window.$j === undefined) {
-		    $j = $;
-		}
-
-		$j(document).ready(function() {
-			$j('#login').popupWindow({ 
+		$(document).ready(function() {
+			$('#login').popupWindow({ 
 				windowURL: getAuthorizeUrl(loginUrl, clientId, redirectUri),
 				windowName: 'Connect',
 				centerBrowser: 1,
@@ -90,7 +85,7 @@ Sample HTML page for Force.com JavaScript REST Toolkit
 				width:675
 			});
 
-			$dialog = $j('<div></div>')
+			$dialog = $('<div></div>')
 				.dialog({
 					autoOpen: false,
 					width: 450
@@ -104,13 +99,12 @@ Sample HTML page for Force.com JavaScript REST Toolkit
 		}
 
 		function hideButton(){
-			$j('#connect').html(ajaxgif+" connecting...");
+			$('#connect').text(ajaxgif+" connecting...");
 		}
 
 		function sessionCallback(oauthResponse) {
 		    if (typeof oauthResponse === 'undefined'
 		        || typeof oauthResponse['access_token'] === 'undefined') {
-		        //$j('#prompt').html('Error - unauthorized!');
 		        errorCallback({
 		            status: 0, 
 		            statusText: 'Unauthorized', 
@@ -121,7 +115,7 @@ Sample HTML page for Force.com JavaScript REST Toolkit
 		            oauthResponse.instance_url);
 
 		        // Kick things off by doing a describe on Account...  
-		        $j('#prompt').html(ajaxgif+" loading metadata...");
+		        $('#prompt').text(ajaxgif+" loading metadata...");
 		        client.describe('Account',metadataCallback, errorCallback);
 		    }
 		}

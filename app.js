@@ -51,18 +51,18 @@
   function metadataCallback(response){
      // Using TrimPath Template for now - may switch to jQuery Template at some
      // point
- 	$j('#prompt').html(TrimPath.processDOMTemplate("prompt_jst"
+ 	$('#prompt').html(TrimPath.processDOMTemplate("prompt_jst"
  	    , response));
 
      // Set up autocomplete
-     $j( "#value" ).autocomplete({
+     $( "#value" ).autocomplete({
          source: function( request, response ) {
              var query = "SELECT Id, Name FROM Account "+
-                 "WHERE "+$j("#field").val()+" LIKE '%"+request.term+"%' "+
+                 "WHERE "+$("#field").val()+" LIKE '%"+request.term+"%' "+
                  "ORDER BY Name LIMIT 20";
 
              client.query(query, function( data ) {
-                 response( $j.map( data.records, function( record ) {
+                 response( $.map( data.records, function( record ) {
                      return {
                          label: record.Name,
                          value: record.Id
@@ -76,22 +76,22 @@
              if ( ui.item != null ) {
                  showAccountDetail(ui.item.value);
              } else {
-                 filterAccounts($j("#field").val(),this.value);
+                 filterAccounts($("#field").val(),this.value);
              }
 
              return false;
          },
      });
 
- 	$j('#go').click(function(e) {
-         var field = $j("#field").val();
-         var value = $j("#value").val();
+ 	$('#go').click(function(e) {
+         var field = $("#field").val();
+         var value = $("#value").val();
 
      	e.preventDefault();
  	    filterAccounts(field,value);
  	});
 
- 	$j('#new').click(function(e) {
+ 	$('#new').click(function(e) {
      	e.preventDefault();
 
      	// Just make Trimpath happy
@@ -101,19 +101,19 @@
      	    dummy[response.fields[i].name] = '';
      	}
          $dialog.html(TrimPath.processDOMTemplate("edit_jst", dummy));
-         $dialog.find('#action').html('Create').click(function(e) {
+         $dialog.find('#action').text('Create').click(function(e) {
              e.preventDefault();
              $dialog.dialog('close');
 
              var fields = {};
              $dialog.find('input').each(function() {
-                 var child = $j(this);
+                 var child = $(this);
                  if ( child.val().length > 0 ) {
                      fields[child.attr("name")] = child.val();  
                  }               
              });
 
-             $j('#list').html(ajaxgif+" creating account...");
+             $('#list').html(ajaxgif+" creating account...");
 
              client.create('Account', fields, createCallback, errorCallback);
          });
@@ -125,21 +125,21 @@
  }
 
  function queryCallback(response) {
- 	$j('#list').html(TrimPath.processDOMTemplate("accounts_jst"
+ 	$('#list').html(TrimPath.processDOMTemplate("accounts_jst"
  	    , response));
 
-     $j('#version').html($j.fn.jquery);
-     $j('#uiversion').html($j.ui.version);
+    $('#version').text($.fn.jquery);
+    $('#uiversion').text($.ui.version);
 
- 	$j("#list tr:nth-child(odd)").addClass("odd");
+ 	$("#list tr:nth-child(odd)").addClass("odd");
 
- 	$j('#logout').click(logout);
+ 	$('#logout').click(logout);
 
- 	$j('#accounts').find('.id')
+ 	$('#accounts').find('.id')
  	    .hover(function() {
-              $j(this).addClass("highlighted");
+              $(this).addClass("highlighted");
             },function(){
-              $j(this).removeClass("highlighted");
+              $(this).removeClass("highlighted");
          })
          .click(function(){
              showAccountDetail(this.id);
@@ -156,36 +156,36 @@
      && !response.Website.startsWith('http://')) {
          response.Website = 'http://'+response.Website;
      }
-     $dialog.html(TrimPath.processDOMTemplate("detail_jst"
+     $dialog.TrimPath.processDOMTemplate("detail_jst"
          ,response));
      $dialog.find('#industry').click(function(e) {
          e.preventDefault();
          $dialog.dialog('close');
-         filterIndustry($j(this).html());
+         filterIndustry($(this).text());
      });
      $dialog.find('#delete').click(function(e) {
          e.preventDefault();
          $dialog.dialog('close');
-         $j('#list').html(ajaxgif+" deleting account...");
+         $('#list').html(ajaxgif+" deleting account...");
          client.del('Account', $dialog.find('#id').val(), deleteCallback, errorCallback);
      });
      $dialog.find('#edit').click(function(e) {
          e.preventDefault();
          $dialog.html(TrimPath.processDOMTemplate("edit_jst"
              ,response));
-         $dialog.find('#action').html('Update').click(function(e) {
+         $dialog.find('#action').text('Update').click(function(e) {
              e.preventDefault();
              $dialog.dialog('close');
 
              var fields = {};
              $dialog.find('input').each(function() {
-                 var child = $j(this);
+                 var child = $(this);
                  if ( child.val().length > 0 && child.attr("name") != 'id') {
                      fields[child.attr("name")] = child.val();  
                  }               
              });
 
-             $j('#list').html(ajaxgif+" updating account...");
+             $('#list').html(ajaxgif+" updating account...");
 
              client.update('Account', $dialog.find('#id').val(), fields, updateCallback, errorCallback);
          });
@@ -193,19 +193,19 @@
  }
 
  function createCallback(response) {
- 	$j('#list').html('Created '+response.id);
+ 	$('#list').text('Created '+response.id);
 
  	setTimeout("filterAccounts()",1000);
  }
 
  function updateCallback(response) {
- 	$j('#list').html('Updated');
+ 	$('#list').text('Updated');
 
  	setTimeout("filterAccounts()",1000);
  }
 
  function deleteCallback(response) {
- 	$j('#list').html('Deleted');
+ 	$('#list').text('Deleted');
 
  	setTimeout("filterAccounts()",1000);
  }
@@ -222,7 +222,7 @@
  }
 
  function filterIndustry(industry) {
-     $j('#list').html(ajaxgif+" loading data...");
+     $('#list').html(ajaxgif+" loading data...");
 
      var query = "SELECT Id, Name FROM Account WHERE Industry = '"+industry
      +"' ORDER BY Name LIMIT 20";
@@ -231,7 +231,7 @@
  }
 
  function filterAccounts(field, value) {
-     $j('#list').html(ajaxgif+" loading data...");
+     $('#list').html(ajaxgif+" loading data...");
 
      var query = ( typeof value !== 'undefined' && value.length > 0 ) 
          ? "SELECT Id, Name FROM Account WHERE "+field+" LIKE '%"+value

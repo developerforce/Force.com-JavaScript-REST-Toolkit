@@ -50,20 +50,17 @@ an HTML5 mobile app using jQuery Mobile
 <apex:includeScript value="{!URLFOR($Resource.sample, 'forcetk.js')}"  />
 <apex:includeScript value="{!URLFOR($Resource.sample, 'mobileapp.js')}"  />
 <script type="application/javascript">
-// Get a reference to jQuery that we can work with
-$j = jQuery.noConflict();
-
 // Get an instance of the REST API client and set the session ID
 var client = new forcetk.Client();
 client.setSessionToken('{!$Api.Session_ID}');
 
 // Kick things off...
-$j(document).ready(function(){
+$(document).ready(function(){
 	addClickListeners();
 
-    $j.mobile.pageLoading();
+    $.mobile.pageLoading();
     getAccounts(function(){
-        $j.mobile.pageLoading(true);
+        $.mobile.pageLoading(true);
     });
 });
 </script>

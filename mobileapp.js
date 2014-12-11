@@ -35,85 +35,85 @@ function errorCallback(jqXHR){
 }
 
 function addClickListeners() {
-    $j('#newbtn').click(function(e) {
+    $('#newbtn').click(function(e) {
         // Show the 'New Account' form
         e.preventDefault();
-        $j('#accountform')[0].reset();
-        $j('#accformheader').html('New Account');
+        $('#accountform')[0].reset();
+        $('#accformheader').text('New Account');
         setButtonText('#actionbtn', 'Create');
-        $j('#actionbtn').unbind('click.btn').bind('click.btn', createHandler);
-        $j.mobile.changePage('#editpage', "slide", false, true);
+        $('#actionbtn').unbind('click.btn').bind('click.btn', createHandler);
+        $.mobile.changePage('#editpage', "slide", false, true);
     });
 
-    $j('#deletebtn').click(function(e) {
+    $('#deletebtn').click(function(e) {
         // Delete the account
         e.preventDefault();
-        $j.mobile.pageLoading();
-        client.del('Account', $j('#accountdetail').find('#Id').val()
+        $.mobile.pageLoading();
+        client.del('Account', $('#accountdetail').find('#Id').val()
         ,
         function(response) {
             getAccounts(function() {
-                $j.mobile.pageLoading(true);
-                $j.mobile.changePage('#mainpage', "slide", true, true);
+                $.mobile.pageLoading(true);
+                $.mobile.changePage('#mainpage', "slide", true, true);
             });
         }, errorCallback);
     });
 
-    $j('#editbtn').click(function(e) {
+    $('#editbtn').click(function(e) {
         // Get account fields and show the 'Edit Account' form
         e.preventDefault();
-        $j.mobile.pageLoading();
-        client.retrieve("Account", $j('#accountdetail').find('#Id').val()
+        $.mobile.pageLoading();
+        client.retrieve("Account", $('#accountdetail').find('#Id').val()
         , "Name,Id,Industry,TickerSymbol",
         function(response) {
-            $j('#accountform').find('input').each(function() {
-                $j(this).val(response[$j(this).attr("name")]);
+            $('#accountform').find('input').each(function() {
+                $(this).val(response[$(this).attr("name")]);
             });
-            $j('#accformheader').html('Edit Account');
+            $('#accformheader').text('Edit Account');
             setButtonText('#actionbtn', 'Update');
-            $j('#actionbtn')
+            $('#actionbtn')
             .unbind('click.btn')
             .bind('click.btn', updateHandler);
-            $j.mobile.pageLoading(true);
-            $j.mobile.changePage('#editpage', "slide", false, true);
+            $.mobile.pageLoading(true);
+            $.mobile.changePage('#editpage', "slide", false, true);
         }, errorCallback);
     });
 }
 
 // Populate the account list and set up click handling
 function getAccounts(callback) {
-    $j('#accountlist').empty();
+    $('#accountlist').empty();
     client.query("SELECT Id, Name FROM Account ORDER BY Name LIMIT 20"
     ,
     function(response) {
-        $j.each(response.records,
+        $.each(response.records,
         function() {
             var id = this.Id;
-            $j('<li></li>')
+            $('<li></li>')
             .hide()
             .append('<a href="#"><h2>' + this.Name + '</h2></a>')
             .click(function(e) {
                 e.preventDefault();
-                $j.mobile.pageLoading();
+                $.mobile.pageLoading();
                 // We could do this more efficiently by adding Industry and
                 // TickerSymbol to the fields in the SELECT, but we want to
                 // show dynamic use of the retrieve function...
                 client.retrieve("Account", id, "Name,Id,Industry,TickerSymbol"
                 ,
                 function(response) {
-                    $j('#Name').html(response.Name);
-                    $j('#Industry').html(response.Industry);
-                    $j('#TickerSymbol').html(response.TickerSymbol);
-                    $j('#Id').val(response.Id);
-                    $j.mobile.pageLoading(true);
-                    $j.mobile.changePage('#detailpage', "slide", false, true);
+                    $('#Name').text(response.Name);
+                    $('#Industry').text(response.Industry);
+                    $('#TickerSymbol').text(response.TickerSymbol);
+                    $('#Id').val(response.Id);
+                    $.mobile.pageLoading(true);
+                    $.mobile.changePage('#detailpage', "slide", false, true);
                 }, errorCallback);
             })
             .appendTo('#accountlist')
             .show();
         });
 
-        $j('#accountlist').listview('refresh');
+        $('#accountlist').listview('refresh');
 
         if (typeof callback != 'undefined' && callback != null) {
             callback();
@@ -124,20 +124,20 @@ function getAccounts(callback) {
 // Gather fields from the account form and create a record
 function createHandler(e) {
     e.preventDefault();
-    var accountform = $j('#accountform');
+    var accountform = $('#accountform');
     var fields = {};
     accountform.find('input').each(function() {
-        var child = $j(this);
+        var child = $(this);
         if (child.val().length > 0 && child.attr("name") != 'Id') {
             fields[child.attr("name")] = child.val();
         }
     });
-    $j.mobile.pageLoading();
+    $.mobile.pageLoading();
     client.create('Account', fields,
     function(response) {
         getAccounts(function() {
-            $j.mobile.pageLoading(true);
-            $j.mobile.changePage('#mainpage', "slide", true, true);
+            $.mobile.pageLoading(true);
+            $.mobile.changePage('#mainpage', "slide", true, true);
         });
     }, errorCallback);
 }
@@ -145,21 +145,21 @@ function createHandler(e) {
 // Gather fields from the account form and update a record
 function updateHandler(e) {
     e.preventDefault();
-    var accountform = $j('#accountform');
+    var accountform = $('#accountform');
     var fields = {};
     accountform.find('input').each(function() {
-        var child = $j(this);
+        var child = $(this);
         if (child.val().length > 0 && child.attr("name") != 'Id') {
             fields[child.attr("name")] = child.val();
         }
     });
-    $j.mobile.pageLoading();
+    $.mobile.pageLoading();
     client.update('Account', accountform.find('#Id').val(), fields
     ,
     function(response) {
         getAccounts(function() {
-            $j.mobile.pageLoading(true);
-            $j.mobile.changePage('#mainpage', "slide", true, true);
+            $.mobile.pageLoading(true);
+            $.mobile.changePage('#mainpage', "slide", true, true);
         });
     }, errorCallback);
 }
@@ -167,5 +167,5 @@ function updateHandler(e) {
 // Ugh - this is required to change text on a jQuery Mobile button
 // due to the way it futzes with things at runtime
 function setButtonText(id, str) {
-    $j(id).html(str).parent().find('.ui-btn-text').text(str);
+    $(id).text(str).parent().find('.ui-btn-text').text(str);
 }

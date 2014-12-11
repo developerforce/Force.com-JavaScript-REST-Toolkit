@@ -40,11 +40,6 @@ if (forcetk === undefined) {
 
 if (forcetk.Client === undefined) {
 
-    // We use $j rather than $ for jQuery so it works in Visualforce
-    if (window.$j === undefined) {
-        $j = $;
-    }
-
     /**
      * The Client provides a convenient wrapper for the Force.com REST API, 
      * allowing JavaScript in Visualforce pages to use the API via the Ajax
@@ -63,7 +58,7 @@ if (forcetk.Client === undefined) {
                 // In PhoneGap
                 this.proxyUrl = null;
             } else {
-                // In Visualforce
+                // In Visualforce - still need proxyUrl for Apex REST methods
                 this.proxyUrl = location.protocol + "//" + location.hostname
                     + "/services/proxy";
             }
@@ -76,6 +71,7 @@ if (forcetk.Client === undefined) {
         this.refreshToken = null;
         this.sessionId = null;
         this.apiVersion = null;
+        this.visualforce = false;
         this.instanceUrl = null;
         this.asyncAjax = true;
     }
@@ -96,9 +92,9 @@ if (forcetk.Client === undefined) {
     forcetk.Client.prototype.refreshAccessToken = function(callback, error) {
         var that = this;
         var url = this.loginUrl + '/services/oauth2/token';
-        return $j.ajax({
+        return $.ajax({
             type: 'POST',
-            url: (this.proxyUrl !== null) ? this.proxyUrl: url,
+            url: (this.proxyUrl !== null && ! this.visualforce) ? this.proxyUrl: url,
             cache: false,
             processData: false,
             data: 'grant_type=refresh_token&client_id=' + this.clientId + '&refresh_token=' + this.refreshToken,
@@ -106,7 +102,7 @@ if (forcetk.Client === undefined) {
             error: error,
             dataType: "json",
             beforeSend: function(xhr) {
-                if (that.proxyUrl !== null) {
+                if (that.proxyUrl !== null && ! this.visualforce) {
                     xhr.setRequestHeader('SalesforceProxy-Endpoint', url);
                 }
             }
@@ -117,15 +113,17 @@ if (forcetk.Client === undefined) {
      * Set a session token and the associated metadata in the client.
      * @param sessionId a salesforce.com session ID. In a Visualforce page,
      *                   use '{!$Api.sessionId}' to obtain a session ID.
-     * @param [apiVersion="21.0"] Force.com API version
+     * @param [apiVersion="v29.0"] Force.com API version
      * @param [instanceUrl] Omit this if running on Visualforce; otherwise 
      *                   use the value from the OAuth token.
      */
     forcetk.Client.prototype.setSessionToken = function(sessionId, apiVersion, instanceUrl) {
         this.sessionId = sessionId;
         this.apiVersion = (typeof apiVersion === 'undefined' || apiVersion === null)
-        ? 'v27.0': apiVersion;
+        ? 'v29.0': apiVersion;
         if (typeof instanceUrl === 'undefined' || instanceUrl == null) {
+            this.visualforce = true;
+
             // location.hostname can be of the form 'abc.na1.visual.force.com',
             // 'na1.salesforce.com' or 'abc.my.salesforce.com' (custom domains). 
             // Split on '.', and take the [1] or [0] element as appropriate
@@ -156,12 +154,12 @@ if (forcetk.Client === undefined) {
      */
     forcetk.Client.prototype.ajax = function(path, callback, error, method, payload, retry) {
         var that = this;
-        var url = this.instanceUrl + '/services/data' + path;
+        var url = (this.visualforce ? '' : this.instanceUrl) + '/services/data' + path;
 
-        return $j.ajax({
+        return $.ajax({
             type: method || "GET",
             async: this.asyncAjax,
-            url: (this.proxyUrl !== null) ? this.proxyUrl: url,
+            url: (this.proxyUrl !== null && ! this.visualforce) ? this.proxyUrl: url,
             contentType: method == "DELETE"  ? null : 'application/json',
             cache: false,
             processData: false,
@@ -181,10 +179,10 @@ if (forcetk.Client === undefined) {
             },
             dataType: "json",
             beforeSend: function(xhr) {
-                if (that.proxyUrl !== null) {
+                if (that.proxyUrl !== null && ! that.visualforce) {
                     xhr.setRequestHeader('SalesforceProxy-Endpoint', url);
                 }
-                xhr.setRequestHeader(that.authzHeader, "OAuth " + that.sessionId);
+                xhr.setRequestHeader(that.authzHeader, "Bearer " + that.sessionId);
                 xhr.setRequestHeader('X-User-Agent', 'salesforce-toolkit-rest-javascript/' + that.apiVersion);
             }
         });
@@ -200,20 +198,20 @@ if (forcetk.Client === undefined) {
      * @param mimetype of the file
      * @param callback function to which response will be passed
      * @param [error=null] function to which request will be passed in case of error
-     * @param rety true if we've already tried refresh token flow once
+     * @param retry true if we've already tried refresh token flow once
      **/
     forcetk.Client.prototype.getChatterFile = function(path,mimeType,callback,error,retry) {
         var that = this;
-        var url = this.instanceUrl + path;
+        var url = (this.visualforce ? '' : this.instanceUrl) + path;
 
         var request = new XMLHttpRequest();
                   
-        request.open("GET",  (this.proxyUrl !== null) ? this.proxyUrl: url, true);
+        request.open("GET",  (this.proxyUrl !== null && ! this.visualforce) ? this.proxyUrl: url, true);
         request.responseType = "arraybuffer";
         
-        request.setRequestHeader(that.authzHeader, "OAuth " + that.sessionId);
-        request.setRequestHeader('X-User-Agent', 'salesforce-toolkit-rest-javascript/' + that.apiVersion);
-        if (this.proxyUrl !== null) {
+        request.setRequestHeader(this.authzHeader, "Bearer " + this.sessionId);
+        request.setRequestHeader('X-User-Agent', 'salesforce-toolkit-rest-javascript/' + this.apiVersion);
+        if (this.proxyUrl !== null && ! this.visualforce) {
             request.setRequestHeader('SalesforceProxy-Endpoint', url);
         }
         
@@ -250,6 +248,124 @@ if (forcetk.Client === undefined) {
         request.send();
         
     }
+    
+    // Local utility to create a random string for multipart boundary
+    function randomString() {
+        var str = '';
+        for (var i = 0; i < 4; i++) {
+            str += (Math.random().toString(16)+"000000000").substr(2,8);
+        }
+        return str;
+    }
+    
+    /* Low level function to create/update records with blob data
+     * @param path resource path relative to /services/data
+     * @param fields an object containing initial field names and values for 
+     *               the record, e.g. {ContentDocumentId: "069D00000000so2", 
+     *               PathOnClient: "Q1 Sales Brochure.pdf"}
+     * @param filename filename for blob data; e.g. "Q1 Sales Brochure.pdf"
+     * @param payloadField 'VersionData' for ContentVersion, 'Body' for Document
+     * @param payload Blob, File, ArrayBuffer (Typed Array), or String payload
+     * @param callback function to which response will be passed
+     * @param [error=null] function to which response will be passed in case of error
+     * @param retry true if we've already tried refresh token flow once
+     */
+    forcetk.Client.prototype.blob = function(path, fields, filename, payloadField, payload, callback, error, retry) { 
+        var that = this;
+        var url = (this.visualforce ? '' : this.instanceUrl) + '/services/data' + path;
+        var boundary = randomString();
+        
+        var blob = new Blob([
+            "--boundary_" + boundary + '\n' 
+            + "Content-Disposition: form-data; name=\"entity_content\";" + "\n" 
+            + "Content-Type: application/json" + "\n\n" 
+            + JSON.stringify(fields) 
+            + "\n\n" 
+            + "--boundary_" + boundary + "\n" 
+            + "Content-Type: application/octet-stream" + "\n" 
+            + "Content-Disposition: form-data; name=\"" + payloadField 
+              + "\"; filename=\"" + filename + "\"\n\n",
+            payload,
+            "\n\n" 
+            + "--boundary_" + boundary + "--"
+        ], {type : 'multipart/form-data; boundary=\"boundary_' + boundary + '\"'});
+        
+        var request = new XMLHttpRequest();
+        request.open("POST", (this.proxyUrl !== null && ! this.visualforce) ? this.proxyUrl: url, this.asyncAjax);
+        
+        request.setRequestHeader(this.authzHeader, "Bearer " + this.sessionId);
+        request.setRequestHeader('X-User-Agent', 'salesforce-toolkit-rest-javascript/' + this.apiVersion);
+        if (this.proxyUrl !== null && ! this.visualforce) {
+            request.setRequestHeader('SalesforceProxy-Endpoint', url);
+        }
+        
+        if (this.asyncAjax) {
+            request.onreadystatechange = function() {
+                // continue if the process is completed
+                if (request.readyState == 4) {
+                    // continue only if HTTP status is good
+                    if (request.status >= 200 && request.status < 300) {
+                        // retrieve the response
+                        callback(request.response ? JSON.parse(request.response) : null);
+                    } else if(request.status == 401 && !retry) {
+                        that.refreshAccessToken(function(oauthResponse) {
+                            that.setSessionToken(oauthResponse.access_token, null,oauthResponse.instance_url);
+                            that.blob(path, fields, fileName, file, callback, error, true);
+                        },
+                        error);
+                    } else {
+                        // return status message
+                        error(request, request.statusText, request.response);
+                    }
+                }            
+            }
+        }
+        
+        request.send(blob);
+        
+        return this.asyncAjax ? JSON.parse(request.response) : null;
+    }
+    
+    /*
+     * Create a record with blob data
+     * @param objtype object type; e.g. "ContentVersion"
+     * @param fields an object containing initial field names and values for 
+     *               the record, e.g. {ContentDocumentId: "069D00000000so2", 
+     *               PathOnClient: "Q1 Sales Brochure.pdf"}
+     * @param filename filename for blob data; e.g. "Q1 Sales Brochure.pdf"
+     * @param payloadField 'VersionData' for ContentVersion, 'Body' for Document
+     * @param payload Blob, File, ArrayBuffer (Typed Array), or String payload
+     * @param callback function to which response will be passed
+     * @param [error=null] function to which response will be passed in case of error
+     * @param retry true if we've already tried refresh token flow once
+     */
+    forcetk.Client.prototype.createBlob = function(objtype, fields, filename, 
+                                                   payloadField, payload, callback, 
+                                                   error, retry) { 
+        return this.blob('/' + this.apiVersion + '/sobjects/' + objtype + '/', 
+                         fields, filename, payloadField, payload, callback, error);
+    }
+
+    /*
+     * Update a record with blob data
+     * @param objtype object type; e.g. "ContentVersion"
+     * @param id the record's object ID
+     * @param fields an object containing initial field names and values for 
+     *               the record, e.g. {ContentDocumentId: "069D00000000so2", 
+     *               PathOnClient: "Q1 Sales Brochure.pdf"}
+     * @param filename filename for blob data; e.g. "Q1 Sales Brochure.pdf"
+     * @param payloadField 'VersionData' for ContentVersion, 'Body' for Document
+     * @param payload Blob, File, ArrayBuffer (Typed Array), or String payload
+     * @param callback function to which response will be passed
+     * @param [error=null] function to which response will be passed in case of error
+     * @param retry true if we've already tried refresh token flow once
+     */
+    forcetk.Client.prototype.updateBlob = function(objtype, id, fields, filename, 
+                                                   payloadField, payload, callback, 
+                                                   error, retry) { 
+        return this.blob('/' + this.apiVersion + '/sobjects/' + objtype + '/' + id + 
+                         '?_HttpMethod=PATCH', fields, filename, payloadField, payload, callback, error);
+    }
 
     /*
      * Low level utility function to call the Salesforce endpoint specific for Apex REST API.
@@ -258,14 +374,14 @@ if (forcetk.Client === undefined) {
      * @param [error=null] function to which jqXHR will be passed in case of error
      * @param [method="GET"] HTTP method for call
      * @param [payload=null] payload for POST/PATCH etc
-	 * @param [paramMap={}] parameters to send as header values for POST/PATCH etc
-	 * @param [retry] specifies whether to retry on error
+     * @param [paramMap={}] parameters to send as header values for POST/PATCH etc
+     * @param [retry] specifies whether to retry on error
      */
     forcetk.Client.prototype.apexrest = function(path, callback, error, method, payload, paramMap, retry) {
         var that = this;
         var url = this.instanceUrl + '/services/apexrest' + path;
 
-        return $j.ajax({
+        return $.ajax({
             type: method || "GET",
             async: this.asyncAjax,
             url: (this.proxyUrl !== null) ? this.proxyUrl: url,
@@ -291,14 +407,14 @@ if (forcetk.Client === undefined) {
                 if (that.proxyUrl !== null) {
                     xhr.setRequestHeader('SalesforceProxy-Endpoint', url);
                 }
-				//Add any custom headers
-				if (paramMap === null) {
-					paramMap = {};
-				}
-				for (paramName in paramMap) {
-					xhr.setRequestHeader(paramName, paramMap[paramName]);
-				}
-                xhr.setRequestHeader(that.authzHeader, "OAuth " + that.sessionId);
+                //Add any custom headers
+                if (paramMap === null) {
+                    paramMap = {};
+                }
+                for (paramName in paramMap) {
+                    xhr.setRequestHeader(paramName, paramMap[paramName]);
+                }
+                xhr.setRequestHeader(that.authzHeader, "Bearer " + that.sessionId);
                 xhr.setRequestHeader('X-User-Agent', 'salesforce-toolkit-rest-javascript/' + that.apiVersion);
             }
         });
@@ -465,9 +581,9 @@ if (forcetk.Client === undefined) {
         var index = url.indexOf( serviceData );
         
         if( index > -1 ){
-        	url = url.substr( index + serviceData.length );
+            url = url.substr( index + serviceData.length );
         } else {
-        	//-- leave alone
+            //-- leave alone
         }
         
         return this.ajax( url, callback, error );

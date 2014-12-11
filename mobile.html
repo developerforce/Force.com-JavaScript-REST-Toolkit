@@ -55,13 +55,8 @@ var proxyUrl    = 'https://localhost/jsapp/proxy.php?mode=native';
 // OAuth
 var client = new forcetk.Client(clientId, loginUrl, proxyUrl);;
 
-// We use $j rather than $ for jQuery
-if (window.$j === undefined) {
-    $j = $;
-}
-
-$j(document).ready(function() {
-	$j('#login').popupWindow({ 
+$(document).ready(function() {
+	$('#login').popupWindow({ 
 		windowURL: getAuthorizeUrl(loginUrl, clientId, redirectUri),
 		windowName: 'Connect',
 		centerBrowser: 1,
@@ -79,7 +74,6 @@ function getAuthorizeUrl(loginUrl, clientId, redirectUri){
 function sessionCallback(oauthResponse) {
     if (typeof oauthResponse === 'undefined'
         || typeof oauthResponse['access_token'] === 'undefined') {
-        //$j('#prompt').html('Error - unauthorized!');
         errorCallback({
             status: 0, 
             statusText: 'Unauthorized', 
@@ -91,10 +85,10 @@ function sessionCallback(oauthResponse) {
 
 		addClickListeners();
 
-	    $j.mobile.changePage('#mainpage',"slide",false,true);
-	    $j.mobile.pageLoading();
+	    $.mobile.changePage('#mainpage',"slide",false,true);
+	    $.mobile.pageLoading();
 	    getAccounts(function(){
-	        $j.mobile.pageLoading(true);
+	        $.mobile.pageLoading(true);
 	    });
     }
 }

@@ -22,35 +22,35 @@ Recent Updates
 
 * Inserting or updating blob data using the `create` or `update` functions (passing base64-encoded binary data in JSON) is limited by the REST API to 50 MB of text data or 37.5 MB of base64–encoded data. New functions, `createBlob` and `updateBlob`, allow creation and update of ContentVersion and Document records with binary ('blob') content with a size of up to 500 MB. Here is a minimal sample that shows how to upload a file to Chatter Files:
 
-		<apex:page>
-		    <script src="{!$Resource.forcetk_new}"></script>
-		    <p>
-		        Select a file to upload as a new Chatter File.
-		    </p>
-		    <input type="file" id="file" onchange="upload()"/>
-		    <p id="message"></p>
-		    <script>
-		        var client = new forcetk.Client();
-		        client.setSessionToken('{!$Api.Session_ID}');
-		    	function upload() {
-		            var file = document.getElementById("file").files[0];
-		            client.createBlob('ContentVersion', {
-		                Origin: 'H', // 'H' for Chatter File, 'C' for Content Document
-		                PathOnClient: file.name
-		            }, file.name, 'VersionData', file, function(response){
-		                console.log(response);
-		                document.getElementById("message").innerHTML = 
-		                    "Chatter File created: <a href=\"/" + response.id + "\">Take a look!</a>";
-		            }, function(request, status, response){
-		                console.log(response);
-		                document.getElementById("message").innerHTML = 
-		                    "Error: " + status;
-		            });
-		        }
-		    </script>
+		<apex:page docType="html-5.0" title="File Uploader">
+		  <h3>
+		    Select a file to upload as a new Chatter File.
+		  </h3>
+		  <input type="file" id="file" onchange="upload()"/>
+		  <p id="message"></p>
+		  <script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
+		  <script src="{!$Resource.forcetk}"></script>
+		  <script>
+		    var client = new forcetk.Client();
+
+		    client.setSessionToken('{!$Api.Session_ID}');
+
+		    function upload() {
+		        var file = $("#file")[0].files[0];
+		        client.createBlob('ContentVersion', {
+		            Origin: 'H', // 'H' for Chatter File, 'C' for Content Document
+		            PathOnClient: file.name
+		        }, file.name, 'VersionData', file, function(response){
+		            console.log(response);
+		            $("#message").html("Chatter File created: <a target=\"_blank\" href=\"/" + response.id + "\">Take a look!</a>");
+		        }, function(request, status, response){
+		            $("#message").html("Error: " + status);
+		        });
+		    }
+		  </script>
 		</apex:page>
 
-  Under the covers, `createBlob` sends a multipart message. See the REST API doc page [Insert or Update Blob Data](https://www.salesforce.com/us/developer/docs/api_rest/Content/dome_sobject_insert_update_blob.htm) for more details.
+	Under the covers, `createBlob` sends a multipart message. See the REST API doc page [Insert or Update Blob Data](https://www.salesforce.com/us/developer/docs/api_rest/Content/dome_sobject_insert_update_blob.htm) for more details.
 
 Dependencies
 ------------

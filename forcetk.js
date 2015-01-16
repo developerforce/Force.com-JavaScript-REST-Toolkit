@@ -54,7 +54,7 @@ if (forcetk.Client === undefined) {
         this.clientId = clientId;
         this.loginUrl = loginUrl || 'https://login.salesforce.com/';
         if (typeof proxyUrl === 'undefined' || proxyUrl === null) {
-            if (location.protocol === 'file:') {
+            if (location.protocol === 'file:' || location.protocol === 'ms-appx:') {
                 // In PhoneGap
                 this.proxyUrl = null;
             } else {

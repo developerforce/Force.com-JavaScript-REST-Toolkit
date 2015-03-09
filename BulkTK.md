@@ -19,7 +19,7 @@ Dependencies
 
  *  [jquery](http://jquery.com/)
  *  [ForceTK](https://github.com/developerforce/Force.com-JavaScript-REST-Toolkit)
- *  [jxon](https://github.com/wireload/Ratatosk/blob/master/jxon.js)
+ *  [jxon](https://github.com/developerforce/Force.com-JavaScript-REST-Toolkit/blob/master/jxon.js) (originally from the [Ratatosk](https://github.com/wireload/Ratatosk) project; this version preserves case in element and attribute names)
 
 Example Usage
 =============

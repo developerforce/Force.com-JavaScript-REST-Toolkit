@@ -27,9 +27,11 @@
 /* 
  * BulkTK: JavaScript library to wrap Force.com Bulk API. Extends ForceTK.
  * Dependencies:
- * 	jquery - http://jquery.com/
- *  ForceTK - https://github.com/developerforce/Force.com-JavaScript-REST-Toolkit
- *  jxon - https://github.com/wireload/Ratatosk/blob/master/jxon.js
+ *  jquery - http://jquery.com/
+ *  ForceTK - https://github.com/developerforce/Force.com-JavaScript-REST-Toolkit/blob/master/forcetk.js
+ *  jxon - https://github.com/developerforce/Force.com-JavaScript-REST-Toolkit/blob/master/jxon.js
+ *      (originally from the [Ratatosk](https://github.com/wireload/Ratatosk) 
+ *      project; this version preserves case in element and attribute names)
  */
 
 forcetk.Client.prototype.xmlHeader = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
@@ -85,7 +87,7 @@ forcetk.Client.prototype.bulkAjax = function(path, parseXML, callback, error, me
         },
         dataType: "text",
         beforeSend: function(xhr) {
-            if (that.proxyUrl !== null && ! that.visualforce) {
+            if (that.proxyUrl !== null) {
                 xhr.setRequestHeader('SalesforceProxy-Endpoint', url);
             }
             xhr.setRequestHeader('X-SFDC-Session', that.sessionId);

@@ -92,6 +92,7 @@ Sample Visualforce page for Force.com Bulk API JavaScript Toolkit
     <script src="{!$Resource.forcetk}"></script>
     <script src="{!$Resource.jxon}"></script>
     <script src="{!$Resource.bulkTK}"></script>
+    <!-- From https://github.com/vkiryukhin/vkBeautify -->
     <script src="{!$Resource.vkbeautify}"></script>
     <script>
         var client = new forcetk.Client();

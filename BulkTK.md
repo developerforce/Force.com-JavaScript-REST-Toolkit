@@ -10,19 +10,35 @@ The Force.com Bulk API allows asynchronous data access. BulkTK extends ForceTK w
 
 You should familiarize yourself with the [Force.com Bulk API documentation](https://www.salesforce.com/us/developer/docs/api_asynch/), since BulkTK is a relatively thin layer on the raw XML Bulk API.
 
-bulk.page is a simple Visualforce single page application to demonstrate BulkTK. Try it out in a sandbox or developer edition.
+[bulk.page](https://github.com/developerforce/Force.com-JavaScript-REST-Toolkit/blob/master/bulk.page) is a simple Visualforce single page application to demonstrate BulkTK. Try it out in a sandbox or developer edition.
 
 Note that, just like ForceTK, BulkTK is unsupported and supplied as is. It is also currently in a very early stage of development. It appears to work well, but bugs cannot be ruled out, and the interface should not be considered stable.
+
+Dependencies
+============
+
+ *  [jquery](http://jquery.com/)
+ *  [ForceTK](https://github.com/developerforce/Force.com-JavaScript-REST-Toolkit)
+ *  [jxon](https://github.com/wireload/Ratatosk/blob/master/jxon.js)
 
 Example Usage
 =============
 
-You must create a ForceTK client first. On a Visualforce page, you would do:
+This example focuses on Visualforce. See the [ForceTK documentation](https://github.com/developerforce/Force.com-JavaScript-REST-Toolkit) for details on authenticating from an external website, such as a Heroku app, or PhoneGap/Cordova.
+
+First, include BulkTK and its dependencies:
+
+    <script src="{!$Resource.jquery}"></script>
+    <script src="{!$Resource.forcetk}"></script>
+    <script src="{!$Resource.jxon}"></script>
+    <script src="{!$Resource.bulkTK}"></script>
+
+Now create a ForceTK client:
 
     var client = new forcetk.Client();
     client.setSessionToken('{!$Api.Session_ID}');
 
-See the ForceTK documentation for authenticating from an external website, such as a Heroku app, or PhoneGap/Cordova.
+See the [ForceTK documentation](https://github.com/developerforce/Force.com-JavaScript-REST-Toolkit) for details on authenticating from an external website, such as a Heroku app, or PhoneGap/Cordova.
 
 Create a job
 ------------

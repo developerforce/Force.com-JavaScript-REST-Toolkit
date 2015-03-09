@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Contact records -->
+<sObjects xmlns="http://www.force.com/2009/06/asyncapi/dataload">
+   <sObject>
+      <Twitter_Handle__c>pattest7</Twitter_Handle__c>
+      <Title>Pirate</Title>
+   </sObject>
+</sObjects>

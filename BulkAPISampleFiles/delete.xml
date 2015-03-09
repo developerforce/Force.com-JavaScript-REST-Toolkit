@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Contact records -->
+<sObjects xmlns="http://www.force.com/2009/06/asyncapi/dataload">
+   <sObject>
+      <Id>003E000001DJOfxIAH</Id>
+   </sObject>
+   <sObject>
+      <Id>003E000001DJOfyIAH</Id>
+   </sObject>
+   <sObject>
+      <Id>003E000001DJOV4IAP</Id>
+   </sObject>
+   <sObject>
+      <Id>003E000001DJOV5IAP</Id>
+   </sObject>
+</sObjects>

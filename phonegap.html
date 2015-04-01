@@ -48,9 +48,9 @@
          from the CDN, but then the device needs to be online for the app to
          be functional.
          -->
-        <link rel="stylesheet" href="css/jquery.mobile-1.0a4.1.min.css" />
-        <script type="text/javascript" src="js/jquery-1.5.2.min.js"></script>
-        <script type="text/javascript" src="js/jquery.mobile-1.0a4.1.min.js"></script>
+        <link rel="stylesheet" href="css/jquery.mobile-1.4.5.min.css" />
+        <script type="text/javascript" src="js/jquery-1.11.2.min.js"></script>
+        <script type="text/javascript" src="js/jquery.mobile-1.4.5.min.js"></script>
         <script type="text/javascript" src="js/forcetk.js"></script>
         <script type="text/javascript" src="js/mobileapp.js"></script>
         <script type="text/javascript" src="cordova.js"></script>
@@ -90,7 +90,7 @@
                         function() {
                             client.setRefreshToken(null);
                             $.mobile.changePage('#loginpage', "slide", false, true);
-                            $.mobile.pageLoading();
+                            $.mobile.loading('show');
                             var ref = window.open(getAuthorizeUrl(loginUrl, clientId, redirectUri), '_blank', 'location=no,toolbar=no');
                             ref.addEventListener('loadstop', function(evt) {
                                 if (evt.url.startsWith(redirectUri)) {
@@ -105,9 +105,9 @@
                 });
 
                 $.mobile.changePage('#mainpage', "slide", false, true);
-                $.mobile.pageLoading();
+                $.mobile.loading('show');
                 getAccounts(function() {
-                    $.mobile.pageLoading(true);
+                    $.mobile.loading('hide');
                 });
             }
 
@@ -152,7 +152,7 @@
                 keychain = new Keychain();
                 keychain.getForKey(
                 function(value) {
-                    $.mobile.pageLoading();
+                    $.mobile.loading('show');
                     client.setRefreshToken(value);
                     client.refreshAccessToken(sessionCallback,
                     function(jqXHR, textStatus, errorThrown) {
@@ -173,7 +173,7 @@
         </script>
     </head>
     <body>
-        <div data-role="page" data-theme="b" id="loginpage">
+        <div data-role="page" data-theme="a" id="loginpage">
             <div data-role="header">
                 <h1>Login</h1>
             </div>
@@ -184,16 +184,15 @@
                 <h4>Force.com</h4>
             </div>
         </div>
-        <div data-role="page" data-theme="b" id="mainpage">
-            <div data-role="header" data-backbtn="false">
+        <div data-role="page" data-theme="a" id="mainpage">
+            <div data-role="header">
                 <h1>Account List</h1>
             </div>
             <div data-role="content">
                 <form>
                     <button data-role="button" id="newbtn">New</button>
                 </form>
-                <ul id="accountlist" data-inset="true" data-role="listview" 
-                    data-theme="c" data-dividertheme="b">
+                <ul id="accountlist" data-inset="true" data-role="listview">
                 </ul>
                 <form>
                     <button data-role="button" id="logoutbtn">Logout</button>
@@ -203,8 +202,8 @@
                 <h4>Force.com</h4>
             </div>
         </div>
-        <div data-role="page" data-theme="b" id="detailpage">
-            <div data-role="header">
+        <div data-role="page" data-theme="a" id="detailpage">
+            <div data-role="header" data-add-back-btn="true">
                 <h1>Account Detail</h1>
             </div>
             <div data-role="content">
@@ -217,15 +216,15 @@
                     <input type="hidden" name="Id" id="Id" />
                     <button data-role="button" id="editbtn">Edit</button>
                     <button data-role="button" id="deletebtn" data-icon="delete" 
-                        data-theme="e">Delete</button>
+                            data-theme="b">Delete</button>
                 </form>
             </div>
             <div data-role="footer">
                 <h4>Force.com</h4>
             </div>
         </div>
-        <div data-role="page" data-theme="b" id="editpage">
-            <div data-role="header">
+        <div data-role="page" data-theme="a" id="editpage">
+            <div data-role="header" data-add-back-btn="true">
                 <h1 id="accformheader">New Account</h1>
             </div>
             <div data-role="content">
@@ -234,17 +233,15 @@
                     <table>
                         <tr>
                             <td>Account Name:</td>
-                            <td><input name="Name" id="Name" data-theme="c"/></td>
+                            <td><input name="Name" id="Name" /></td>
                         </tr>
                         <tr>
                             <td>Industry:</td>
-                            <td><input name="Industry" id="Industry" 
-                                data-theme="c"/></td>
+                            <td><input name="Industry" id="Industry" /></td>
                         </tr>
                         <tr>
                             <td>Ticker Symbol:</td>
-                            <td><input name="TickerSymbol" id="TickerSymbol" 
-                                data-theme="c"/></td>
+                            <td><input name="TickerSymbol" id="TickerSymbol" /></td>
                         </tr>
                     </table>
                     <button data-role="button" id="actionbtn">Action</button>

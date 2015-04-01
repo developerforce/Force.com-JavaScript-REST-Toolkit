@@ -48,12 +48,12 @@ function addClickListeners() {
     $('#deletebtn').click(function(e) {
         // Delete the account
         e.preventDefault();
-        $.mobile.pageLoading();
+        $.mobile.loading('show');
         client.del('Account', $('#accountdetail').find('#Id').val()
         ,
         function(response) {
             getAccounts(function() {
-                $.mobile.pageLoading(true);
+                $.mobile.loading('hide');
                 $.mobile.changePage('#mainpage', "slide", true, true);
             });
         }, errorCallback);
@@ -62,7 +62,7 @@ function addClickListeners() {
     $('#editbtn').click(function(e) {
         // Get account fields and show the 'Edit Account' form
         e.preventDefault();
-        $.mobile.pageLoading();
+        $.mobile.loading('show');
         client.retrieve("Account", $('#accountdetail').find('#Id').val()
         , "Name,Id,Industry,TickerSymbol",
         function(response) {
@@ -74,7 +74,7 @@ function addClickListeners() {
             $('#actionbtn')
             .unbind('click.btn')
             .bind('click.btn', updateHandler);
-            $.mobile.pageLoading(true);
+            $.mobile.loading('hide');
             $.mobile.changePage('#editpage', "slide", false, true);
         }, errorCallback);
     });
@@ -94,7 +94,7 @@ function getAccounts(callback) {
             .append('<a href="#"><h2>' + this.Name + '</h2></a>')
             .click(function(e) {
                 e.preventDefault();
-                $.mobile.pageLoading();
+                $.mobile.loading('show');
                 // We could do this more efficiently by adding Industry and
                 // TickerSymbol to the fields in the SELECT, but we want to
                 // show dynamic use of the retrieve function...
@@ -105,7 +105,7 @@ function getAccounts(callback) {
                     $('#Industry').text(response.Industry);
                     $('#TickerSymbol').text(response.TickerSymbol);
                     $('#Id').val(response.Id);
-                    $.mobile.pageLoading(true);
+                    $.mobile.loading('hide');
                     $.mobile.changePage('#detailpage', "slide", false, true);
                 }, errorCallback);
             })
@@ -132,11 +132,11 @@ function createHandler(e) {
             fields[child.attr("name")] = child.val();
         }
     });
-    $.mobile.pageLoading();
+    $.mobile.loading('show');
     client.create('Account', fields,
     function(response) {
         getAccounts(function() {
-            $.mobile.pageLoading(true);
+            $.mobile.loading('hide');
             $.mobile.changePage('#mainpage', "slide", true, true);
         });
     }, errorCallback);
@@ -153,12 +153,12 @@ function updateHandler(e) {
             fields[child.attr("name")] = child.val();
         }
     });
-    $.mobile.pageLoading();
+    $.mobile.loading('show');
     client.update('Account', accountform.find('#Id').val(), fields
     ,
     function(response) {
         getAccounts(function() {
-            $.mobile.pageLoading(true);
+            $.mobile.loading('hide');
             $.mobile.changePage('#mainpage', "slide", true, true);
         });
     }, errorCallback);

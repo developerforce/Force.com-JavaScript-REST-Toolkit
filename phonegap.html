@@ -26,10 +26,17 @@
  -->
 <!--
  Sample HTML page showing use of Force.com JavaScript REST Toolkit from
- a PhoneGap app using jQuery Mobile
+ a Cordova 4.3.0 app using jQuery Mobile.
 
- Save this as www/index.html in your PhoneGap project. You'll also need all
- the .js files referenced below.
+ Save this as www/index.html in your PhoneGap project. You'll need to copy all
+ the .js files referenced below to the js directory, as well as the jQuery Mobile
+ CSS file.
+
+ The sample uses the InAppBrowser and iOS Keychain plugins. Install these with
+
+ cordova plugin add org.apache.cordova.inappbrowser
+ cordova plugin add com.shazron.cordova.plugin.keychainutil
+
  -->
 <html>
     <head>
@@ -41,130 +48,128 @@
          from the CDN, but then the device needs to be online for the app to
          be functional.
          -->
-        <link rel="stylesheet" href="static/jquery.mobile-1.0a4.1.min.css" />
-        <script type="text/javascript" src="static/jquery-1.5.2.min.js"></script>
-        <script type="text/javascript" src="static/jquery.mobile-1.0a4.1.min.js"></script>
-        <script type="text/javascript" src="forcetk.js"></script>
-        <script type="text/javascript" src="mobileapp.js"></script>
-        <script type="text/javascript" src="phonegap.0.9.5.min.js"></script>
-        <script type="text/javascript" src="ChildBrowser.js"></script>
-        <script type="text/javascript" src="SAiOSKeychainPlugin.js"></script>
+        <link rel="stylesheet" href="css/jquery.mobile-1.0a4.1.min.css" />
+        <script type="text/javascript" src="js/jquery-1.5.2.min.js"></script>
+        <script type="text/javascript" src="js/jquery.mobile-1.0a4.1.min.js"></script>
+        <script type="text/javascript" src="js/forcetk.js"></script>
+        <script type="text/javascript" src="js/mobileapp.js"></script>
+        <script type="text/javascript" src="cordova.js"></script>
         <script type="text/javascript">
-			// OAuth Configuration
-			var loginUrl = 'https://login.salesforce.com/';
-			var clientId = '3MVG9Km_cBLhsuPzTtcGHsZpj9HSp.uUwbHupEXhWi6k3JJphEv8swpsUYIFCZSLp8pi7YYMbRjeQUxptYdIt';
-			var redirectUri = 'https://login.salesforce.com/services/oauth2/success';
+            // OAuth Configuration
+            var loginUrl = 'https://login.salesforce.com/';
+            var clientId = '3MVG9Km_cBLhsuPzTtcGHsZpj9HSp.uUwbHupEXhWi6k3JJphEv8swpsUYIFCZSLp8pi7YYMbRjeQUxptYdIt';
+            var redirectUri = 'https://login.salesforce.com/services/oauth2/success';
 
-			var client = new forcetk.Client(clientId, loginUrl);
+            var client = new forcetk.Client(clientId, loginUrl);
 
-			// Make our own startsWith utility fn
-			String.prototype.startsWith = function(str) {
-			    return (this.substr(0, str.length) === str);
-			}
+            var keychain;
 
-			function getAuthorizeUrl(loginUrl, clientId, redirectUri) {
-			    return loginUrl + 'services/oauth2/authorize?display=touch'
-			    + '&response_type=token&client_id=' + escape(clientId)
-			    + '&redirect_uri=' + escape(redirectUri);
-			}
+            // Make our own startsWith utility fn
+            if (!String.prototype.startsWith) {
+              String.prototype.startsWith = function(searchString, position) {
+                position = position || 0;
+                return this.lastIndexOf(searchString, position) === position;
+              };
+            }
 
-			function sessionCallback(oauthResponse) {
-			    client.setSessionToken(oauthResponse.access_token, null,
-			    	oauthResponse.instance_url);
+            function getAuthorizeUrl(loginUrl, clientId, redirectUri) {
+                return loginUrl + 'services/oauth2/authorize?display=touch'
+                + '&response_type=token&client_id=' + escape(clientId)
+                + '&redirect_uri=' + escape(redirectUri);
+            }
 
-			    addClickListeners();
+            function sessionCallback(oauthResponse) {
+                client.setSessionToken(oauthResponse.access_token, null,
+                    oauthResponse.instance_url);
 
-			    $('#logoutbtn').click(function(e) {
-			        // Delete the saved refresh token
-			        window.plugins.keychain.removeForKey('refresh_token', 
-					    'forcetk',
-				        function() {
-				            var cb = ChildBrowser.install();
+                addClickListeners();
 
-				            client.setRefreshToken(null);
-				            $.mobile.changePage('#loginpage', "slide", false, true);
-				            $.mobile.pageLoading();
-				            cb.onLocationChange = function(loc) {
-				                if (loc.startsWith(redirectUri)) {
-				                    cb.close();
-				                    oauthCallback(unescape(loc));
-				                }
-				            };
-				            cb.showWebPage(getAuthorizeUrl(loginUrl, clientId, redirectUri));
-				        }
-				    );
-			    });
+                $('#logoutbtn').click(function(e) {
+                    // Delete the saved refresh token
+                    keychain.removeForKey(
+                        function() {
+                            client.setRefreshToken(null);
+                            $.mobile.changePage('#loginpage', "slide", false, true);
+                            $.mobile.pageLoading();
+                            var ref = window.open(getAuthorizeUrl(loginUrl, clientId, redirectUri), '_blank', 'location=no,toolbar=no');
+                            ref.addEventListener('loadstop', function(evt) {
+                                if (evt.url.startsWith(redirectUri)) {
+                                    ref.close();
+                                    oauthCallback(unescape(evt.url));
+                                }
+                            });
+                        }, function(error) {
+                            console.log(error);
+                        }, 'refresh_token', 'forcetk'
+                    );
+                });
 
-			    $.mobile.changePage('#mainpage', "slide", false, true);
-			    $.mobile.pageLoading();
-			    getAccounts(function() {
-			        $.mobile.pageLoading(true);
-			    });
-			}
+                $.mobile.changePage('#mainpage', "slide", false, true);
+                $.mobile.pageLoading();
+                getAccounts(function() {
+                    $.mobile.pageLoading(true);
+                });
+            }
 
-			function oauthCallback(loc) {
-			    var oauthResponse = {};
+            function oauthCallback(loc) {
+                var oauthResponse = {};
 
-			    var fragment = loc.split("#")[1];
+                var fragment = loc.split("#")[1];
 
-			    if (fragment) {
-			        var nvps = fragment.split('&');
-			        for (var nvp in nvps) {
-			            var parts = nvps[nvp].split('=');
-			            oauthResponse[parts[0]] = unescape(parts[1]);
-			        }
-			    }
+                if (fragment) {
+                    var nvps = fragment.split('&');
+                    for (var nvp in nvps) {
+                        var parts = nvps[nvp].split('=');
+                        oauthResponse[parts[0]] = unescape(parts[1]);
+                    }
+                }
 
-			    if (typeof oauthResponse === 'undefined'
-			    || typeof oauthResponse['access_token'] === 'undefined') {
-			        errorCallback({
-			            status: 0,
-			            statusText: 'Unauthorized',
-			            responseText: 'No OAuth response'
-			        });
-			    } else {
-			        window.plugins.keychain.setForKey('refresh_token',
-				        oauthResponse.refresh_token,
-				        'forcetk',
-				        null,
-				        function(key, error) {
-				            alert("Error storing OAuth refresh token!");
-				        }
-				    );
+                if (typeof oauthResponse === 'undefined'
+                || typeof oauthResponse['access_token'] === 'undefined') {
+                    errorCallback({
+                        status: 0,
+                        statusText: 'Unauthorized',
+                        responseText: 'No OAuth response'
+                    });
+                } else {
+                    keychain.setForKey(
+                        function(){
+                            console.log('Refresh token stored');
+                        },
+                        function(error) {
+                            alert("Error storing OAuth refresh token!");
+                        },
+                        'refresh_token',
+                        'forcetk',
+                        oauthResponse.refresh_token                        
+                    );
 
-			        sessionCallback(oauthResponse);
-			    }
-			}
+                    sessionCallback(oauthResponse);
+                }
+            }
 
-			// We use $ rather than $ for jQuery
-			if (window.$ === undefined) {
-			    $ = $;
-			}
-
-			$(document).ready(function() {
-			    var cb = ChildBrowser.install();
-			    SAiOSKeychainPlugin.install();
-			    window.plugins.keychain.getForKey('refresh_token',
-			    'forcetk',
-			    function(key, value) {
-			        $.mobile.pageLoading();
-			        client.setRefreshToken(value);
-			        client.refreshAccessToken(sessionCallback,
-			        function(jqXHR, textStatus, errorThrown) {
-			            alert('Error getting refresh token: ' + errorThrown);
-			        });
-			    },
-			    function(key, error) {
-			        // No refresh token - do OAuth
-			        cb.onLocationChange = function(loc) {
-			            if (loc.startsWith(redirectUri)) {
-			                cb.close();
-			                oauthCallback(unescape(loc));
-			            }
-			        };
-			        cb.showWebPage(getAuthorizeUrl(loginUrl, clientId, redirectUri));
-			    });
-			});
+            document.addEventListener("deviceready", function(){
+                keychain = new Keychain();
+                keychain.getForKey(
+                function(value) {
+                    $.mobile.pageLoading();
+                    client.setRefreshToken(value);
+                    client.refreshAccessToken(sessionCallback,
+                    function(jqXHR, textStatus, errorThrown) {
+                        alert('Error getting refresh token: ' + errorThrown);
+                    });
+                },
+                function(error) {
+                    // No refresh token - do OAuth
+                    var ref = window.open(getAuthorizeUrl(loginUrl, clientId, redirectUri), '_blank', 'location=no,toolbar=no');
+                    ref.addEventListener('loadstop', function(evt) {
+                        if (evt.url.startsWith(redirectUri)) {
+                            ref.close();
+                            oauthCallback(unescape(evt.url));
+                        }
+                    });
+                }, 'refresh_token', 'forcetk');
+            });
         </script>
     </head>
     <body>

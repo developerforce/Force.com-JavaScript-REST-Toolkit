@@ -239,7 +239,7 @@ An absolutely minimal sample using OAuth to obtain a session ID is:
 	  </body>
 	</html>
 	
-A fully featured sample (including persistence of the OAuth refresh token to the iOS Keychain) is provided in [cordova-ios.html](Force.com-JavaScript-REST-Toolkit/blob/master/cordova-ios.html). The sample uses Cordova 4.3.0 and the InAppBrowser and iOS Keychain plugins. Install these with
+A fully featured sample (including persistence of the OAuth refresh token to the iOS Keychain) for iOS is provided in [cordova-ios.html](https://github.com/developerforce/Force.com-JavaScript-REST-Toolkit/blob/master/cordova-ios.html). The sample uses Cordova 4.3.0 and the InAppBrowser and iOS Keychain plugins. Install these with
 
 	cordova plugin add org.apache.cordova.inappbrowser
 	cordova plugin add com.shazron.cordova.plugin.keychainutil

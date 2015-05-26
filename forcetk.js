@@ -323,7 +323,7 @@ if (forcetk.Client === undefined) {
         
         request.send(blob);
         
-        return this.asyncAjax ? JSON.parse(request.response) : null;
+        return this.asyncAjax ? null : JSON.parse(request.response);
     }
     
     /*

@@ -292,7 +292,8 @@ if (forcetk.Client === undefined) {
         
         var request = new XMLHttpRequest();
         request.open("POST", (this.proxyUrl !== null && ! this.visualforce) ? this.proxyUrl: url, this.asyncAjax);
-        
+
+        request.setRequestHeader('Accept', 'application/json');
         request.setRequestHeader(this.authzHeader, "Bearer " + this.sessionId);
         request.setRequestHeader('X-User-Agent', 'salesforce-toolkit-rest-javascript/' + this.apiVersion);
         if (this.proxyUrl !== null && ! this.visualforce) {

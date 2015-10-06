@@ -562,7 +562,7 @@ if (forcetk.Client === undefined) {
      * @param [error=null] function to which jqXHR will be passed in case of error
      */
     forcetk.Client.prototype.query = function(soql, callback, error) {
-        return this.ajax('/' + this.apiVersion + '/query?q=' + escape(soql)
+        return this.ajax('/' + this.apiVersion + '/query?q=' + encodeURIComponent(soql)
         , callback, error);
     }
     
@@ -598,7 +598,7 @@ if (forcetk.Client === undefined) {
      * @param [error=null] function to which jqXHR will be passed in case of error
      */
     forcetk.Client.prototype.search = function(sosl, callback, error) {
-        return this.ajax('/' + this.apiVersion + '/search?q=' + escape(sosl)
+        return this.ajax('/' + this.apiVersion + '/search?q=' + encodeURIComponent(sosl)
         , callback, error);
     }
 }

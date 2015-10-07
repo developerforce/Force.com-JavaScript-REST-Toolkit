@@ -286,7 +286,7 @@ if (forcetk.Client === undefined) {
             + "Content-Disposition: form-data; name=\"" + payloadField 
               + "\"; filename=\"" + filename + "\"\n\n",
             payload,
-            "\n\n" 
+            "\n" 
             + "--boundary_" + boundary + "--"
         ], {type : 'multipart/form-data; boundary=\"boundary_' + boundary + '\"'});
         

@@ -300,6 +300,7 @@ if (forcetk.Client === undefined) {
         request.setRequestHeader('Accept', 'application/json');
         request.setRequestHeader(this.authzHeader, "Bearer " + this.sessionId);
         request.setRequestHeader('X-User-Agent', 'salesforce-toolkit-rest-javascript/' + this.apiVersion);
+        request.setRequestHeader('Content-Type', 'multipart/form-data; boundary=\"boundary_' + boundary + '\"');
         if (this.proxyUrl !== null && !this.visualforce) {
             request.setRequestHeader('SalesforceProxy-Endpoint', url);
         }

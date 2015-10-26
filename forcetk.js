@@ -380,7 +380,7 @@ if (forcetk.Client === undefined) {
      * @param callback function to which response will be passed
      * @param [error=null] function to which jqXHR will be passed in case of error
      * @param [method="GET"] HTTP method for call
-     * @param [payload=null] payload for POST/PATCH etc
+     * @param [payload=null] string or object with payload for POST/PATCH etc or params for GET
      * @param [paramMap={}] parameters to send as header values for POST/PATCH etc
      * @param [retry] specifies whether to retry on error
      */
@@ -389,10 +389,28 @@ if (forcetk.Client === undefined) {
         var that = this,
             url = this.instanceUrl + '/services/apexrest' + path;
 
+        method = method || "GET";
+
+        if (method === "GET") {
+            // Handle proxied query params correctly
+            if (this.proxyUrl && payload) {
+                if (typeof payload !== 'string') {
+                    payload = $.param(payload);
+                }
+                url += "?" + payload;
+                payload = null;
+            }
+        } else {
+            // Allow object payload for POST etc
+            if (payload && typeof payload !== 'string') {
+                payload = JSON.stringify(payload);
+            }
+        }
+
         return $.ajax({
-            type: method || "GET",
+            type: method,
             async: this.asyncAjax,
-            url: (this.proxyUrl !== null) ? this.proxyUrl : url,
+            url: this.proxyUrl || url,
             contentType: 'application/json',
             cache: false,
             processData: false,

@@ -61,10 +61,13 @@ if (forcetk.Client === undefined) {
             if (location.protocol === 'file:' || location.protocol === 'ms-appx:') {
                 // In PhoneGap
                 this.proxyUrl = null;
-            } else {
+            } else if (location.hostname.indexOf('force.com')>-1){
                 // In Visualforce - still need proxyUrl for Apex REST methods
                 this.proxyUrl = location.protocol + "//" + location.hostname
                     + "/services/proxy";
+            } else {
+                //This means we are running locally, or on an external server, and we have CORS enabled (hopefully)
+                this.proxyUrl=null;
             }
             this.authzHeader = "Authorization";
         } else {

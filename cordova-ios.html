@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<!--
+ Copyright (c) 2011, salesforce.com, inc.
+ All rights reserved.
+ 
+ Redistribution and use in source and binary forms, with or without modification, are permitted provided
+ that the following conditions are met:
+ 
+ Redistributions of source code must retain the above copyright notice, this list of conditions and the
+ following disclaimer.
+ 
+ Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
+ the following disclaimer in the documentation and/or other materials provided with the distribution.
+ 
+ Neither the name of salesforce.com, inc. nor the names of its contributors may be used to endorse or
+ promote products derived from this software without specific prior written permission.
+ 
+ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+ WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+ PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+ ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+ TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ POSSIBILITY OF SUCH DAMAGE.
+ -->
+<!--
+ Sample HTML page showing use of Force.com JavaScript REST Toolkit from
+ a Cordova 4.3.0 app using jQuery Mobile.
+
+ Save this as www/index.html in your PhoneGap project. You'll need to copy all
+ the .js files referenced below to the js directory, as well as the jQuery Mobile
+ CSS file.
+
+ The sample uses the InAppBrowser and iOS Keychain plugins. Install these with
+
+ cordova plugin add org.apache.cordova.inappbrowser
+ cordova plugin add com.shazron.cordova.plugin.keychainutil
+
+ -->
+<html>
+    <head>
+        <title>Accounts</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no;" />
+        <!--
+         We use local copies of jQuery and jQuery Mobile. You could load it
+         from the CDN, but then the device needs to be online for the app to
+         be functional.
+         -->
+        <link rel="stylesheet" href="css/jquery.mobile-1.4.5.min.css" />
+        <script type="text/javascript" src="js/jquery-1.11.2.min.js"></script>
+        <script type="text/javascript" src="js/jquery.mobile-1.4.5.min.js"></script>
+        <script type="text/javascript" src="js/forcetk.js"></script>
+        <script type="text/javascript" src="js/mobileapp.js"></script>
+        <script type="text/javascript" src="cordova.js"></script>
+        <script type="text/javascript">
+            // OAuth Configuration
+            var loginUrl = 'https://login.salesforce.com/';
+            var clientId = '3MVG9Km_cBLhsuPzTtcGHsZpj9HSp.uUwbHupEXhWi6k3JJphEv8swpsUYIFCZSLp8pi7YYMbRjeQUxptYdIt';
+            var redirectUri = 'https://login.salesforce.com/services/oauth2/success';
+
+            var client = new forcetk.Client(clientId, loginUrl);
+
+            var keychain;
+
+            // Make our own startsWith utility fn
+            if (!String.prototype.startsWith) {
+              String.prototype.startsWith = function(searchString, position) {
+                position = position || 0;
+                return this.lastIndexOf(searchString, position) === position;
+              };
+            }
+
+            function getAuthorizeUrl(loginUrl, clientId, redirectUri) {
+                return loginUrl + 'services/oauth2/authorize?display=touch'
+                + '&response_type=token&client_id=' + escape(clientId)
+                + '&redirect_uri=' + escape(redirectUri);
+            }
+
+            function sessionCallback(oauthResponse) {
+                client.setSessionToken(oauthResponse.access_token, null,
+                    oauthResponse.instance_url);
+
+                addClickListeners();
+
+                $('#logoutbtn').click(function(e) {
+                    // Delete the saved refresh token
+                    keychain.removeForKey(
+                        function() {
+                            client.setRefreshToken(null);
+                            $.mobile.changePage('#loginpage', "slide", false, true);
+                            $.mobile.loading('show');
+                            var ref = window.open(getAuthorizeUrl(loginUrl, clientId, redirectUri), '_blank', 'location=no,toolbar=no');
+                            ref.addEventListener('loadstop', function(evt) {
+                                if (evt.url.startsWith(redirectUri)) {
+                                    ref.close();
+                                    oauthCallback(unescape(evt.url));
+                                }
+                            });
+                        }, function(error) {
+                            console.log(error);
+                        }, 'refresh_token', 'forcetk'
+                    );
+                });
+
+                $.mobile.changePage('#mainpage', "slide", false, true);
+                $.mobile.loading('show');
+                getAccounts(function() {
+                    $.mobile.loading('hide');
+                });
+            }
+
+            function oauthCallback(loc) {
+                var oauthResponse = {};
+
+                var fragment = loc.split("#")[1];
+
+                if (fragment) {
+                    var nvps = fragment.split('&');
+                    for (var nvp in nvps) {
+                        var parts = nvps[nvp].split('=');
+                        oauthResponse[parts[0]] = unescape(parts[1]);
+                    }
+                }
+
+                if (typeof oauthResponse === 'undefined'
+                || typeof oauthResponse['access_token'] === 'undefined') {
+                    errorCallback({
+                        status: 0,
+                        statusText: 'Unauthorized',
+                        responseText: 'No OAuth response'
+                    });
+                } else {
+                    keychain.setForKey(
+                        function(){
+                            console.log('Refresh token stored');
+                        },
+                        function(error) {
+                            alert("Error storing OAuth refresh token!");
+                        },
+                        'refresh_token',
+                        'forcetk',
+                        oauthResponse.refresh_token                        
+                    );
+
+                    sessionCallback(oauthResponse);
+                }
+            }
+
+            document.addEventListener("deviceready", function(){
+                keychain = new Keychain();
+                keychain.getForKey(
+                function(value) {
+                    $.mobile.loading('show');
+                    client.setRefreshToken(value);
+                    client.refreshAccessToken(sessionCallback,
+                    function(jqXHR, textStatus, errorThrown) {
+                        alert('Error getting refresh token: ' + errorThrown);
+                    });
+                },
+                function(error) {
+                    // No refresh token - do OAuth
+                    var ref = window.open(getAuthorizeUrl(loginUrl, clientId, redirectUri), '_blank', 'location=no,toolbar=no');
+                    ref.addEventListener('loadstop', function(evt) {
+                        if (evt.url.startsWith(redirectUri)) {
+                            ref.close();
+                            oauthCallback(unescape(evt.url));
+                        }
+                    });
+                }, 'refresh_token', 'forcetk');
+            });
+        </script>
+    </head>
+    <body>
+        <div data-role="page" data-theme="a" id="loginpage">
+            <div data-role="header">
+                <h1>Login</h1>
+            </div>
+            <div data-role="content" style="margin-left: auto; margin-right: auto; text-align: center;">
+                Connecting to Force.com
+            </div>
+            <div data-role="footer">
+                <h4>Force.com</h4>
+            </div>
+        </div>
+        <div data-role="page" data-theme="a" id="mainpage">
+            <div data-role="header">
+                <h1>Account List</h1>
+            </div>
+            <div data-role="content">
+                <form>
+                    <button data-role="button" id="newbtn">New</button>
+                </form>
+                <ul id="accountlist" data-inset="true" data-role="listview">
+                </ul>
+                <form>
+                    <button data-role="button" id="logoutbtn">Logout</button>
+                </form>
+            </div>
+            <div data-role="footer">
+                <h4>Force.com</h4>
+            </div>
+        </div>
+        <div data-role="page" data-theme="a" id="detailpage">
+            <div data-role="header" data-add-back-btn="true">
+                <h1>Account Detail</h1>
+            </div>
+            <div data-role="content">
+                <table>
+                    <tr><td>Account Name:</td><td id="Name"></td></tr>
+                    <tr><td>Industry:</td><td id="Industry"></td></tr>
+                    <tr><td>Ticker Symbol:</td><td id="TickerSymbol"></td></tr>
+                </table>
+                <form name="accountdetail" id="accountdetail">
+                    <input type="hidden" name="Id" id="Id" />
+                    <button data-role="button" id="editbtn">Edit</button>
+                    <button data-role="button" id="deletebtn" data-icon="delete" 
+                            data-theme="b">Delete</button>
+                </form>
+            </div>
+            <div data-role="footer">
+                <h4>Force.com</h4>
+            </div>
+        </div>
+        <div data-role="page" data-theme="a" id="editpage">
+            <div data-role="header" data-add-back-btn="true">
+                <h1 id="accformheader">New Account</h1>
+            </div>
+            <div data-role="content">
+                <form name="accountform" id="accountform">
+                    <input type="hidden" name="Id" id="Id" />
+                    <table>
+                        <tr>
+                            <td>Account Name:</td>
+                            <td><input name="Name" id="Name" /></td>
+                        </tr>
+                        <tr>
+                            <td>Industry:</td>
+                            <td><input name="Industry" id="Industry" /></td>
+                        </tr>
+                        <tr>
+                            <td>Ticker Symbol:</td>
+                            <td><input name="TickerSymbol" id="TickerSymbol" /></td>
+                        </tr>
+                    </table>
+                    <button data-role="button" id="actionbtn">Action</button>
+                </form>
+            </div>
+            <div data-role="footer">
+                <h4>Force.com</h4>
+            </div>
+        </div>
+    </body>
+</html>

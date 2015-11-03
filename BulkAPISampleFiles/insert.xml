@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Contact records -->
+<sObjects xmlns="http://www.force.com/2009/06/asyncapi/dataload">
+   <sObject>
+      <FirstName>Tom</FirstName>
+      <LastName>Jones</LastName>
+      <Department>Marketing</Department>
+      <Birthdate>1940-06-07Z</Birthdate>
+      <Description>Self-described as "the top" branding guru on the West Coast</Description>
+   </sObject>
+   <sObject>
+      <FirstName>Ian</FirstName>
+      <LastName>Dury</LastName>
+      <Department>R&amp;D</Department>
+      <Description>World-renowned expert in fuzzy logic design. Influential in technology purchases.</Description>
+   </sObject>
+</sObjects>

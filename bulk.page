@@ -1,0 +1,255 @@
+<!--
+Copyright (c) 2015, salesforce.com, inc.
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification, are permitted provided
+that the following conditions are met:
+
+Redistributions of source code must retain the above copyright notice, this list of conditions and the
+ following disclaimer.
+
+Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
+the following disclaimer in the documentation and/or other materials provided with the distribution.
+
+Neither the name of salesforce.com, inc. nor the names of its contributors may be used to endorse or
+promote products derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.
+-->
+<!--
+Sample Visualforce page for Force.com Bulk API JavaScript Toolkit
+-->
+<apex:page docType="html-5.0" title="Bulk Uploader" sidebar="false">
+    <style>
+        div.content {
+            min-width:100px;
+            float:left;
+        }
+        @media screen and (max-width: 767px){
+            div.content { 
+                width:100% 
+            }
+        }
+        div.right {
+            margin-left: 10px;
+        }
+    </style>
+    <div class="content">        
+        <h3>1. Create a Bulk API job</h3><br/>
+        <select id="operation" onchange="selectOp()">
+            <option value="delete">delete</option>
+            <option value="insert">insert</option>
+            <option value="query" selected="true">query</option>
+            <option value="update">update</option>
+            <option value="upsert">upsert</option>
+            <option value="hardDelete">hardDelete</option>
+        </select>
+        <select id="object">
+            <option value="null" selected="true">Loading objects...</option>
+        </select>
+        <button onclick="createJob()">Create Job</button><br/>
+        <select id="contentType">
+            <option value="CSV" selected="true">CSV</option>
+            <option value="XML">XML</option>
+            <!-- Not yet implemented!
+            <option value="ZIP_CSV">Zipped CSV</option>
+            <option value="ZIP_XML">Zipped XML</option>
+            -->
+        </select>
+        <div class="externalIdDiv" style="display: none">
+            External ID Field:&nbsp;<input type="text" id="externalIdField"/>            
+        </div>
+        <br/>
+        <div class="insert update delete upsert hardDelete" style="display: none">
+            <h3>2. Select one or more CSV files to upload</h3><br/>
+            <input type="file" id="file" onchange="upload()"/>
+            <br/>
+        </div>
+        <div class="query" style="display: none">
+            <h3>2. Enter a SOQL Query</h3><br/>
+            <input type="text" id="soql"/>
+            <button onclick="setQuery()">Query</button>
+            <br/>
+        </div>
+        <div class="close" style="display: none">
+            <h3>3. Close the Bulk API job</h3><br/>
+            <button onclick="closeJob()">Close Job</button>
+            <br/>
+        </div>
+    </div>
+    <div class="content right">        
+        <pre id="message"></pre>
+    </div>
+    
+    <script src="{!$Resource.jquery}"></script>
+    <script src="{!$Resource.forcetk}"></script>
+    <script src="{!$Resource.jxon}"></script>
+    <script src="{!$Resource.bulkTK}"></script>
+    <!-- From https://github.com/vkiryukhin/vkBeautify -->
+    <script src="{!$Resource.vkbeautify}"></script>
+    <script>
+        var client = new forcetk.Client();
+        client.setSessionToken('{!$Api.Session_ID}');
+    
+        var jobId;
+        var batches;
+        var operation;
+        var object;
+        var contentType;
+    
+        var $message;
+        var $operation;
+        var $object;
+        var $soql;
+        var $file;
+        var $insert;
+        var $query;
+        var $close;            
+        var $externalIdDiv; 
+        var $externalIdField; 
+        var $contentType;
+
+        function showError(jqXHR, textStatus, errorThrown) {
+            $message.append(document.createTextNode(jqXHR.responseText));
+        }
+
+        function reset() {
+            $insert.hide();
+            $query.hide();
+            $close.hide();            
+            $externalIdDiv.hide(); 
+        }
+    
+        function selectOp() {
+            if ($operation.val() === 'upsert') {
+                $externalIdDiv.show(); 
+            }
+        }
+    
+        function createJob() {
+            operation = $operation.val();
+            object = $object.val();
+            contentType = $contentType.val();
+            
+            var job = {
+                operation : operation,
+                object : object,
+            };
+            
+            if (operation === 'upsert') {
+                job.externalIdFieldName = $externalIdField.val();
+            }
+            job.contentType = contentType;
+            
+            client.createJob(job, function(response) {
+                batches = 0;
+                jobId = response.jobInfo.id;
+                $message.text('Job created with id '+jobId+'\n');
+                $("."+$operation.val()).show();
+                if (operation === 'query') {
+                    $soql.val("SELECT Id FROM "+object);
+                }
+            }, showError);          
+        }
+    
+        function setQuery() {
+            var soql = $soql.val();
+            var mimeType = (contentType === 'CSV') 
+                ? "text/csv; charset=UTF-8" 
+                : "application/xml; charset=UTF-8";
+            
+            client.addBatch(jobId, mimeType, soql, function(response){
+                batches++;
+                $message.append('Batch state: ',response.batchInfo.state+'\n');
+                $close.show();
+            }, showError);
+        }
+    
+        function getJobDetails(client, jobId){
+            client.getJobDetails(jobId, function(response){
+                $message.append(response.jobInfo.numberRecordsProcessed+' records processed\n');
+                if ((response.jobInfo.numberBatchesCompleted + 
+                     response.jobInfo.numberBatchesFailed) === batches) {
+                    $message.append('Done!\n');
+                    client.getJobBatchDetails(jobId, function(response){
+                        response.batchInfoList.batchInfo.forEach(function(batch){
+                            var batchId = batch.id;
+                            client.getBatchResult(jobId, batchId, (operation === 'query'), function(response){
+                                $message.append('Batch result:\n');
+                                if (operation === 'query') {
+                                    response['result-list'].result.forEach(function(result){
+                                        client.getBulkQueryResult(jobId, batchId, result, function(response){
+                                            $message.append('Query result:\n');
+                                            var text = (contentType === 'CSV') ? response : vkbeautify.xml(response);
+                                            $message.append(document.createTextNode(text));
+                                            reset();
+                                        }, showError);
+                                    });
+                                } else {
+                                    var text = (contentType === 'CSV') ? response : vkbeautify.xml(response);
+                                    $message.append(document.createTextNode(text));
+                                    reset();
+                                }
+                            }, showError);
+                        });
+                    }, showError);
+                } else {
+                    setTimeout(function(){
+                        getJobDetails(client, jobId);                   
+                    }, 1000);
+                }
+            }, showError);
+        }
+
+        function upload() {
+            var file = $file[0].files[0];
+            
+            var mimeType = (contentType === 'CSV') 
+                ? "text/csv; charset=UTF-8" 
+                : "application/xml; charset=UTF-8";
+            
+            client.addBatch(jobId, mimeType,
+                            file, function(response){
+                batches++;
+                $message.append('Batch state: ',response.batchInfo.state+'\n');
+                $close.show();
+            }, showError);
+        }
+    
+        function closeJob() {
+            client.closeJob(jobId, function(response){
+                $message.append('Job state: '+response.jobInfo.state+'\n');
+                getJobDetails(client, jobId);
+            }, showError);
+        }
+    
+        $(document).ready(function(){
+            client.describeGlobal(function(response){
+                $object.empty();
+                response.sobjects.forEach(function(sobject){
+                    $object.append('<option value='+sobject.name+'>'+sobject.label+'</option>');
+                });
+                $object.val('Contact');
+            }, showError);
+            
+            $message     = $("#message");
+            $operation   = $("#operation");
+            $object      = $("#object");
+            $soql        = $("#soql");
+            $file        = $("#file");
+            $contentType = $("#contentType");
+            $insert      = $(".insert");
+            $query       = $(".query");
+            $close       = $(".close");            
+            $externalIdDiv   = $(".externalIdDiv");
+            $externalIdField = $("#externalIdField");
+        });
+    </script>
+</apex:page>

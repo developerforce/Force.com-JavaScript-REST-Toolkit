@@ -98,7 +98,7 @@ if (forcetk.Client === undefined) {
 		'use strict';
 		var that = this,
 			url = this.loginUrl + '/services/oauth2/token';
-		return $.ajax({
+		return jQuery.ajax({
 				type: 'POST',
 				url: (this.proxyUrl !== null && !this.visualforce) ? this.proxyUrl : url,
 				cache: false,
@@ -163,7 +163,7 @@ if (forcetk.Client === undefined) {
 		var that = this,
 				url = (this.visualforce ? '' : this.instanceUrl) + '/services/data' + path;
 
-		return $.ajax({
+		return jQuery.ajax({
 				type: method || "GET",
 				async: this.asyncAjax,
 				url: (this.proxyUrl !== null && !this.visualforce) ? this.proxyUrl : url,
@@ -400,7 +400,7 @@ if (forcetk.Client === undefined) {
 				// Handle proxied query params correctly
 				if (this.proxyUrl && payload) {
 					if (typeof payload !== 'string') {
-						payload = $.param(payload);
+						payload = jQuery.param(payload);
 					}
 					url += "?" + payload;
 					payload = null;
@@ -412,7 +412,7 @@ if (forcetk.Client === undefined) {
 				}
 		}
 
-		return $.ajax({
+		return jQuery.ajax({
 				type: method,
 				async: this.asyncAjax,
 				url: this.proxyUrl || url,

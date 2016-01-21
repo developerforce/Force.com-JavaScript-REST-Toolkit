@@ -61,14 +61,16 @@
                  "WHERE "+$("#field").val()+" LIKE '%"+request.term+"%' "+
                  "ORDER BY Name LIMIT 20";
 
-             client.query(query, function( data ) {
+             client.query(query)
+             .then(function( data ) {
                  response( $.map( data.records, function( record ) {
                      return {
                          label: record.Name,
                          value: record.Id
                      }
                  }));
-             }, errorCallback);
+             })
+             .catch(errorCallback);
          },
          minLength: 2,
          delay: 1000,
@@ -115,7 +117,9 @@
 
              $('#list').html(ajaxgif+" creating account...");
 
-             client.create('Account', fields, createCallback, errorCallback);
+             client.create('Account', fields)
+             .then(createCallback)
+             .catch(errorCallback);
          });
          $dialog.dialog('option', 'title', 'New Account');
          $dialog.dialog('open');
@@ -167,7 +171,9 @@
          e.preventDefault();
          $dialog.dialog('close');
          $('#list').html(ajaxgif+" deleting account...");
-         client.del('Account', $dialog.find('#id').val(), deleteCallback, errorCallback);
+         client.del('Account', $dialog.find('#id').val())
+         .then(deleteCallback)
+         .catch(errorCallback);
      });
      $dialog.find('#edit').click(function(e) {
          e.preventDefault();
@@ -187,7 +193,9 @@
 
              $('#list').html(ajaxgif+" updating account...");
 
-             client.update('Account', $dialog.find('#id').val(), fields, updateCallback, errorCallback);
+             client.update('Account', $dialog.find('#id').val(), fields)
+             .then(updateCallback)
+             .catch(errorCallback);
          });
      });
  }
@@ -217,8 +225,9 @@
      $dialog.html(ajaxgif+" retrieving...");
 
      // Get account details and populate the dialog
-     client.retrieve('Account', id, 'Name,Industry,TickerSymbol,Website'
-         , detailCallback, errorCallback);
+     client.retrieve('Account', id, 'Name,Industry,TickerSymbol,Website')
+     .then(detailCallback)
+     .catch(errorCallback);
  }
 
  function filterIndustry(industry) {
@@ -227,7 +236,9 @@
      var query = "SELECT Id, Name FROM Account WHERE Industry = '"+industry
      +"' ORDER BY Name LIMIT 20";
 
-     client.query(query, queryCallback, errorCallback);
+     client.query(query)
+     .then(queryCallback)
+     .catch(errorCallback);
  }
 
  function filterAccounts(field, value) {
@@ -238,6 +249,8 @@
          +"%' ORDER BY Name LIMIT 20"
          : "SELECT Id, Name FROM Account ORDER BY Name LIMIT 20";
 
-     client.query(query, queryCallback, errorCallback);
+     client.query(query)
+     .then(queryCallback)
+     .catch(errorCallback);
  }
  

@@ -32,8 +32,8 @@
  * console, go to Your Name | Setup | Security Controls | Remote Site Settings
  */
 
-/*jslint browser: true*/
-/*global alert, Blob, $, jQuery*/
+/*jslint browser: true, plusplus: true*/
+/*global alert, Blob*/
 
 var forcetk = window.forcetk;
 
@@ -96,30 +96,36 @@ if (forcetk.Client === undefined) {
      */
     forcetk.Client.prototype.refreshAccessToken = function (callback, error) {
         'use strict';
-        var that = this,
-            url = this.loginUrl + '/services/oauth2/token';
-        return $.ajax({
-            type: 'POST',
-            url: (this.proxyUrl !== null && !this.visualforce) ? this.proxyUrl : url,
-            cache: false,
-            processData: false,
-            data: 'grant_type=refresh_token&client_id=' + this.clientId + '&refresh_token=' + this.refreshToken,
-            success: callback,
-            error: error,
-            dataType: "json",
-            beforeSend: function (xhr) {
-                if (that.proxyUrl !== null && !this.visualforce) {
-                    xhr.setRequestHeader('SalesforceProxy-Endpoint', url);
+        var xhr = new XMLHttpRequest(),
+            url = this.loginUrl + '/services/oauth2/token',
+            payload = 'grant_type=refresh_token&client_id=' + this.clientId + '&refresh_token=' + this.refreshToken;
+
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4) {
+                if (xhr.status > 199 && xhr.status < 300) {
+                    if (callback) {
+                        callback(xhr.responseText ? JSON.parse(xhr.responseText) : undefined);
+                    }
+                } else {
+                    console.error(xhr.responseText);
+                    if (error) {
+                        error(xhr);
+                    }
                 }
             }
-        });
+        };
+
+        xhr.open('POST', url, true);
+        xhr.setRequestHeader("Accept", "application/json");
+        xhr.setRequestHeader('X-User-Agent', 'salesforce-toolkit-rest-javascript/' + this.apiVersion);
+        xhr.send(payload);
     };
 
     /**
      * Set a session token and the associated metadata in the client.
      * @param sessionId a salesforce.com session ID. In a Visualforce page,
      *                   use '{!$Api.sessionId}' to obtain a session ID.
-     * @param [apiVersion="v29.0"] Force.com API version
+     * @param [apiVersion="v36.0"] Force.com API version
      * @param [instanceUrl] Omit this if running on Visualforce; otherwise 
      *                   use the value from the OAuth token.
      */
@@ -127,7 +133,7 @@ if (forcetk.Client === undefined) {
         'use strict';
         this.sessionId = sessionId;
         this.apiVersion = (apiVersion === undefined || apiVersion === null)
-            ? 'v29.0' : apiVersion;
+            ? 'v36.0' : apiVersion;
         if (instanceUrl === undefined || instanceUrl === null) {
             this.visualforce = true;
 
@@ -150,49 +156,73 @@ if (forcetk.Client === undefined) {
         }
     };
 
+    var nonce  = +(new Date());
+    var rquery = (/\?/);
+
     /*
      * Low level utility function to call the Salesforce endpoint.
      * @param path resource path relative to /services/data
      * @param callback function to which response will be passed
      * @param [error=null] function to which jqXHR will be passed in case of error
      * @param [method="GET"] HTTP method for call
-     * @param [payload=null] payload for POST/PATCH etc
+     * @param [payload=null] string payload for POST/PATCH etc
      */
     forcetk.Client.prototype.ajax = function (path, callback, error, method, payload, retry) {
         'use strict';
-        var that = this,
-            url = (this.visualforce ? '' : this.instanceUrl) + '/services/data' + path;
 
-        return $.ajax({
-            type: method || "GET",
-            async: this.asyncAjax,
-            url: (this.proxyUrl !== null && !this.visualforce) ? this.proxyUrl : url,
-            contentType: method === "DELETE"  ? null : 'application/json',
-            cache: false,
-            processData: false,
-            data: payload,
-            success: callback,
-            error: (!this.refreshToken || retry) ? error : function (jqXHR, textStatus, errorThrown) {
-                if (jqXHR.status === 401) {
-                    that.refreshAccessToken(function (oauthResponse) {
-                        that.setSessionToken(oauthResponse.access_token, null,
-                            oauthResponse.instance_url);
-                        that.ajax(path, callback, error, method, payload, true);
-                    },
-                        error);
-                } else {
-                    error(jqXHR, textStatus, errorThrown);
+        // dev friendly API: Add leading '/' if missing so url + path concat always works
+        if (path.charAt(0) !== '/') {
+            path = '/' + path;
+        }
+
+        var xhr = new XMLHttpRequest(),
+            url = (this.visualforce ? '' : this.instanceUrl) + '/services/data' + path,
+            that = this;
+
+        method = method || 'GET';
+
+        // Cache-busting logic inspired by jQuery
+        url = url + (rquery.test(url) ? "&" : "?") + "_=" + nonce++;
+
+        if (this.asyncAjax) {
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    if (xhr.status > 199 && xhr.status < 300) {
+                        if (callback) {
+                            callback(xhr.responseText ? JSON.parse(xhr.responseText) : undefined);
+                        }
+                    } else if (xhr.status === 401 && that.refresh_token) {
+                        if (retry) {
+                            console.error(xhr.responseText);
+                            error(xhr);
+                        } else {
+                            that.refreshAccessToken(function (oauthResponse) {
+                                that.setSessionToken(oauthResponse.access_token, null,
+                                    oauthResponse.instance_url);
+                                that.ajax(path, callback, error, method, payload, true);
+                            },
+                                error);
+                        }
+                    } else {
+                        console.error(xhr.responseText);
+                        if (error) {
+                            error(xhr);
+                        }
+                    }
                 }
-            },
-            dataType: "json",
-            beforeSend: function (xhr) {
-                if (that.proxyUrl !== null && !that.visualforce) {
-                    xhr.setRequestHeader('SalesforceProxy-Endpoint', url);
-                }
-                xhr.setRequestHeader(that.authzHeader, "Bearer " + that.sessionId);
-                xhr.setRequestHeader('X-User-Agent', 'salesforce-toolkit-rest-javascript/' + that.apiVersion);
-            }
-        });
+            };
+        }
+
+        xhr.open(method, url, this.asyncAjax);
+        xhr.setRequestHeader("Accept", "application/json");
+        xhr.setRequestHeader(this.authzHeader, "Bearer " + this.sessionId);
+        xhr.setRequestHeader('X-User-Agent', 'salesforce-toolkit-rest-javascript/' + this.apiVersion);
+        if (method !== "DELETE") {
+            xhr.setRequestHeader("Content-Type", 'application/json');
+        }
+        xhr.send(payload);
+
+        return this.asyncAjax ? null : JSON.parse(xhr.responseText);
     };
 
     /**
@@ -374,6 +404,19 @@ if (forcetk.Client === undefined) {
                          '?_HttpMethod=PATCH', fields, filename, payloadField, payload, callback, error, retry);
     };
 
+    var param = function (data) {
+        'use strict';
+        var r20 = /%20/g,
+            s = [],
+            key;
+        for (key in data) {
+            if (data.hasOwnProperty(key)) {
+                s[s.length] = encodeURIComponent(key) + "=" + encodeURIComponent(data[key]);
+            }
+        }
+        return s.join("&").replace(r20, "+");
+    };
+
     /*
      * Low level utility function to call the Salesforce endpoint specific for Apex REST API.
      * @param path resource path relative to /services/apexrest
@@ -386,16 +429,24 @@ if (forcetk.Client === undefined) {
      */
     forcetk.Client.prototype.apexrest = function (path, callback, error, method, payload, paramMap, retry) {
         'use strict';
-        var that = this,
-            url = this.instanceUrl + '/services/apexrest' + path;
 
-        method = method || "GET";
+        // dev friendly API: Add leading '/' if missing so url + path concat always works
+        if (path.charAt(0) !== '/') {
+            path = '/' + path;
+        }
+
+        var xhr = new XMLHttpRequest(),
+            that = this,
+            url = this.instanceUrl + '/services/apexrest' + path,
+            paramName;
+
+        method = method || 'GET';
 
         if (method === "GET") {
             // Handle proxied query params correctly
             if (this.proxyUrl && payload) {
                 if (typeof payload !== 'string') {
-                    payload = $.param(payload);
+                    payload = param(payload);
                 }
                 url += "?" + payload;
                 payload = null;
@@ -407,46 +458,63 @@ if (forcetk.Client === undefined) {
             }
         }
 
-        return $.ajax({
-            type: method,
-            async: this.asyncAjax,
-            url: this.proxyUrl || url,
-            contentType: 'application/json',
-            cache: false,
-            processData: false,
-            data: payload,
-            success: callback,
-            error: (!this.refreshToken || retry) ? error : function (jqXHR, textStatus, errorThrown) {
-                if (jqXHR.status === 401) {
-                    that.refreshAccessToken(function (oauthResponse) {
-                        that.setSessionToken(oauthResponse.access_token, null,
-                            oauthResponse.instance_url);
-                        that.apexrest(path, callback, error, method, payload, paramMap, true);
-                    }, error);
-                } else {
-                    error(jqXHR, textStatus, errorThrown);
-                }
-            },
-            dataType: "json",
-            beforeSend: function (xhr) {
-                var paramName;
-                if (that.proxyUrl !== null) {
-                    xhr.setRequestHeader('SalesforceProxy-Endpoint', url);
-                }
-                //Add any custom headers
-                if (paramMap === null) {
-                    paramMap = {};
-                }
-                for (paramName in paramMap) {
-                    if (paramMap.hasOwnProperty(paramName)) {
-                        xhr.setRequestHeader(paramName, paramMap[paramName]);
+        // Cache-busting logic inspired by jQuery
+        url = url + (rquery.test(url) ? "&" : "?") + "_=" + nonce++;
+
+        if (this.asyncAjax) {
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    if (xhr.status > 199 && xhr.status < 300) {
+                        if (callback) {
+                            callback(xhr.responseText ? JSON.parse(xhr.responseText) : undefined);
+                        }
+                    } else if (xhr.status === 401 && that.refresh_token) {
+                        if (retry) {
+                            console.error(xhr.responseText);
+                            error(xhr);
+                        } else {
+                            that.refreshAccessToken(function (oauthResponse) {
+                                that.setSessionToken(oauthResponse.access_token, null,
+                                    oauthResponse.instance_url);
+                                that.apexrest(path, callback, error, method, payload, paramMap, true);
+                            },
+                                error);
+                        }
+                    } else {
+                        console.error(xhr.responseText);
+                        if (error) {
+                            error(xhr);
+                        }
                     }
                 }
-                xhr.setRequestHeader(that.authzHeader, "Bearer " + that.sessionId);
-                xhr.setRequestHeader('X-User-Agent', 'salesforce-toolkit-rest-javascript/' + that.apiVersion);
+            };
+        }
+
+        xhr.open(method, this.proxyUrl || url, this.asyncAjax);
+        xhr.setRequestHeader("Accept", "application/json");
+        xhr.setRequestHeader(this.authzHeader, "Bearer " + this.sessionId);
+        xhr.setRequestHeader('X-User-Agent', 'salesforce-toolkit-rest-javascript/' + this.apiVersion);
+        xhr.setRequestHeader("Content-Type", 'application/json');
+
+        //Add any custom headers
+        if (paramMap === null) {
+            paramMap = {};
+        }
+        for (paramName in paramMap) {
+            if (paramMap.hasOwnProperty(paramName)) {
+                xhr.setRequestHeader(paramName, paramMap[paramName]);
             }
-        });
+        }
+
+        if (that.proxyUrl !== null) {
+            xhr.setRequestHeader('SalesforceProxy-Endpoint', url);
+        }
+
+        xhr.send(payload);
+
+        return this.asyncAjax ? null : JSON.parse(xhr.responseText);
     };
+
 
     /*
      * Lists summary information about each Salesforce.com version currently 

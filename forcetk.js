@@ -312,8 +312,8 @@ if (forcetk.Client === undefined) {
 				request.onreadystatechange = function () {
 					// continue if the process is completed
 					if (request.readyState === 4) {
-						// continue only if HTTP status is good
-						if (request.status >= 200 && request.status < 300) {
+						// continue only if HTTP status is good (1223 is a 204 in IE9)
+						if ((request.status >= 200 && request.status < 300) || (request.status == 1223)) {
 								// retrieve the response
 								callback(request.response ? JSON.parse(request.response) : null);
 						} else if (request.status === 401 && !retry) {
@@ -331,7 +331,12 @@ if (forcetk.Client === undefined) {
 		if(progressCallback){
 			request.upload.addEventListener("progress", progressCallback);
 		}
-		request.send(blob);
+		if(blob.fake) {
+			request.send(blob.data);
+		} else {
+			request.send(blob);
+		}
+
 
 		return this.asyncAjax ? null : JSON.parse(request.response);
 	};

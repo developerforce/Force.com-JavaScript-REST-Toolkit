@@ -80,7 +80,7 @@
              }
 
              return false;
-         },
+         }
      });
 
  	$('#go').click(function(e) {
@@ -156,7 +156,7 @@
      && !response.Website.startsWith('http://')) {
          response.Website = 'http://'+response.Website;
      }
-     $dialog.TrimPath.processDOMTemplate("detail_jst"
+     $dialog.html(TrimPath.processDOMTemplate("detail_jst"
          ,response));
      $dialog.find('#industry').click(function(e) {
          e.preventDefault();

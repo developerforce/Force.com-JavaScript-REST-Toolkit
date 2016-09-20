@@ -13,73 +13,42 @@ Due to the [same origin policy](http://en.wikipedia.org/wiki/Same_origin_policy)
 Recent Updates
 --------------
 
-* [Visualforce Remote Objects](https://www.salesforce.com/us/developer/docs/pages/index_Left.htm#CSHID=pages_remote_objects.htm|StartTopic=Content%2Fpages_remote_objects.htm|SkinName=webhelp) are proxy objects that enable basic DML operations on sObjects directly from JavaScript. Behind the scenes, the Remote Objects controller handles sharing rules, field level security, and other data accessibility concerns. Pages that use Remote Objects are subject to all the standard Visualforce limits, but like JavaScript remoting, Remote Objects calls don’t count toward API request limits.
-
-  
-  Since Remote Objects are more secure than RemoteTK (which does not respect sharing rules, FLS etc since system-level access is proxied via the RemoteTK controller), and similarly do not consume API calls (the main motivation for RemoteTK), RemoteTK has been removed from the toolkit.
-
-* Since the Summer '13 release, the `/services/data` endpoint has been exposed on Visualforce hosts, so no proxy is now required for REST API calls in JavaScript served via Visualforce (although the proxy **is** still required for calls to `/services/apexrest`). `forcetk.js` has been updated to reflect this.
-
-* Inserting or updating blob data using the `create` or `update` functions (passing base64-encoded binary data in JSON) is limited by the REST API to 50 MB of text data or 37.5 MB of base64–encoded data. New functions, `createBlob` and `updateBlob`, allow creation and update of ContentVersion and Document records with binary ('blob') content with a size of up to 500 MB. Here is a minimal sample that shows how to upload a file to Chatter Files:
-
-		<apex:page docType="html-5.0" title="File Uploader">
-		  <h3>
-		    Select a file to upload as a new Chatter File.
-		  </h3>
-		  <input type="file" id="file" onchange="upload()"/>
-		  <p id="message"></p>
-		  <script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
-		  <script src="{!$Resource.forcetk}"></script>
-		  <script>
-		    var client = new forcetk.Client();
-
-		    client.setSessionToken('{!$Api.Session_ID}');
-
-		    function upload() {
-		        var file = $("#file")[0].files[0];
-		        client.createBlob('ContentVersion', {
-		            Origin: 'H', // 'H' for Chatter File, 'C' for Content Document
-		            PathOnClient: file.name
-		        }, file.name, 'VersionData', file, function(response){
-		            console.log(response);
-		            $("#message").html("Chatter File created: <a target=\"_blank\" href=\"/" + response.id + "\">Take a look!</a>");
-		        }, function(request, status, response){
-		            $("#message").html("Error: " + status);
-		        });
-		    }
-		  </script>
-		</apex:page>
-
-	Under the covers, `createBlob` sends a multipart message. See the REST API doc page [Insert or Update Blob Data](https://www.salesforce.com/us/developer/docs/api_rest/Content/dome_sobject_insert_update_blob.htm) for more details.
+[Older Updates](OlderUpdates.md)
 
 Dependencies
 ------------
 
-The toolkit uses [jQuery](http://jquery.com/). It has been tested on jQuery 1.4.4 and 1.5.2, but other versions may also work.
+The toolkit uses [ECMAScript 6 Promises](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise).
+
+TBD - Babel
 
 Configuration
 -------------
 
-ForceTK requires that you add the correct REST endpoint hostname for your instance (i.e. https://na1.salesforce.com/ or similar) as a remote site in *Your Name > Administration Setup > Security Controls > Remote Site Settings*.
+If you are using ForceTK from JavaScript hosted in an 'off platform' web page (for example, in a Heroku app), you will need to add the app's origin (protocol, host and port, for example https://myapp.herokuapp.com/) to your org's [CORS configuration](https://help.salesforce.com/htviewhelpdoc?err=1&id=extend_code_cors.htm&siteLang=en_US).
 
 Using ForceTK in a Visualforce page
 -----------------------------------
 
-Create a zip file containing app.js, forcetk.js, jquery.js, and any other static resources your project may need. Upload the zip via *Your Name > App Setup > Develop > Static Resources*.
+Create a zip file containing app.js, forcetk.js and any other static resources your project may need. Upload the zip via *Your Name > App Setup > Develop > Static Resources*.
 
 Your Visualforce page will need to include jQuery and the toolkit, then create a client object, passing a session ID to the constructor. An absolutely minimal sample is:
 
 	<apex:page>
-	    <apex:includeScript value="{!URLFOR($Resource.static, 'jquery.js')}" />
-	    <apex:includeScript value="{!URLFOR($Resource.static, 'forcetk.js')}"  />
+	    <apex:includeScript value="{!$Resource.forcetk}" />
 	    <script type="text/javascript">
-			// Get an instance of the REST API client and set the session ID
-			var client = new forcetk.Client();
-			client.setSessionToken('{!$Api.Session_ID}');
-        
-	        client.query("SELECT Name FROM Account LIMIT 1", function(response){
-	            $('#accountname').text(response.records[0].Name);
-	        });
+	        // Get an instance of the REST API client and set the session ID
+	        var client = new forcetk.Client();
+	        client.setSessionToken('{!$Api.Session_ID}');
+
+	        client.query("SELECT Name FROM Account LIMIT 1")
+	          .then(function(response){
+	            document.getElementById("accountname").textContent = response.records[0].Name;
+	          }) 
+	          .catch(function(error){ 
+	            console.error(error);
+	            alert(error);
+	          });
 	    </script>
 	    <p>The first account I see is <span id="accountname"></span>.</p>
 	</apex:page>
@@ -89,9 +58,9 @@ More fully featured samples are provided in [example.page](Force.com-JavaScript-
 Using the Toolkit in an HTML page outside the Force.com platform
 ----------------------------------------------------------------
 
-You will need to deploy proxy.php to your server, configuring CORS support (see comments in proxy.php) if your JavaScript is to be hosted on a different server.
+As mentioned above, you will need to [configure CORS](https://help.salesforce.com/htviewhelpdoc?err=1&id=extend_code_cors.htm&siteLang=en_US) to call the Force.com REST API from JavaScript hosted 'off-platform'.
 
-Your HTML page will need to include jQuery and the toolkit, then create a client object, passing a session ID to the constructor. An absolutely minimal sample using OAuth to obtain a session ID is:
+Your HTML page will need to include the toolkit, then create a client object, passing a session ID to the constructor. An absolutely minimal sample using OAuth to obtain a session ID is:
 
 	<html>
 	  <head>
@@ -148,13 +117,17 @@ Your HTML page will need to include jQuery and the toolkit, then create a client
 	    </script>
 	    <p id="message">Click here.</p>
 	</html>
+
+TBD - new OAuth!
 	
 More fully featured samples are provided in [example.html](Force.com-JavaScript-REST-Toolkit/blob/master/example.html) and [mobile.html](Force.com-JavaScript-REST-Toolkit/blob/master/mobile.html).
 
 Using the Toolkit in a Cordova app
 ----------------------------------
 
-Your HTML page will need to include jQuery, the toolkit and Cordova. You will also need to install the [InAppBrowser](http://plugins.cordova.io/#/package/org.apache.cordova.inappbrowser) plugin to be able to pop up a browser window for authentication. Create a client object, passing a session ID to the constructor. You can use __https://login.salesforce.com/services/oauth2/success__ as the redirect URI and catch the page load in InAppBrowser.
+TBD - update for current Cordova!
+
+Your HTML page will need to include the toolkit and Cordova. You will also need to install the [InAppBrowser](http://plugins.cordova.io/#/package/org.apache.cordova.inappbrowser) plugin to be able to pop up a browser window for authentication. Create a client object, passing a session ID to the constructor. You can use __https://login.salesforce.com/services/oauth2/success__ as the redirect URI and catch the page load in InAppBrowser.
 
 An absolutely minimal sample using OAuth to obtain a session ID is:
 

@@ -32,16 +32,37 @@
  * console, go to Your Name | Setup | Security Controls | Remote Site Settings
  */
 
-/*jslint browser: true*/
-/*global alert, Blob, $, jQuery*/
+/*jslint browser: true, plusplus: true*/
+/*global alert, Blob, Promise*/
 
-var forcetk = window.forcetk;
+var nonce  = +(new Date());
+var rquery = (/\?/);
 
-if (forcetk === undefined) {
-    forcetk = {};
-}
+// Local utility to create a random string for multipart boundary
+var randomString = function () {
+    'use strict';
+    var str = '',
+        i;
+    for (i = 0; i < 4; i += 1) {
+        str += (Math.random().toString(16) + "000000000").substr(2, 8);
+    }
+    return str;
+};
 
-if (forcetk.Client === undefined) {
+var param = function (data) {
+    'use strict';
+    var r20 = /%20/g,
+        s = [],
+        key;
+    for (key in data) {
+        if (data.hasOwnProperty(key)) {
+            s[s.length] = encodeURIComponent(key) + "=" + encodeURIComponent(data[key]);
+        }
+    }
+    return s.join("&").replace(r20, "+");
+};
+
+export class Org {
 
     /**
      * The Client provides a convenient wrapper for the Force.com REST API, 
@@ -53,8 +74,7 @@ if (forcetk.Client === undefined) {
      *                  PhoneGap etc
      * @constructor
      */
-    forcetk.Client = function (clientId, loginUrl, proxyUrl) {
-        'use strict';
+    constructor(clientId, loginUrl, proxyUrl) {
         this.clientId = clientId;
         this.loginUrl = loginUrl || 'https://login.salesforce.com/';
         if (proxyUrl === undefined || proxyUrl === null) {
@@ -78,56 +98,61 @@ if (forcetk.Client === undefined) {
         this.visualforce = false;
         this.instanceUrl = null;
         this.asyncAjax = true;
-    };
+    }
 
     /**
      * Set a refresh token in the client.
      * @param refreshToken an OAuth refresh token
      */
-    forcetk.Client.prototype.setRefreshToken = function (refreshToken) {
+    setRefreshToken(refreshToken) {
         'use strict';
         this.refreshToken = refreshToken;
-    };
+    }
 
     /**
      * Refresh the access token.
-     * @param callback function to call on success
-     * @param error function to call on failure
      */
-    forcetk.Client.prototype.refreshAccessToken = function (callback, error) {
+    refreshAccessToken() {
         'use strict';
         var that = this,
-            url = this.loginUrl + '/services/oauth2/token';
-        return $.ajax({
-            type: 'POST',
-            url: (this.proxyUrl !== null && !this.visualforce) ? this.proxyUrl : url,
-            cache: false,
-            processData: false,
-            data: 'grant_type=refresh_token&client_id=' + this.clientId + '&refresh_token=' + this.refreshToken,
-            success: callback,
-            error: error,
-            dataType: "json",
-            beforeSend: function (xhr) {
-                if (that.proxyUrl !== null && !this.visualforce) {
-                    xhr.setRequestHeader('SalesforceProxy-Endpoint', url);
-                }
-            }
-        });
-    };
+            promise = new Promise(function (resolve, reject) {
+                var xhr = new XMLHttpRequest(),
+                    url = this.loginUrl + '/services/oauth2/token',
+                    payload = 'grant_type=refresh_token&client_id=' + that.clientId + '&refresh_token=' + that.refreshToken;
+
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState === 4) {
+                        if (xhr.status > 199 && xhr.status < 300) {
+                            resolve(xhr.responseText ? JSON.parse(xhr.responseText) : undefined);
+                        } else {
+                            console.error(xhr.responseText);
+                            reject(xhr, xhr.statusText, xhr.response);
+                        }
+                    }
+                };
+
+                xhr.open('POST', url, true);
+                xhr.setRequestHeader("Accept", "application/json");
+                xhr.setRequestHeader('X-User-Agent', 'salesforce-toolkit-rest-javascript/' + that.apiVersion);
+                xhr.send(payload);
+            });
+
+        return promise;
+    }
 
     /**
      * Set a session token and the associated metadata in the client.
      * @param sessionId a salesforce.com session ID. In a Visualforce page,
      *                   use '{!$Api.sessionId}' to obtain a session ID.
-     * @param [apiVersion="v29.0"] Force.com API version
+     * @param [apiVersion="v35.0"] Force.com API version
      * @param [instanceUrl] Omit this if running on Visualforce; otherwise 
      *                   use the value from the OAuth token.
      */
-    forcetk.Client.prototype.setSessionToken = function (sessionId, apiVersion, instanceUrl) {
+    setSessionToken(sessionId, apiVersion, instanceUrl) {
         'use strict';
         this.sessionId = sessionId;
         this.apiVersion = (apiVersion === undefined || apiVersion === null)
-            ? 'v29.0' : apiVersion;
+            ? 'v35.0' : apiVersion;
         if (instanceUrl === undefined || instanceUrl === null) {
             this.visualforce = true;
 
@@ -148,52 +173,75 @@ if (forcetk.Client === undefined) {
         } else {
             this.instanceUrl = instanceUrl;
         }
-    };
+    }
 
     /*
      * Low level utility function to call the Salesforce endpoint.
      * @param path resource path relative to /services/data
-     * @param callback function to which response will be passed
-     * @param [error=null] function to which jqXHR will be passed in case of error
      * @param [method="GET"] HTTP method for call
-     * @param [payload=null] payload for POST/PATCH etc
+     * @param [payload=null] string payload for POST/PATCH etc
      */
-    forcetk.Client.prototype.ajax = function (path, callback, error, method, payload, retry) {
+    ajax(path, method, payload, retry) {
         'use strict';
-        var that = this,
-            url = (this.visualforce ? '' : this.instanceUrl) + '/services/data' + path;
 
-        return $.ajax({
-            type: method || "GET",
-            async: this.asyncAjax,
-            url: (this.proxyUrl !== null && !this.visualforce) ? this.proxyUrl : url,
-            contentType: method === "DELETE"  ? null : 'application/json',
-            cache: false,
-            processData: false,
-            data: payload,
-            success: callback,
-            error: (!this.refreshToken || retry) ? error : function (jqXHR, textStatus, errorThrown) {
-                if (jqXHR.status === 401) {
-                    that.refreshAccessToken(function (oauthResponse) {
-                        that.setSessionToken(oauthResponse.access_token, null,
-                            oauthResponse.instance_url);
-                        that.ajax(path, callback, error, method, payload, true);
-                    },
-                        error);
-                } else {
-                    error(jqXHR, textStatus, errorThrown);
+        var that = this,
+            promise = new Promise(function (resolve, reject) {
+
+                // dev friendly API: Add leading '/' if missing so url + path concat always works
+                if (path.charAt(0) !== '/') {
+                    path = '/' + path;
                 }
-            },
-            dataType: "json",
-            beforeSend: function (xhr) {
-                if (that.proxyUrl !== null && !that.visualforce) {
-                    xhr.setRequestHeader('SalesforceProxy-Endpoint', url);
+
+                var xhr = new XMLHttpRequest(),
+                    url = (that.visualforce ? '' : that.instanceUrl) + '/services/data' + path;
+
+                method = method || 'GET';
+
+                // Cache-busting logic inspired by jQuery
+                url = url + (rquery.test(url) ? "&" : "?") + "_=" + nonce++;
+
+                if (that.asyncAjax) {
+                    xhr.onreadystatechange = function () {
+                        if (xhr.readyState === 4) {
+                            if (xhr.status > 199 && xhr.status < 300) {
+                                resolve(xhr.responseText ? JSON.parse(xhr.responseText) : undefined);
+                            } else if (xhr.status === 401 && that.refresh_token) {
+                                if (retry) {
+                                    console.error(xhr.responseText);
+                                    reject(xhr, xhr.statusText, xhr.response);
+                                } else {
+                                    // ATTN Christophe - does this look right?
+                                    return that.refreshAccessToken()
+                                        .then(function (oauthResponse) {
+                                            that.setSessionToken(oauthResponse.access_token, null,
+                                                oauthResponse.instance_url);
+                                            return that.ajax(path, method, payload, true);
+                                        });
+                                }
+                            } else {
+                                console.error(xhr.responseText);
+                                reject(xhr, xhr.statusText, xhr.response);
+                            }
+                        }
+                    };
                 }
+
+                xhr.open(method, url, that.asyncAjax);
+                xhr.setRequestHeader("Accept", "application/json");
                 xhr.setRequestHeader(that.authzHeader, "Bearer " + that.sessionId);
                 xhr.setRequestHeader('X-User-Agent', 'salesforce-toolkit-rest-javascript/' + that.apiVersion);
-            }
-        });
-    };
+                if (method !== "DELETE") {
+                    xhr.setRequestHeader("Content-Type", 'application/json');
+                }
+                xhr.send(payload);
+
+                if (!that.asyncAjax) {
+                    resolve(JSON.parse(xhr.responseText));
+                }
+            });
+
+        return promise;
+    }
 
     /**
      * Utility function to query the Chatter API and download a file
@@ -203,64 +251,55 @@ if (forcetk.Client === undefined) {
      * @author Tom Gersic
      * @param path resource path relative to /services/data
      * @param mimetype of the file
-     * @param callback function to which response will be passed
-     * @param [error=null] function to which request will be passed in case of error
      * @param retry true if we've already tried refresh token flow once
      */
-    forcetk.Client.prototype.getChatterFile = function (path, mimeType, callback, error, retry) {
+    getChatterFile(path, mimeType, retry) {
         'use strict';
         var that = this,
             url = (this.visualforce ? '' : this.instanceUrl) + path,
-            request = new XMLHttpRequest();
+            promise = new Promise(function (resolve, reject) {
+                var request = new XMLHttpRequest();
 
-        request.open("GET", (this.proxyUrl !== null && !this.visualforce) ? this.proxyUrl : url, true);
-        request.responseType = "arraybuffer";
+                request.open("GET", (that.proxyUrl !== null && !that.visualforce) ? that.proxyUrl : url, true);
+                request.responseType = "arraybuffer";
 
-        request.setRequestHeader(this.authzHeader, "Bearer " + this.sessionId);
-        request.setRequestHeader('X-User-Agent', 'salesforce-toolkit-rest-javascript/' + this.apiVersion);
-        if (this.proxyUrl !== null && !this.visualforce) {
-            request.setRequestHeader('SalesforceProxy-Endpoint', url);
-        }
-
-        request.onreadystatechange = function () {
-            // continue if the process is completed
-            if (request.readyState === 4) {
-                // continue only if HTTP status is "OK"
-                if (request.status === 200) {
-                    try {
-                        // retrieve the response
-                        callback(request.response);
-                    } catch (e) {
-                        // display error message
-                        alert("Error reading the response: " + e.toString());
-                    }
-                } else if (request.status === 401 && !retry) {
-                    //refresh token in 401
-                    that.refreshAccessToken(function (oauthResponse) {
-                        that.setSessionToken(oauthResponse.access_token, null, oauthResponse.instance_url);
-                        that.getChatterFile(path, mimeType, callback, error, true);
-                    }, error);
-                } else {
-                    // display status message
-                    error(request, request.statusText, request.response);
+                request.setRequestHeader(that.authzHeader, "Bearer " + that.sessionId);
+                request.setRequestHeader('X-User-Agent', 'salesforce-toolkit-rest-javascript/' + that.apiVersion);
+                if (that.proxyUrl !== null && !that.visualforce) {
+                    request.setRequestHeader('SalesforceProxy-Endpoint', url);
                 }
-            }
-        };
 
-        request.send();
+                request.onreadystatechange = function () {
+                    // continue if the process is completed
+                    if (request.readyState === 4) {
+                        // continue only if HTTP status is "OK"
+                        if (request.status === 200) {
+                            try {
+                                // retrieve the response
+                                resolve(request.response);
+                            } catch (e) {
+                                // display error message
+                                alert("Error reading the response: " + e.toString());
+                            }
+                        } else if (request.status === 401 && !retry) {
+                            //refresh token in 401
+                            return that.refreshAccessToken()
+                                .then(function (oauthResponse) {
+                                    that.setSessionToken(oauthResponse.access_token, null,
+                                        oauthResponse.instance_url);
+                                    return that.getChatterFile(path, mimeType, true);
+                                });
+                        }
 
-    };
+                        reject(request, request.statusText, request.response);
+                    }
+                };
 
-    // Local utility to create a random string for multipart boundary
-    var randomString = function () {
-        'use strict';
-        var str = '',
-            i;
-        for (i = 0; i < 4; i += 1) {
-            str += (Math.random().toString(16) + "000000000").substr(2, 8);
-        }
-        return str;
-    };
+                request.send();
+            });
+
+        return promise;
+    }
 
     /* Low level function to create/update records with blob data
      * @param path resource path relative to /services/data
@@ -270,66 +309,71 @@ if (forcetk.Client === undefined) {
      * @param filename filename for blob data; e.g. "Q1 Sales Brochure.pdf"
      * @param payloadField 'VersionData' for ContentVersion, 'Body' for Document
      * @param payload Blob, File, ArrayBuffer (Typed Array), or String payload
-     * @param callback function to which response will be passed
-     * @param [error=null] function to which response will be passed in case of error
      * @param retry true if we've already tried refresh token flow once
      */
-    forcetk.Client.prototype.blob = function (path, fields, filename, payloadField, payload, callback, error, retry) {
+    blob(path, fields, filename, payloadField, payload, retry) {
         'use strict';
         var that = this,
-            url = (this.visualforce ? '' : this.instanceUrl) + '/services/data' + path,
-            boundary = randomString(),
-            blob = new Blob([
-                "--boundary_" + boundary + '\n'
-                    + "Content-Disposition: form-data; name=\"entity_content\";" + "\n"
-                    + "Content-Type: application/json" + "\n\n"
-                    + JSON.stringify(fields)
-                    + "\n\n"
-                    + "--boundary_" + boundary + "\n"
-                    + "Content-Type: application/octet-stream" + "\n"
-                    + "Content-Disposition: form-data; name=\"" + payloadField
-                    + "\"; filename=\"" + filename + "\"\n\n",
-                payload,
-                "\n\n"
-                    + "--boundary_" + boundary + "--"
-            ], {type : 'multipart/form-data; boundary=\"boundary_' + boundary + '\"'}),
-            request = new XMLHttpRequest();
+            promise = new Promise(function (resolve, reject) {
+                var url = (that.visualforce ? '' : that.instanceUrl) + '/services/data' + path,
+                    boundary = randomString(),
+                    blob = new Blob([
+                        "--boundary_" + boundary + '\n'
+                            + "Content-Disposition: form-data; name=\"entity_content\";" + "\n"
+                            + "Content-Type: application/json" + "\n\n"
+                            + JSON.stringify(fields)
+                            + "\n\n"
+                            + "--boundary_" + boundary + "\n"
+                            + "Content-Type: application/octet-stream" + "\n"
+                            + "Content-Disposition: form-data; name=\"" + payloadField
+                            + "\"; filename=\"" + filename + "\"\n\n",
+                        payload,
+                        "\n\n"
+                            + "--boundary_" + boundary + "--"
+                    ], {type : 'multipart/form-data; boundary=\"boundary_' + boundary + '\"'}),
+                    request = new XMLHttpRequest();
 
-        request.open("POST", (this.proxyUrl !== null && !this.visualforce) ? this.proxyUrl : url, this.asyncAjax);
+                request.open("POST", (that.proxyUrl !== null && !that.visualforce) ? that.proxyUrl : url, that.asyncAjax);
 
-        request.setRequestHeader('Accept', 'application/json');
-        request.setRequestHeader(this.authzHeader, "Bearer " + this.sessionId);
-        request.setRequestHeader('X-User-Agent', 'salesforce-toolkit-rest-javascript/' + this.apiVersion);
-        request.setRequestHeader('Content-Type', 'multipart/form-data; boundary=\"boundary_' + boundary + '\"');
-        if (this.proxyUrl !== null && !this.visualforce) {
-            request.setRequestHeader('SalesforceProxy-Endpoint', url);
-        }
-
-        if (this.asyncAjax) {
-            request.onreadystatechange = function () {
-                // continue if the process is completed
-                if (request.readyState === 4) {
-                    // continue only if HTTP status is good
-                    if (request.status >= 200 && request.status < 300) {
-                        // retrieve the response
-                        callback(request.response ? JSON.parse(request.response) : null);
-                    } else if (request.status === 401 && !retry) {
-                        that.refreshAccessToken(function (oauthResponse) {
-                            that.setSessionToken(oauthResponse.access_token, null, oauthResponse.instance_url);
-                            that.blob(path, fields, filename, payloadField, payload, callback, error, true);
-                        }, error);
-                    } else {
-                        // return status message
-                        error(request, request.statusText, request.response);
-                    }
+                request.setRequestHeader('Accept', 'application/json');
+                request.setRequestHeader(that.authzHeader, "Bearer " + that.sessionId);
+                request.setRequestHeader('X-User-Agent', 'salesforce-toolkit-rest-javascript/' + that.apiVersion);
+                request.setRequestHeader('Content-Type', 'multipart/form-data; boundary=\"boundary_' + boundary + '\"');
+                if (that.proxyUrl !== null && !that.visualforce) {
+                    request.setRequestHeader('SalesforceProxy-Endpoint', url);
                 }
-            };
-        }
 
-        request.send(blob);
+                if (that.asyncAjax) {
+                    request.onreadystatechange = function () {
+                        // continue if the process is completed
+                        if (request.readyState === 4) {
+                            // continue only if HTTP status is good
+                            if (request.status >= 200 && request.status < 300) {
+                                // retrieve the response
+                                resolve(request.response ? JSON.parse(request.response) : null);
+                            } else if (request.status === 401 && !retry) {
+                                return that.refreshAccessToken()
+                                    .then(function (oauthResponse) {
+                                        that.setSessionToken(oauthResponse.access_token, null,
+                                            oauthResponse.instance_url);
+                                        return that.blob(path, fields, filename, payloadField, payload, true);
+                                    });
+                            }
+                            // return status message
+                            reject(request, request.statusText, request.response);
+                        }
+                    };
+                }
 
-        return this.asyncAjax ? null : JSON.parse(request.response);
-    };
+                request.send(blob);
+
+                if (!that.asyncAjax) {
+                    resolve(JSON.parse(request.responseText));
+                }
+            });
+
+        return promise;
+    }
 
     /*
      * Create a record with blob data
@@ -340,17 +384,14 @@ if (forcetk.Client === undefined) {
      * @param filename filename for blob data; e.g. "Q1 Sales Brochure.pdf"
      * @param payloadField 'VersionData' for ContentVersion, 'Body' for Document
      * @param payload Blob, File, ArrayBuffer (Typed Array), or String payload
-     * @param callback function to which response will be passed
-     * @param [error=null] function to which response will be passed in case of error
      * @param retry true if we've already tried refresh token flow once
      */
-    forcetk.Client.prototype.createBlob = function (objtype, fields, filename,
-                                                   payloadField, payload, callback,
-                                                   error, retry) {
+    createBlob(objtype, fields, filename,
+                                                   payloadField, payload, retry) {
         'use strict';
         return this.blob('/' + this.apiVersion + '/sobjects/' + objtype + '/',
-                         fields, filename, payloadField, payload, callback, error, retry);
-    };
+                         fields, filename, payloadField, payload, retry);
+    }
 
     /*
      * Update a record with blob data
@@ -362,77 +403,90 @@ if (forcetk.Client === undefined) {
      * @param filename filename for blob data; e.g. "Q1 Sales Brochure.pdf"
      * @param payloadField 'VersionData' for ContentVersion, 'Body' for Document
      * @param payload Blob, File, ArrayBuffer (Typed Array), or String payload
-     * @param callback function to which response will be passed
-     * @param [error=null] function to which response will be passed in case of error
      * @param retry true if we've already tried refresh token flow once
      */
-    forcetk.Client.prototype.updateBlob = function (objtype, id, fields, filename,
-                                                   payloadField, payload, callback,
-                                                   error, retry) {
+    updateBlob(objtype, id, fields, filename,
+                                                   payloadField, payload, retry) {
         'use strict';
         return this.blob('/' + this.apiVersion + '/sobjects/' + objtype + '/' + id +
-                         '?_HttpMethod=PATCH', fields, filename, payloadField, payload, callback, error, retry);
-    };
+                         '?_HttpMethod=PATCH', fields, filename, payloadField, payload, retry);
+    }
 
     /*
      * Low level utility function to call the Salesforce endpoint specific for Apex REST API.
      * @param path resource path relative to /services/apexrest
-     * @param callback function to which response will be passed
-     * @param [error=null] function to which jqXHR will be passed in case of error
      * @param [method="GET"] HTTP method for call
      * @param [payload=null] string or object with payload for POST/PATCH etc or params for GET
      * @param [paramMap={}] parameters to send as header values for POST/PATCH etc
      * @param [retry] specifies whether to retry on error
      */
-    forcetk.Client.prototype.apexrest = function (path, callback, error, method, payload, paramMap, retry) {
+    apexrest(path, method, payload, paramMap, retry) {
         'use strict';
+
         var that = this,
-            url = this.instanceUrl + '/services/apexrest' + path;
+            promise = new Promise(function (resolve, reject) {
 
-        method = method || "GET";
-
-        if (method === "GET") {
-            // Handle proxied query params correctly
-            if (this.proxyUrl && payload) {
-                if (typeof payload !== 'string') {
-                    payload = $.param(payload);
+                // dev friendly API: Add leading '/' if missing so url + path concat always works
+                if (path.charAt(0) !== '/') {
+                    path = '/' + path;
                 }
-                url += "?" + payload;
-                payload = null;
-            }
-        } else {
-            // Allow object payload for POST etc
-            if (payload && typeof payload !== 'string') {
-                payload = JSON.stringify(payload);
-            }
-        }
 
-        return $.ajax({
-            type: method,
-            async: this.asyncAjax,
-            url: this.proxyUrl || url,
-            contentType: 'application/json',
-            cache: false,
-            processData: false,
-            data: payload,
-            success: callback,
-            error: (!this.refreshToken || retry) ? error : function (jqXHR, textStatus, errorThrown) {
-                if (jqXHR.status === 401) {
-                    that.refreshAccessToken(function (oauthResponse) {
-                        that.setSessionToken(oauthResponse.access_token, null,
-                            oauthResponse.instance_url);
-                        that.apexrest(path, callback, error, method, payload, paramMap, true);
-                    }, error);
+                var xhr = new XMLHttpRequest(),
+                    url = that.instanceUrl + '/services/apexrest' + path,
+                    paramName;
+
+                method = method || 'GET';
+
+                if (method === "GET") {
+                    // Handle proxied query params correctly
+                    if (that.proxyUrl && payload) {
+                        if (typeof payload !== 'string') {
+                            payload = param(payload);
+                        }
+                        url += "?" + payload;
+                        payload = null;
+                    }
                 } else {
-                    error(jqXHR, textStatus, errorThrown);
+                    // Allow object payload for POST etc
+                    if (payload && typeof payload !== 'string') {
+                        payload = JSON.stringify(payload);
+                    }
                 }
-            },
-            dataType: "json",
-            beforeSend: function (xhr) {
-                var paramName;
-                if (that.proxyUrl !== null) {
-                    xhr.setRequestHeader('SalesforceProxy-Endpoint', url);
+
+                // Cache-busting logic inspired by jQuery
+                url = url + (rquery.test(url) ? "&" : "?") + "_=" + nonce++;
+
+                if (that.asyncAjax) {
+                    xhr.onreadystatechange = function () {
+                        if (xhr.readyState === 4) {
+                            if (xhr.status > 199 && xhr.status < 300) {
+                                resolve(xhr.responseText ? JSON.parse(xhr.responseText) : undefined);
+                            } else if (xhr.status === 401 && that.refresh_token) {
+                                if (retry) {
+                                    console.error(xhr.responseText);
+                                    reject(xhr, xhr.statusText, xhr.response);
+                                } else {
+                                    return that.refreshAccessToken()
+                                        .then(function (oauthResponse) {
+                                            that.setSessionToken(oauthResponse.access_token, null,
+                                                oauthResponse.instance_url);
+                                            return that.apexrest(path, method, payload, paramMap, true);
+                                        });
+                                }
+                            } else {
+                                console.error(xhr.responseText);
+                                reject(xhr, xhr.statusText, xhr.response);
+                            }
+                        }
+                    };
                 }
+
+                xhr.open(method, that.proxyUrl || url, that.asyncAjax);
+                xhr.setRequestHeader("Accept", "application/json");
+                xhr.setRequestHeader(that.authzHeader, "Bearer " + that.sessionId);
+                xhr.setRequestHeader('X-User-Agent', 'salesforce-toolkit-rest-javascript/' + that.apiVersion);
+                xhr.setRequestHeader("Content-Type", 'application/json');
+
                 //Add any custom headers
                 if (paramMap === null) {
                     paramMap = {};
@@ -442,70 +496,69 @@ if (forcetk.Client === undefined) {
                         xhr.setRequestHeader(paramName, paramMap[paramName]);
                     }
                 }
-                xhr.setRequestHeader(that.authzHeader, "Bearer " + that.sessionId);
-                xhr.setRequestHeader('X-User-Agent', 'salesforce-toolkit-rest-javascript/' + that.apiVersion);
-            }
-        });
-    };
+
+                if (that.proxyUrl !== null) {
+                    xhr.setRequestHeader('SalesforceProxy-Endpoint', url);
+                }
+
+                xhr.send(payload);
+
+                if (!that.asyncAjax) {
+                    resolve(JSON.parse(xhr.responseText));
+                }
+            });
+
+        return promise;
+    }
+
 
     /*
      * Lists summary information about each Salesforce.com version currently 
      * available, including the version, label, and a link to each version's
      * root.
-     * @param callback function to which response will be passed
-     * @param [error=null] function to which jqXHR will be passed in case of error
      */
-    forcetk.Client.prototype.versions = function (callback, error) {
+    versions() {
         'use strict';
-        return this.ajax('/', callback, error);
-    };
+        return this.ajax('/');
+    }
 
     /*
      * Lists available resources for the client's API version, including 
      * resource name and URI.
-     * @param callback function to which response will be passed
-     * @param [error=null] function to which jqXHR will be passed in case of error
      */
-    forcetk.Client.prototype.resources = function (callback, error) {
+    resources() {
         'use strict';
-        return this.ajax('/' + this.apiVersion + '/', callback, error);
-    };
+        return this.ajax('/' + this.apiVersion + '/');
+    }
 
     /*
      * Lists the available objects and their metadata for your organization's 
      * data.
-     * @param callback function to which response will be passed
-     * @param [error=null] function to which jqXHR will be passed in case of error
      */
-    forcetk.Client.prototype.describeGlobal = function (callback, error) {
+    describeGlobal() {
         'use strict';
-        return this.ajax('/' + this.apiVersion + '/sobjects/', callback, error);
-    };
+        return this.ajax('/' + this.apiVersion + '/sobjects/');
+    }
 
     /*
      * Describes the individual metadata for the specified object.
      * @param objtype object type; e.g. "Account"
-     * @param callback function to which response will be passed
-     * @param [error=null] function to which jqXHR will be passed in case of error
      */
-    forcetk.Client.prototype.metadata = function (objtype, callback, error) {
+    metadata(objtype) {
         'use strict';
-        return this.ajax('/' + this.apiVersion + '/sobjects/' + objtype + '/',
-            callback, error);
-    };
+        return this.ajax('/' + this.apiVersion + '/sobjects/' + objtype + '/');
+    }
 
     /*
      * Completely describes the individual metadata at all levels for the 
      * specified object.
      * @param objtype object type; e.g. "Account"
-     * @param callback function to which response will be passed
-     * @param [error=null] function to which jqXHR will be passed in case of error
      */
-    forcetk.Client.prototype.describe = function (objtype, callback, error) {
+    describe(objtype) {
         'use strict';
         return this.ajax('/' + this.apiVersion + '/sobjects/' + objtype
-            + '/describe/', callback, error);
-    };
+            + '/describe/');
+    }
 
     /*
      * Creates a new record of the given type.
@@ -513,14 +566,11 @@ if (forcetk.Client === undefined) {
      * @param fields an object containing initial field names and values for 
      *               the record, e.g. {:Name "salesforce.com", :TickerSymbol 
      *               "CRM"}
-     * @param callback function to which response will be passed
-     * @param [error=null] function to which jqXHR will be passed in case of error
      */
-    forcetk.Client.prototype.create = function (objtype, fields, callback, error) {
+    create(objtype, fields) {
         'use strict';
-        return this.ajax('/' + this.apiVersion + '/sobjects/' + objtype + '/',
-            callback, error, "POST", JSON.stringify(fields));
-    };
+        return this.ajax('/' + this.apiVersion + '/sobjects/' + objtype + '/', "POST", JSON.stringify(fields));
+    }
 
     /*
      * Retrieves field values for a record of the given type.
@@ -528,20 +578,13 @@ if (forcetk.Client === undefined) {
      * @param id the record's object ID
      * @param [fields=null] optional comma-separated list of fields for which 
      *               to return values; e.g. Name,Industry,TickerSymbol
-     * @param callback function to which response will be passed
-     * @param [error=null] function to which jqXHR will be passed in case of error
      */
-    forcetk.Client.prototype.retrieve = function (objtype, id, fieldlist, callback, error) {
+    retrieve(objtype, id, fieldlist) {
         'use strict';
-        if (arguments.length === 4) {
-            error = callback;
-            callback = fieldlist;
-            fieldlist = null;
-        }
         var fields = fieldlist ? '?fields=' + fieldlist : '';
         return this.ajax('/' + this.apiVersion + '/sobjects/' + objtype + '/' + id
-            + fields, callback, error);
-    };
+            + fields);
+    }
 
     /*
      * Upsert - creates or updates record of the given type, based on the 
@@ -552,14 +595,12 @@ if (forcetk.Client === undefined) {
      * @param fields an object containing field names and values for 
      *               the record, e.g. {:Name "salesforce.com", :TickerSymbol 
      *               "CRM"}
-     * @param callback function to which response will be passed
-     * @param [error=null] function to which jqXHR will be passed in case of error
      */
-    forcetk.Client.prototype.upsert = function (objtype, externalIdField, externalId, fields, callback, error) {
+    upsert(objtype, externalIdField, externalId, fields) {
         'use strict';
         return this.ajax('/' + this.apiVersion + '/sobjects/' + objtype + '/' + externalIdField + '/' + externalId
-            + '?_HttpMethod=PATCH', callback, error, "POST", JSON.stringify(fields));
-    };
+            + '?_HttpMethod=PATCH', "POST", JSON.stringify(fields));
+    }
 
     /*
      * Updates field values on a record of the given type.
@@ -568,53 +609,43 @@ if (forcetk.Client === undefined) {
      * @param fields an object containing initial field names and values for 
      *               the record, e.g. {:Name "salesforce.com", :TickerSymbol 
      *               "CRM"}
-     * @param callback function to which response will be passed
-     * @param [error=null] function to which jqXHR will be passed in case of error
      */
-    forcetk.Client.prototype.update = function (objtype, id, fields, callback, error) {
+    update(objtype, id, fields) {
         'use strict';
         return this.ajax('/' + this.apiVersion + '/sobjects/' + objtype + '/' + id
-            + '?_HttpMethod=PATCH', callback, error, "POST", JSON.stringify(fields));
-    };
+            + '?_HttpMethod=PATCH', "POST", JSON.stringify(fields));
+    }
 
     /*
      * Deletes a record of the given type. Unfortunately, 'delete' is a 
      * reserved word in JavaScript.
      * @param objtype object type; e.g. "Account"
      * @param id the record's object ID
-     * @param callback function to which response will be passed
-     * @param [error=null] function to which jqXHR will be passed in case of error
      */
-    forcetk.Client.prototype.del = function (objtype, id, callback, error) {
+    del(objtype, id) {
         'use strict';
-        return this.ajax('/' + this.apiVersion + '/sobjects/' + objtype + '/' + id,
-            callback, error, "DELETE");
-    };
+        return this.ajax('/' + this.apiVersion + '/sobjects/' + objtype + '/' + id, "DELETE");
+    }
 
     /*
      * Executes the specified SOQL query.
      * @param soql a string containing the query to execute - e.g. "SELECT Id, 
      *             Name from Account ORDER BY Name LIMIT 20"
-     * @param callback function to which response will be passed
-     * @param [error=null] function to which jqXHR will be passed in case of error
      */
-    forcetk.Client.prototype.query = function (soql, callback, error) {
+    query(soql) {
         'use strict';
-        return this.ajax('/' + this.apiVersion + '/query?q=' + encodeURIComponent(soql),
-            callback, error);
-    };
+        return this.ajax('/' + this.apiVersion + '/query?q=' + encodeURIComponent(soql));
+    }
 
     /*
      * Queries the next set of records based on pagination.
      * <p>This should be used if performing a query that retrieves more than can be returned
      * in accordance with http://www.salesforce.com/us/developer/docs/api_rest/Content/dome_query.htm</p>
-     * <p>Ex: forcetkClient.queryMore( successResponse.nextRecordsUrl, successHandler, failureHandler )</p>
+     * <p>Ex: forcetkClient.queryMore(successResponse.nextRecordsUrl, successHandler, failureHandler)</p>
      * 
      * @param url - the url retrieved from nextRecordsUrl or prevRecordsUrl
-     * @param callback function to which response will be passed
-     * @param [error=null] function to which jqXHR will be passed in case of error
      */
-    forcetk.Client.prototype.queryMore = function (url, callback, error) {
+    queryMore(url) {
         'use strict';
         //-- ajax call adds on services/data to the url call, so only send the url after
         var serviceData = "services/data",
@@ -624,19 +655,17 @@ if (forcetk.Client === undefined) {
             url = url.substr(index + serviceData.length);
         }
 
-        return this.ajax(url, callback, error);
-    };
+        return this.ajax(url);
+    }
 
     /*
      * Executes the specified SOSL search.
      * @param sosl a string containing the search to execute - e.g. "FIND 
      *             {needle}"
-     * @param callback function to which response will be passed
-     * @param [error=null] function to which jqXHR will be passed in case of error
      */
-    forcetk.Client.prototype.search = function (sosl, callback, error) {
+    search(sosl) {
         'use strict';
-        return this.ajax('/' + this.apiVersion + '/search?q=' + encodeURIComponent(sosl),
-            callback, error);
-    };
+        return this.ajax('/' + this.apiVersion + '/search?q=' + encodeURIComponent(sosl));
+    }
+
 }

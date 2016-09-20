@@ -24,6 +24,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+/*jslint browser: true, plusplus: true*/
+/*global alert, Promise, forcetk, JXON*/
+
 /* 
  * BulkTK: JavaScript library to wrap Force.com Bulk API. Extends ForceTK.
  * Dependencies:
@@ -40,74 +43,88 @@ forcetk.Client.prototype.xmlHeader = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
  * Low level utility function to call the Bulk API.
  * @param path resource path
  * @param parseXML set to true to parse XML response
- * @param callback function to which response will be passed
- * @param [error=null] function to which jqXHR will be passed in case of error
  * @param [method="GET"] HTTP method for call
  * @param [contentType=null] Content type of payload - e.g. 'application/xml; charset=UTF-8'
  * @param [payload=null] payload for POST
  * @param [parseXML=false] set to true to parse XML response
  */
-forcetk.Client.prototype.bulkAjax = function(path, parseXML, callback, error, method, contentType, payload, retry) {
-    var that = this;
-    var url = this.instanceUrl + path;
-    
+forcetk.Client.prototype.bulkAjax = function (path, parseXML, method, contentType, payload, retry) {
+    'use strict';
+
     if (this.debug) {
         console.log('bulkAjax sending: ', payload);
     }
-    
-    return $.ajax({
-        type: method || "GET",
-        async: this.asyncAjax,
-        url: (this.proxyUrl !== null) ? this.proxyUrl: url,
-        contentType: method == "DELETE"  ? null : contentType,
-        cache: false,
-        processData: false,
-        data: payload,
-        success: function(data, textStatus, jqXHR) {
-            var respContentType = jqXHR.getResponseHeader('Content-Type');
-            // Naughty Bulk API doesn't always set Content-Type!
-            if (parseXML && 
-                ((respContentType && respContentType.indexOf('application/xml') === 0) ||
-                data.indexOf('<?xml') === 0)) {
-                data = JXON.fromXML(data);
+
+    var that = this,
+        url = this.instanceUrl + path,
+        promise = new Promise(function (resolve, reject) {
+
+            method = method || 'GET';
+
+            var xhr = new XMLHttpRequest();
+
+            if (that.asyncAjax) {
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState === 4) {
+                        if (xhr.status > 199 && xhr.status < 300) {
+                            var respContentType = xhr.getResponseHeader('Content-Type'),
+                                data = xhr.responseText;
+                            // Naughty Bulk API doesn't always set Content-Type!
+                            if (parseXML &&
+                                    ((respContentType && respContentType.indexOf('application/xml') === 0) ||
+                                    data.indexOf('<?xml') === 0)) {
+                                data = JXON.fromXML(data);
+                            }
+                            resolve(data);
+                        } else if (xhr.status === 401 && that.refresh_token) {
+                            if (retry) {
+                                console.error(xhr.responseText);
+                                reject(xhr, xhr.statusText, xhr.response);
+                            } else {
+                                return that.refreshAccessToken()
+                                    .then(function (oauthResponse) {
+                                        that.setSessionToken(oauthResponse.access_token, null,
+                                            oauthResponse.instance_url);
+                                        return that.bulkAjax(path, parseXML, method, contentType, payload, true);
+                                    });
+                            }
+                        } else {
+                            console.error(xhr.responseText);
+                            reject(xhr, xhr.statusText, xhr.response);
+                        }
+                    }
+                };
             }
-            callback(data, textStatus, jqXHR);
-        },
-        error: (!that.refreshToken || retry ) ? error : function(jqXHR, textStatus, errorThrown) {
-            if (jqXHR.status === 401) {
-                that.refreshAccessToken(function(oauthResponse) {
-                    that.setSessionToken(oauthResponse.access_token, null,
-                    oauthResponse.instance_url);
-                    that.ajax(path, callback, error, method, payload, true);
-                },
-                error);
-            } else {
-                error(jqXHR, textStatus, errorThrown);
-            }
-        },
-        dataType: "text",
-        beforeSend: function(xhr) {
+
+            xhr.open(method, (that.proxyUrl !== null) ? that.proxyUrl : url, that.asyncAjax);
+            xhr.setRequestHeader('X-SFDC-Session', that.sessionId);
+            xhr.setRequestHeader('X-User-Agent', 'salesforce-toolkit-rest-javascript/' + that.apiVersion);
+            xhr.setRequestHeader("Content-Type", contentType);
             if (that.proxyUrl !== null) {
                 xhr.setRequestHeader('SalesforceProxy-Endpoint', url);
             }
-            xhr.setRequestHeader('X-SFDC-Session', that.sessionId);
-            xhr.setRequestHeader('X-User-Agent', 'salesforce-toolkit-rest-javascript/' + that.apiVersion);
-        }
-    });
+            xhr.send(payload);
+
+            if (!that.asyncAjax) {
+                resolve(xhr.responseText);
+            }
+        });
+
+    return promise;
 };
 
 /*
  * Creates a new Bulk API job.
  * @param job JobInfo structure - see Bulk API docs
- * @param callback function to which response will be passed
- * @param [error=null] function to which jqXHR will be passed in case of error
  */
-forcetk.Client.prototype.createJob = function(job, callback, error) {
+forcetk.Client.prototype.createJob = function (job) {
+    'use strict';
+
     job["@xmlns"] = "http://www.force.com/2009/06/asyncapi/dataload";
-    
+
     var xmlJob = this.xmlHeader + JXON.toXML(job, "jobInfo");
-    
-    return this.bulkAjax('/services/async/33.0/job', true, callback, error, 'POST', 'application/xml; charset=UTF-8', xmlJob);
+
+    return this.bulkAjax('/services/async/33.0/job', true, 'POST', 'application/xml; charset=UTF-8', xmlJob);
 };
 
 /*
@@ -115,99 +132,99 @@ forcetk.Client.prototype.createJob = function(job, callback, error) {
  * @param jobId Job ID
  * @param contentType Content type of data to be uploaded; e.g. "text/csv; charset=UTF-8"
  * @param data Blob, File, ArrayBuffer (Typed Array), or String payload
- * @param callback function to which response will be passed
- * @param [error=null] function to which jqXHR will be passed in case of error
  */
-forcetk.Client.prototype.addBatch = function(jobId, contentType, data, callback, error) {
-    return this.bulkAjax('/services/async/33.0/job/'+jobId+'/batch', true, callback, error, 'POST', contentType, data);
+forcetk.Client.prototype.addBatch = function (jobId, contentType, data) {
+    'use strict';
+
+    return this.bulkAjax('/services/async/33.0/job/' + jobId + '/batch', true, 'POST', contentType, data);
 };
 
 /*
  * Low level function to set job state.
  * @param jobId Job ID
  * @param state New state; e.g. "Closed"
- * @param callback function to which response will be passed
- * @param [error=null] function to which jqXHR will be passed in case of error
  */
-forcetk.Client.prototype.setJobState = function(jobId, state, callback, error) {
+forcetk.Client.prototype.setJobState = function (jobId, state) {
+    'use strict';
+
     var job = {
         "@xmlns" : "http://www.force.com/2009/06/asyncapi/dataload",
         state : state
-    };
+    },
+        xmlJob = this.xmlHeader + JXON.toXML(job, "jobInfo");
 
-    var xmlJob = this.xmlHeader + JXON.toXML(job, "jobInfo");
-    
     //console.log(xmlJob);
-    
-    return this.bulkAjax('/services/async/33.0/job/'+jobId, true, callback, error, 'POST', 'application/xml; charset=UTF-8', xmlJob);
+
+    return this.bulkAjax('/services/async/33.0/job/' + jobId, true, 'POST', 'application/xml; charset=UTF-8', xmlJob);
 };
 
 /*
  * Close a Bulk API job.
  * @param jobId Job ID
- * @param callback function to which response will be passed
- * @param [error=null] function to which jqXHR will be passed in case of error
  */
-forcetk.Client.prototype.closeJob = function(jobId, callback, error) {
-    return this.setJobState(jobId, 'Closed', callback, error, true);
+forcetk.Client.prototype.closeJob = function (jobId) {
+    'use strict';
+
+    return this.setJobState(jobId, 'Closed', true);
 };
 
 /*
  * Abort a Bulk API job.
  * @param jobId Job ID
- * @param callback function to which response will be passed
- * @param [error=null] function to which jqXHR will be passed in case of error
  */
-forcetk.Client.prototype.abortJob = function(jobId, callback, error) {
-    return this.setJobState(jobId, 'Aborted', callback, error, true);
+forcetk.Client.prototype.abortJob = function (jobId) {
+    'use strict';
+
+    return this.setJobState(jobId, 'Aborted', true);
 };
 
 /*
  * Get Bulk API job details.
  * @param jobId Job ID
- * @param callback function to which response will be passed
- * @param [error=null] function to which jqXHR will be passed in case of error
  */
-forcetk.Client.prototype.getJobDetails = function(jobId, callback, error) {
-    return this.bulkAjax('/services/async/33.0/job/'+jobId, true, callback, error);
+forcetk.Client.prototype.getJobDetails = function (jobId) {
+    'use strict';
+
+    return this.bulkAjax('/services/async/33.0/job/' + jobId, true);
 };
 
 /*
  * Get details for all the batches in a Bulk API job.
  * @param jobId Job ID
- * @param callback function to which response will be passed
- * @param [error=null] function to which jqXHR will be passed in case of error
  */
-forcetk.Client.prototype.getJobBatchDetails = function(jobId, callback, error) {
-    return this.bulkAjax('/services/async/33.0/job/'+jobId+'/batch', true, function(response){
-        // Ensure batchInfoList.batchInfo is always an array!
-        if (!(response.batchInfoList.batchInfo instanceof Array)) {
-            response.batchInfoList.batchInfo = [response.batchInfoList.batchInfo];
-        }
-        callback(response);
-    }, error);
+forcetk.Client.prototype.getJobBatchDetails = function (jobId) {
+    'use strict';
+
+    return this.bulkAjax('/services/async/33.0/job/' + jobId + '/batch', true)
+        .then(function (response) {
+            // Ensure batchInfoList.batchInfo is always an array!
+            if (!(response.batchInfoList.batchInfo instanceof Array)) {
+                response.batchInfoList.batchInfo = [response.batchInfoList.batchInfo];
+            }
+            return response;
+        });
 };
 
 /*
  * Get details for a Bulk API batch.
  * @param jobId Job ID
  * @param batchId Batch ID
- * @param callback function to which response will be passed
- * @param [error=null] function to which jqXHR will be passed in case of error
  */
-forcetk.Client.prototype.getBatchDetails = function(jobId, batchId, callback, error) {
-    return this.bulkAjax('/services/async/33.0/job/'+jobId+'/batch/'+batchId, true, callback, error);
+forcetk.Client.prototype.getBatchDetails = function (jobId, batchId) {
+    'use strict';
+
+    return this.bulkAjax('/services/async/33.0/job/' + jobId + '/batch/' + batchId, true);
 };
 
 /*
  * Get the request data for a Bulk API batch.
  * @param jobId Job ID
  * @param batchId Batch ID
- * @param callback function to which response will be passed
- * @param [error=null] function to which jqXHR will be passed in case of error
  */
-forcetk.Client.prototype.getBatchRequest = function(jobId, batchId, callback, error) {
-    return this.bulkAjax('/services/async/33.0/job/'+jobId+'/batch/'+batchId+'/request', false, callback, error);
+forcetk.Client.prototype.getBatchRequest = function (jobId, batchId) {
+    'use strict';
+
+    return this.bulkAjax('/services/async/33.0/job/' + jobId + '/batch/' + batchId + '/request', false);
 };
 
 /*
@@ -215,17 +232,18 @@ forcetk.Client.prototype.getBatchRequest = function(jobId, batchId, callback, er
  * @param jobId Job ID
  * @param batchId Batch ID
  * @param parseXML set to true to parse XML response
- * @param callback function to which response will be passed
- * @param [error=null] function to which jqXHR will be passed in case of error
  */
-forcetk.Client.prototype.getBatchResult = function(jobId, batchId, parseXML, callback, error) {
-    return this.bulkAjax('/services/async/33.0/job/'+jobId+'/batch/'+batchId+'/result', parseXML, function(response){
-        // Ensure result-list.result is always an array!
-        if (response['result-list'] && !(response['result-list'].result instanceof Array)) {
-            response['result-list'].result = [response['result-list'].result];
-        }
-        callback(response);
-    }, error);
+forcetk.Client.prototype.getBatchResult = function (jobId, batchId, parseXML) {
+    'use strict';
+
+    return this.bulkAjax('/services/async/33.0/job/' + jobId + '/batch/' + batchId + '/result', parseXML)
+        .then(function (response) {
+            // Ensure result-list.result is always an array!
+            if (response['result-list'] && !(response['result-list'].result instanceof Array)) {
+                response['result-list'].result = [response['result-list'].result];
+            }
+            return response;
+        });
 };
 
 /*
@@ -233,9 +251,9 @@ forcetk.Client.prototype.getBatchResult = function(jobId, batchId, parseXML, cal
  * @param jobId Job ID
  * @param batchId Batch ID
  * @param resultId Result ID
- * @param callback function to which response will be passed
- * @param [error=null] function to which jqXHR will be passed in case of error
  */
-forcetk.Client.prototype.getBulkQueryResult = function(jobId, batchId, resultId, callback, error) {
-    return this.bulkAjax('/services/async/33.0/job/'+jobId+'/batch/'+batchId+'/result/'+resultId, false, callback, error);
+forcetk.Client.prototype.getBulkQueryResult = function (jobId, batchId, resultId) {
+    'use strict';
+
+    return this.bulkAjax('/services/async/33.0/job/' + jobId + '/batch/' + batchId + '/result/' + resultId, false);
 };

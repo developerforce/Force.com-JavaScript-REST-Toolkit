@@ -81,6 +81,17 @@ if (forcetk.Client === undefined) {
     };
 
     /**
+     * Creates an AJAX request object. Can be overridden for particular implementations.
+     */
+    forcetk.Client.prototype.getXHR = function () {
+        if (window && window.Sarissa && window.Sarissa.originalXMLHttpRequest) {
+            return new window.Sarissa.originalXMLHttpRequest();
+        } else {
+            return new XMLHttpRequest();
+        }
+    };
+
+    /**
      * Set a refresh token in the client.
      * @param refreshToken an OAuth refresh token
      */
@@ -211,7 +222,7 @@ if (forcetk.Client === undefined) {
         'use strict';
         var that = this,
             url = (this.visualforce ? '' : this.instanceUrl) + path,
-            request = new XMLHttpRequest();
+            request = this.getXHR();
 
         request.open("GET", (this.proxyUrl !== null && !this.visualforce) ? this.proxyUrl : url, true);
         request.responseType = "arraybuffer";
@@ -290,10 +301,10 @@ if (forcetk.Client === undefined) {
                     + "Content-Disposition: form-data; name=\"" + payloadField
                     + "\"; filename=\"" + filename + "\"\n\n",
                 payload,
-                "\n\n"
+                "\n"
                     + "--boundary_" + boundary + "--"
             ], {type : 'multipart/form-data; boundary=\"boundary_' + boundary + '\"'}),
-            request = new XMLHttpRequest();
+            request = this.getXHR();
 
         request.open("POST", (this.proxyUrl !== null && !this.visualforce) ? this.proxyUrl : url, this.asyncAjax);
 

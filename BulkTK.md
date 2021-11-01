@@ -53,10 +53,12 @@ Create a job
         contentType : 'CSV'
     };
     
-    client.createJob(job, function(response) {
+    client.createJob(job)
+    .then(function(response) {
         jobId = response.jobInfo.id;
         console.log('Job created with id '+jobId+'\n');
-    }, function(jqXHR, textStatus, errorThrown) {
+    })
+    .catch(function(jqXHR, textStatus, errorThrown) {
         console.log('Error creating job', jqXHR.responseText);
     });          
 
@@ -69,10 +71,11 @@ You can add multiple batches to the job; each batch can contain up to 10,000 rec
                   "Tom,Jones,Marketing,1940-06-07Z,"Self-described as ""the top"" branding guru on the West Coast\n"+
                   "Ian,Dury,R&D,,"World-renowned expert in fuzzy logic design. Influential in technology purchases."\n";
 
-    client.addBatch(jobId, "text/csv; charset=UTF-8", csvData, 
-    function(response){
+    client.addBatch(jobId, "text/csv; charset=UTF-8", csvData)
+    .then(function(response){
         console.log('Added batch '+response.batchInfo.id+'. State: '+response.batchInfo.state+'\n');
-    }, function(jqXHR, textStatus, errorThrown) {
+    })
+    .catch(function(jqXHR, textStatus, errorThrown) {
         console.log('Error adding batch', jqXHR.responseText);
     });
 
@@ -83,18 +86,22 @@ Close the job
 
 You must close the job to inform Salesforce that no more batches will be submitted for the job.
 
-    client.closeJob(jobId, function(response){
+    client.closeJob(jobId)
+    .then(function(response){
         console.log('Job closed. State: '+response.jobInfo.state+'\n');
-    }, function(jqXHR, textStatus, errorThrown) {
+    })
+    .catch(function(jqXHR, textStatus, errorThrown) {
         console.log('Error closing job', jqXHR.responseText);
     });
 
 Check batch status
 ------------------
 
-    client.getBatchDetails(jobId, batchId, function(response){
+    client.getBatchDetails(jobId, batchId)
+    .then(function(response){
         console.log('Batch state: '+response.batchInfo.state+'\n');
-    }, function(jqXHR, textStatus, errorThrown) {
+    })
+    .catch(function(jqXHR, textStatus, errorThrown) {
         console.log('Error getting batch details', jqXHR.responseText);
     });
 
@@ -103,9 +110,10 @@ Get batch results
 
 Pass `true` as the `parseXML` parameter to get batch results for a query, false otherwise.
 
-    client.getBatchResult(jobId, batchId, false, function(response){
+    client.getBatchResult(jobId, batchId, false)
+    .then(function(response){
         console.log('Batch result: '+response);
-    }, function(jqXHR, textStatus, errorThrown) {
+    }).then(function(jqXHR, textStatus, errorThrown) {
         console.log('Error getting batch result', jqXHR.responseText);
     });
 
@@ -116,22 +124,28 @@ When adding a batch to a bulk query job, the `contentType` for the request must 
 
     var soql = 'SELECT Id, FirstName, LastName, Email FROM Contact';
 
-    client.addBatch(jobId, 'text/csv', soql, function(response){
+    client.addBatch(jobId, 'text/csv', soql)
+    .then(function(response){
         console.log('Batch state: '+response.batchInfo.state+'\n');
-    }, function(jqXHR, textStatus, errorThrown) {
+    })
+    .catch(function(jqXHR, textStatus, errorThrown) {
         console.log('Error getting batch result', jqXHR.responseText);
     });
 
 Getting bulk query results is a two step process. Call `getBatchResult()` with `parseXML` set to `true` to get a set of result IDs, then call `getBulkQueryResult()` to get the actual records for each result
 
-    client.getBatchResult(jobId, batchId, true, function(response){
+    client.getBatchResult(jobId, batchId, true)
+    .then(function(response){
         response['result-list'].result.forEach(function(resultId){
-            client.getBulkQueryResult(jobId, batchId, resultId, function(response){
+            client.getBulkQueryResult(jobId, batchId, resultId)
+            .then(function(response){
                 console.log('Batch result: '+response);
-            }, function(jqXHR, textStatus, errorThrown) {
+            })
+            .catch(function(jqXHR, textStatus, errorThrown) {
                 console.log('Error getting bulk query results', jqXHR.responseText);
             });
         });
-    }, function(jqXHR, textStatus, errorThrown) {
+    })
+    .catch(function(jqXHR, textStatus, errorThrown) {
         console.log('Error getting batch result', jqXHR.responseText);
     });

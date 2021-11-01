@@ -148,7 +148,8 @@ Sample Visualforce page for Force.com Bulk API JavaScript Toolkit
             }
             job.contentType = contentType;
             
-            client.createJob(job, function(response) {
+            client.createJob(job)
+            .then(function(response) {
                 batches = 0;
                 jobId = response.jobInfo.id;
                 $message.text('Job created with id '+jobId+'\n');
@@ -156,7 +157,8 @@ Sample Visualforce page for Force.com Bulk API JavaScript Toolkit
                 if (operation === 'query') {
                     $soql.val("SELECT Id FROM "+object);
                 }
-            }, showError);          
+            })
+            .catch(showError);          
         }
     
         function setQuery() {
@@ -165,47 +167,57 @@ Sample Visualforce page for Force.com Bulk API JavaScript Toolkit
                 ? "text/csv; charset=UTF-8" 
                 : "application/xml; charset=UTF-8";
             
-            client.addBatch(jobId, mimeType, soql, function(response){
+            client.addBatch(jobId, mimeType, soql)
+            .then(function(response){
                 batches++;
                 $message.append('Batch state: ',response.batchInfo.state+'\n');
                 $close.show();
-            }, showError);
+            })
+            .catch(showError);
         }
     
         function getJobDetails(client, jobId){
-            client.getJobDetails(jobId, function(response){
+            client.getJobDetails(jobId)
+            .then(function(response){
                 $message.append(response.jobInfo.numberRecordsProcessed+' records processed\n');
                 if ((response.jobInfo.numberBatchesCompleted + 
                      response.jobInfo.numberBatchesFailed) === batches) {
                     $message.append('Done!\n');
-                    client.getJobBatchDetails(jobId, function(response){
+                    client.getJobBatchDetails(jobId)
+                    .then(function(response){
                         response.batchInfoList.batchInfo.forEach(function(batch){
                             var batchId = batch.id;
-                            client.getBatchResult(jobId, batchId, (operation === 'query'), function(response){
+                            client.getBatchResult(jobId, batchId, (operation === 'query'))
+                            .then(function(response){
                                 $message.append('Batch result:\n');
                                 if (operation === 'query') {
                                     response['result-list'].result.forEach(function(result){
-                                        client.getBulkQueryResult(jobId, batchId, result, function(response){
+                                        client.getBulkQueryResult(jobId, batchId, result)
+                                        .then(function(response){
                                             $message.append('Query result:\n');
                                             var text = (contentType === 'CSV') ? response : vkbeautify.xml(response);
                                             $message.append(document.createTextNode(text));
                                             reset();
-                                        }, showError);
+                                        })
+                                        .catch(showError);
                                     });
                                 } else {
                                     var text = (contentType === 'CSV') ? response : vkbeautify.xml(response);
                                     $message.append(document.createTextNode(text));
                                     reset();
                                 }
-                            }, showError);
+                            })
+                            .catch(showError);
                         });
-                    }, showError);
+                    }).
+                    catch(showError);
                 } else {
                     setTimeout(function(){
                         getJobDetails(client, jobId);                   
                     }, 1000);
                 }
-            }, showError);
+            })
+            .catch(showError);
         }
 
         function upload() {
@@ -215,29 +227,34 @@ Sample Visualforce page for Force.com Bulk API JavaScript Toolkit
                 ? "text/csv; charset=UTF-8" 
                 : "application/xml; charset=UTF-8";
             
-            client.addBatch(jobId, mimeType,
-                            file, function(response){
+            client.addBatch(jobId, mimeType, file)
+            .then(function(response){
                 batches++;
                 $message.append('Batch state: ',response.batchInfo.state+'\n');
                 $close.show();
-            }, showError);
+            })
+            .catch(showError);
         }
     
         function closeJob() {
-            client.closeJob(jobId, function(response){
+            client.closeJob(jobId)
+            .then(function(response){
                 $message.append('Job state: '+response.jobInfo.state+'\n');
                 getJobDetails(client, jobId);
-            }, showError);
+            })
+            .catch(showError);
         }
     
         $(document).ready(function(){
-            client.describeGlobal(function(response){
+            client.describeGlobal()
+            .then(function(response){
                 $object.empty();
                 response.sobjects.forEach(function(sobject){
                     $object.append('<option value='+sobject.name+'>'+sobject.label+'</option>');
                 });
                 $object.val('Contact');
-            }, showError);
+            })
+            .catch(showError);
             
             $message     = $("#message");
             $operation   = $("#operation");

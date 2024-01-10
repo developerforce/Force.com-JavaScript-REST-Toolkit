@@ -1,3 +1,7 @@
+> [!WARNING]
+> This project is deprecated, use [JSforce](https://jsforce.github.io/) instead.
+
+
 Force.com JavaScript REST Toolkit
 =================================
 
